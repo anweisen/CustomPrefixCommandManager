@@ -66,12 +66,9 @@ public class CommandHandler {
 
     /**
      * Returns a list with all commands registered.
-     * Returns null when no commands are registered
      * @return a list with all commands
      */
     public Collection<GeneralCommand> getCommands() {
-
-        if (commands.isEmpty()) return null;
 
         Collection<GeneralCommand> commands = new ArrayList<>();
 
