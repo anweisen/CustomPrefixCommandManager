@@ -11,6 +11,6 @@ public enum CommandResult {
     INVALID_CHANNEL,
     PREFIX_NOT_USED,
     COMMAND_NOT_FOUND,
-    UNKNOWN;
+    SUCCESS;
 
 }

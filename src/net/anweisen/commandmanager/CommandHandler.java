@@ -106,9 +106,9 @@ public class CommandHandler {
             return CommandResult.INVALID_CHANNEL;
         }
 
-        CommandResult result = command.onCommand(new CommandEvent(prefix, commandName, event));
+        command.onCommand(new CommandEvent(prefix, commandName, event));
 
-        return result != null ? result : CommandResult.UNKNOWN;
+        return CommandResult.SUCCESS;
 
     }
 
