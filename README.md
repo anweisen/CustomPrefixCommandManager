@@ -52,7 +52,7 @@ If you are trying to access a PrivateCommand in a guild (or a GuildCommand in a 
 
 Using simple commands
 ```java
-class HelpCommand implements SimpleCommand {
+class ExampleCommand implements SimpleCommand {
   
   @Override
   public void onCommand(CommandEvent event) {
@@ -64,7 +64,7 @@ class HelpCommand implements SimpleCommand {
 
 Using advanced commands:
 ```java
-class BanCommand implements AdvancedGuildCommand {
+class ExampleCommand implements AdvancedCommand {
 
   @Override
   public CommandResult onCommand(CommandEvent event) {
@@ -75,6 +75,27 @@ class BanCommand implements AdvancedGuildCommand {
     OR
     return new CommandResult(ResultType.CLIENT_NO_PERMISSIONS, "No permissions!");
  
+  }
+
+}
+```
+
+**Using *CommandEvents*** <br>
+```java
+class ExampleCommand implements SimpleCommand {
+
+  @Override
+  public void onCommand(CommandEvent event) {
+    
+    if (event.getArgs().lenght >= 1 && event.getArg(0)) {
+      ...
+    }
+    OR
+    if (event.getMentionedMembers().isEmpty()) {
+      event.reply("Please use `" + event.getPrefix() + "ban <@User>`");
+      return;
+    }
+    
   }
 
 }
