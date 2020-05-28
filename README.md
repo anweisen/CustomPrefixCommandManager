@@ -12,8 +12,6 @@ You can simply instanciate a CommandHandler with *new CommandHandler()* <br>
 With *handler#registerCommand(new HelpCommand(), "help")* you can register a command. <br>
 You can also use *hanlder#registerCommand(new HelpCommand(), "help", "hilfe")* to register the command directly with aliases <br>
 You can use *handler#addAlias("help", "helpme", "justhelp")* to add 1 or more aliases to a command later on. <br>
-                               ^^^       ^^^^^^^^^^^^^^^^
-                  original command name   command alias(es)
 
 **Handleing events** <br>
 To fully activate the CommandHanlder, you need to use *handler#hanldeCommand(prefix, event)* in  a *MessageReceivedEvent*. <br>
