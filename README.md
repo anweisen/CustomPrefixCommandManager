@@ -33,7 +33,7 @@ If you want to send a *Command not found message*, you can use the following cod
 ```java
 public void onMessageReceived(MessageRecievedEvent event) {
   
-  CommandResult result = hanlder.hanldeCommand(..);
+  CommandResult result = hanlder.hanldeCommand(...);
   
   if (result.getType() == ResultType.COMMAND_NOT_FOUND) {
     //TODO Send command not found message
@@ -82,7 +82,7 @@ class ExampleCommand implements SimpleCommand {
   @Override
   public void onCommand(CommandEvent event) {
     
-    if (event.getArgs().lenght >= 1 && event.getArg(0)) {
+    if (event.getArgs().lenght >= 1 && event.getArg(0).equals(...)) {
       ...
     }
     OR
