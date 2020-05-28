@@ -8,14 +8,16 @@ package net.anweisen.commandmanager;
 
 public class CommandResult {
 
-    public static final CommandResult NORMAL_RESULT = new CommandResult(CommandResult.ResultType.SUCCESS);
+    public static final CommandResult NORMAL_RESULT = new CommandResult(ResultType.SUCCESS);
 
     public enum ResultType {
 
         INVALID_CHANNEL,
+        WEBHOOK_MESSAGE_NO_REACT,
         PREFIX_NOT_USED,
         COMMAND_NOT_FOUND,
         SUCCESS,
+        USER_SPECIFIED,
         UNKNOWN;
 
     }
@@ -30,17 +32,17 @@ public class CommandResult {
 
     public CommandResult(ResultType type) {
         this.type = type;
-        this.message = type.name();
+        this.message = "null";
     }
 
     public CommandResult(String message) {
-        this.type = ResultType.UNKNOWN;
+        this.type = ResultType.USER_SPECIFIED;
         this.message = message;
     }
 
     public CommandResult() {
         this.type = ResultType.UNKNOWN;
-        this.message = "Unknown";
+        this.message = "null";
     }
 
     public ResultType getType() {

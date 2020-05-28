@@ -7,6 +7,7 @@ import net.anweisen.commandmanager.commandtype.Command.AdvancedCommand.AdvancedP
 import net.anweisen.commandmanager.commandtype.Command.SimpleCommand;
 import net.anweisen.commandmanager.commandtype.Command.SimpleCommand.SimpleGuildCommand;
 import net.anweisen.commandmanager.commandtype.Command.SimpleCommand.SimplePrivateCommand;
+import net.anweisen.commandmanager.CommandResult.ResultType;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -22,6 +23,7 @@ import java.util.HashMap;
 
 public class CommandHandler {
 
+    private boolean reactToWebhooks = false;
     private HashMap<String, Command> commands;
 
     public CommandHandler() {
@@ -115,34 +117,42 @@ public class CommandHandler {
     }
 
     /**
+     * If it is going to execute an advanced command it'll return the command result the command returns.
+     * If the command returns null it'll return CommandResult.NORMAL_RESULT
+     * If a simple command is going to be executed, it'll return CommandResult.NORMAL_RESULT as well
+     * It will return
+     *    ResultType.COMMAND_NOT_FOUND if no command was found
+     *    ResultType.INVALID_CHANNEL if it was a guild command executed in a private chat (or a private command in a guild)
+     *    ResultType.PREFIX_NOT_USED if the prefix was not used ^^
+     *    ResultType.WEBHOOK_MESSAGE_NO_REACT if the command was triggered by a webhook and react to webhooks is disabled
+     *
      * @param prefix the prefix which should be in front of the command
      * @param event the command event the command was received
-     * @return the command result the command returns
      */
     public CommandResult handleCommand(String prefix, MessageReceivedEvent event) {
 
+        if (!reactToWebhooks && event.isWebhookMessage()) return new CommandResult(ResultType.WEBHOOK_MESSAGE_NO_REACT);
+
         String raw = event.getMessage().getContentRaw().toLowerCase();
 
-        if (!raw.startsWith(prefix)) return new CommandResult(CommandResult.ResultType.PREFIX_NOT_USED);
+        if (!raw.startsWith(prefix)) return new CommandResult(ResultType.PREFIX_NOT_USED);
 
         String commandName = raw.substring(prefix.length());
 
-        if (!commands.containsKey(commandName)) return new CommandResult(CommandResult.ResultType.COMMAND_NOT_FOUND);
+        if (!commands.containsKey(commandName)) return new CommandResult(ResultType.COMMAND_NOT_FOUND);
 
         Command command = commands.get(commandName);
 
         if ((command instanceof SimpleGuildCommand || command instanceof AdvancedGuildCommand) && !event.isFromGuild()) {
-            return new CommandResult(CommandResult.ResultType.INVALID_CHANNEL);
+            return new CommandResult(ResultType.INVALID_CHANNEL);
         } else if ((command instanceof SimplePrivateCommand || command instanceof AdvancedPrivateCommand) && event.isFromGuild()) {
-            return new CommandResult(CommandResult.ResultType.INVALID_CHANNEL);
+            return new CommandResult(ResultType.INVALID_CHANNEL);
         }
-
-        boolean advanced = command instanceof AdvancedCommand;
 
         CommandResult result = null;
         CommandEvent commandEvent = new CommandEvent(prefix, commandName, event);
 
-        if (advanced) {
+        if (command instanceof AdvancedCommand) {
             AdvancedCommand advancedCommand = (AdvancedCommand) command;
             result = advancedCommand.onCommand(commandEvent);
         } else {
@@ -156,6 +166,14 @@ public class CommandHandler {
 
     private boolean commandIsValid(Command command) {
         return (command instanceof SimpleCommand || command instanceof AdvancedCommand);
+    }
+
+    public void setReactToWebhooks(boolean react) {
+        this.reactToWebhooks = react;
+    }
+
+    public boolean shouldReactToWebhook() {
+        return reactToWebhooks;
     }
 
 }
