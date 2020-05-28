@@ -2,7 +2,7 @@
 ## A simple way to manage commands with custom prefix!
 
 ### Installation
-Download the CommandManager.jar file and add it as libary to your project. <br>
+Download the [CommandManager.jar](https://github.com/anweisen/CustomPrefixCommandManager/raw/master/out/artifacts/CommandManager_jar/CommandManager.jar) file and add it as libary to your project. <br>
 You will no longer need to import JDA, because it's already built-in. <br>
 The current built-in JDA version is **4.1.1_154** <br>
 
