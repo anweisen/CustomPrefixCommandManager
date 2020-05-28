@@ -1,8 +1,13 @@
 package net.anweisen.commandmanager;
 
-import net.anweisen.commandmanager.commandtype.GeneralCommand;
-import net.anweisen.commandmanager.commandtype.GeneralCommand.GuildCommand;
-import net.anweisen.commandmanager.commandtype.GeneralCommand.PrivateCommand;
+import net.anweisen.commandmanager.commandtype.Command;
+import net.anweisen.commandmanager.commandtype.Command.AdvancedCommand;
+import net.anweisen.commandmanager.commandtype.Command.AdvancedCommand.AdvancedGuildCommand;
+import net.anweisen.commandmanager.commandtype.Command.AdvancedCommand.AdvancedPrivateCommand;
+import net.anweisen.commandmanager.commandtype.Command.SimpleCommand;
+import net.anweisen.commandmanager.commandtype.Command.SimpleCommand.SimpleGuildCommand;
+import net.anweisen.commandmanager.commandtype.Command.SimpleCommand.SimplePrivateCommand;
+
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -17,7 +22,7 @@ import java.util.HashMap;
 
 public class CommandHandler {
 
-    private HashMap<String, GeneralCommand> commands;
+    private HashMap<String, Command> commands;
 
     public CommandHandler() {
 
@@ -27,19 +32,21 @@ public class CommandHandler {
 
 
     @Deprecated
-    public void registerCommand(String name, GeneralCommand command) {
+    public void registerCommand(String name, Command command) {
 
         if (name == null) throw new IllegalArgumentException("Command name cannot be null!");
         if (command == null) throw new IllegalArgumentException("Command cannot be null!");
+        if (!commandIsValid(command)) throw new IllegalArgumentException("The command is not simple and not advanced!");
 
         commands.put(name.toLowerCase(), command);
 
     }
 
-    public void registerCommand(GeneralCommand command, String... name) {
+    public void registerCommand(Command command, String... name) {
 
-        if (command == null) throw new IllegalArgumentException("Command cannot be null!");
         if (name == null) throw new IllegalArgumentException("Command name(s) cannot be null!");
+        if (command == null) throw new IllegalArgumentException("Command cannot be null!");
+        if (!commandIsValid(command)) throw new IllegalArgumentException("The command is not simple and not advanced command!");
 
         for (String currentCommandName : name) {
             commands.put(currentCommandName.toLowerCase(), command);
@@ -52,7 +59,7 @@ public class CommandHandler {
         if (commandName == null) throw new IllegalArgumentException("Command name cannot be null!");
         if (alias == null) throw new IllegalArgumentException("Alias cannot be null!");
 
-        GeneralCommand command;
+        Command command;
 
         if ((command = getCommand(commandName.toLowerCase())) == null) throw new IllegalStateException("No command registered :: " + commandName.toLowerCase());
 
@@ -82,7 +89,7 @@ public class CommandHandler {
      * @param name The command's name you are searching for
      * @return The command registered by the name. Returns null when no command is registered by the name
      */
-    public GeneralCommand getCommand(String name) {
+    public Command getCommand(String name) {
 
         if (name == null) throw new IllegalArgumentException("Command name cannot be null!");
 
@@ -97,9 +104,9 @@ public class CommandHandler {
      * It will return a empty list when there are no commands registered
      * @return a list with all commands
      */
-    public Collection<GeneralCommand> getCommands() {
+    public Collection<Command> getCommands() {
 
-        Collection<GeneralCommand> commands = new ArrayList<>();
+        Collection<Command> commands = new ArrayList<>();
 
         commands.addAll(this.commands.values());
 
@@ -116,24 +123,39 @@ public class CommandHandler {
 
         String raw = event.getMessage().getContentRaw().toLowerCase();
 
-        if (!raw.startsWith(prefix)) return CommandResult.PREFIX_NOT_USED;
+        if (!raw.startsWith(prefix)) return new CommandResult(CommandResult.ResultType.PREFIX_NOT_USED);
 
         String commandName = raw.substring(prefix.length());
 
-        if (!commands.containsKey(commandName)) return CommandResult.COMMAND_NOT_FOUND;
+        if (!commands.containsKey(commandName)) return new CommandResult(CommandResult.ResultType.COMMAND_NOT_FOUND);
 
-        GeneralCommand command = commands.get(commandName);
+        Command command = commands.get(commandName);
 
-        if (command instanceof GuildCommand && !event.isFromGuild()) {
-            return CommandResult.INVALID_CHANNEL;
-        } else if (command instanceof PrivateCommand && event.isFromGuild()) {
-            return CommandResult.INVALID_CHANNEL;
+        if ((command instanceof SimpleGuildCommand || command instanceof AdvancedGuildCommand) && !event.isFromGuild()) {
+            return new CommandResult(CommandResult.ResultType.INVALID_CHANNEL);
+        } else if ((command instanceof SimplePrivateCommand || command instanceof AdvancedPrivateCommand) && event.isFromGuild()) {
+            return new CommandResult(CommandResult.ResultType.INVALID_CHANNEL);
         }
 
-        command.onCommand(new CommandEvent(prefix, commandName, event));
+        boolean advanced = command instanceof AdvancedCommand;
 
-        return CommandResult.SUCCESS;
+        CommandResult result = null;
+        CommandEvent commandEvent = new CommandEvent(prefix, commandName, event);
 
+        if (advanced) {
+            AdvancedCommand advancedCommand = (AdvancedCommand) command;
+            result = advancedCommand.onCommand(commandEvent);
+        } else {
+            SimpleCommand simpleCommand = (SimpleCommand) command;
+            simpleCommand.onCommand(commandEvent);
+        }
+
+        return result != null ? result : CommandResult.NORMAL_RESULT;
+
+    }
+
+    private boolean commandIsValid(Command command) {
+        return (command instanceof SimpleCommand || command instanceof AdvancedCommand);
     }
 
 }
