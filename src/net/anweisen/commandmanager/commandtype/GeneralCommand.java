@@ -10,6 +10,10 @@ import net.anweisen.commandmanager.CommandEvent;
 
 public interface GeneralCommand {
 
+    public interface GuildCommand extends GeneralCommand { }
+
+    public interface PrivateCommand extends GeneralCommand { }
+
     void onCommand(CommandEvent event);
 
 }
