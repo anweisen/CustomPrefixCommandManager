@@ -1,8 +1,8 @@
 package net.anweisen.commandmanager;
 
 import net.anweisen.commandmanager.commandtype.GeneralCommand;
-import net.anweisen.commandmanager.commandtype.GuildCommand;
-import net.anweisen.commandmanager.commandtype.PrivateCommand;
+import net.anweisen.commandmanager.commandtype.GeneralCommand.GuildCommand;
+import net.anweisen.commandmanager.commandtype.GeneralCommand.PrivateCommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -25,20 +25,46 @@ public class CommandHandler {
 
     }
 
-    /**
-     * @param name the command's name
-     * @param command The command which should be executed by calling its name
-     */
+
+    @Deprecated
     public void registerCommand(String name, GeneralCommand command) {
+
+        if (name == null) throw new IllegalArgumentException("Command name cannot be null!");
+        if (command == null) throw new IllegalArgumentException("Command cannot be null!");
 
         commands.put(name.toLowerCase(), command);
 
     }
 
-    /**
-     * @param name The command's name which should be removed
-     */
+    public void registerCommand(GeneralCommand command, String... name) {
+
+        if (command == null) throw new IllegalArgumentException("Command cannot be null!");
+        if (name == null) throw new IllegalArgumentException("Command name(s) cannot be null!");
+
+        for (String currentCommandName : name) {
+            commands.put(currentCommandName.toLowerCase(), command);
+        }
+
+    }
+
+    public void addAlias(String commandName, String... alias) {
+
+        if (commandName == null) throw new IllegalArgumentException("Command name cannot be null!");
+        if (alias == null) throw new IllegalArgumentException("Alias cannot be null!");
+
+        GeneralCommand command;
+
+        if ((command = getCommand(commandName.toLowerCase())) == null) throw new IllegalStateException("No command registered :: " + commandName.toLowerCase());
+
+        for (String currentAlias : alias) {
+            commands.put(currentAlias, command);
+        }
+
+    }
+
     public void unregisterCommand(String name) {
+
+        if (name == null) throw new IllegalArgumentException("Command name cannot be null!");
 
         if (!commands.containsKey(name.toLowerCase()));
 
@@ -58,6 +84,8 @@ public class CommandHandler {
      */
     public GeneralCommand getCommand(String name) {
 
+        if (name == null) throw new IllegalArgumentException("Command name cannot be null!");
+
         if (!commands.containsKey(name.toLowerCase())) return null;
 
         return commands.get(name.toLowerCase());
@@ -66,15 +94,14 @@ public class CommandHandler {
 
     /**
      * Returns a list with all commands registered.
+     * It will return a empty list when there are no commands registered
      * @return a list with all commands
      */
     public Collection<GeneralCommand> getCommands() {
 
         Collection<GeneralCommand> commands = new ArrayList<>();
 
-        this.commands.values().forEach(currentCommand -> {
-            commands.add(currentCommand);
-        });
+        commands.addAll(this.commands.values());
 
         return commands;
 
