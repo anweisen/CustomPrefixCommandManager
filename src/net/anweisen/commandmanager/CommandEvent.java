@@ -1,8 +1,11 @@
 package net.anweisen.commandmanager;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.List;
 
 /**
  * @author anweisen
@@ -147,6 +150,26 @@ public class CommandEvent {
         getUser().openPrivateChannel().queue(channel -> {
             channel.sendMessage(sequence).queue();
         });
+    }
+
+    public List<Member> getMentionedMembers() {
+        return receivedEvent.getMessage().getMentionedMembers();
+    }
+
+    public List<TextChannel> getMentionedChannels() {
+        return receivedEvent.getMessage().getMentionedChannels();
+    }
+
+    public List<Role> getMentionedRoles() {
+        return receivedEvent.getMessage().getMentionedRoles();
+    }
+
+    public boolean senderHasPermission(Permission... permission) {
+        return receivedEvent.getMember().hasPermission(permission);
+    }
+
+    public String getArg(int i) {
+        return args[i];
     }
 
 }
