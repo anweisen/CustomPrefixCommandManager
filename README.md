@@ -69,18 +69,13 @@ class ExampleCommand implements AdvancedCommand {
   @Override
   public CommandResult onCommand(CommandEvent event) {
     ...
-    return new CommandResult(ResultType.CLIENT_NO_PERMISSIONS);
-    OR
     return new CommandResult("No permissions!");
-    OR
-    return new CommandResult(ResultType.CLIENT_NO_PERMISSIONS, "No permissions!");
- 
   }
 
 }
 ```
 
-**Using *CommandEvents*** <br>
+**Using CommandEvents** <br>
 ```java
 class ExampleCommand implements SimpleCommand {
 
