@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.anweisen</groupId>
-    <artifactId>CustomPrefixCommandManager</artifactId>
-    <version>1.0.3</version>
+    <artifactId>JDACommandManager</artifactId>
+    <version>1.1.4</version>
 
 
     <build>
