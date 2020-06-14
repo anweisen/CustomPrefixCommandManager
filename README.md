@@ -35,7 +35,7 @@ public void onMessageReceived(MessageRecievedEvent event) {
   
   CommandResult result = hanlder.hanldeCommand(...);
   
-  if (result.getType() == ResultType.COMMAND_NOT_FOUND) {
+  if (result == ResultType.COMMAND_NOT_FOUND) {
     //TODO Send command not found message
   }
   
@@ -48,11 +48,18 @@ There are different types of commands <br>
 - PrivateCommand (SimplePrivateCommand / AdvancedPrivateCommand)
 
 If you are trying to access a PrivateCommand in a guild (or a GuildCommand in a private chat) <br>
-*hanlder#handleCommand(...)* will return a CommandResult with the ResultType *INVALID_CHANNEL* and wont execute the command <br>
+*hanlder#handleCommand(...)* will return *CommandResult.INVALID_CHANNEL* and wont execute the command <br>
 
-Using simple commands
+**Using commands**
 ```java
-class ExampleCommand implements SimpleCommand {
+class ExampleCommand extends Command {
+  
+  public ExampleCommand() {
+    name = "test";
+    alias = {"t"};
+    type = GUILD;
+    reactToWebhooks = false;
+  }
   
   @Override
   public void onCommand(CommandEvent event) {
@@ -62,22 +69,13 @@ class ExampleCommand implements SimpleCommand {
 }
 ```
 
-Using advanced commands:
-```java
-class ExampleCommand implements AdvancedCommand {
-
-  @Override
-  public CommandResult onCommand(CommandEvent event) {
-    ...
-    return new CommandResult("No permissions!");
-  }
-
-}
-```
-
 **Using CommandEvents** <br>
 ```java
-class ExampleCommand implements SimpleCommand {
+class ExampleCommand extends Command {
+
+  public ExampleCommand() {
+    ...
+  }
 
   @Override
   public void onCommand(CommandEvent event) {
@@ -85,10 +83,9 @@ class ExampleCommand implements SimpleCommand {
     if (event.getArgs().lenght >= 1 && event.getArg(0).equals(...)) {
       ...
     }
-    OR
+    
     if (event.getMentionedMembers().isEmpty()) {
       event.reply("Please use `" + event.getPrefix() + "ban <@User>`");
-      return;
     }
     
   }
