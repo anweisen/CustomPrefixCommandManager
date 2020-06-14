@@ -1,34 +1,42 @@
 package net.anweisen.commandmanager.commandtype;
 
 import net.anweisen.commandmanager.CommandEvent;
-import net.anweisen.commandmanager.CommandResult;
 
 /**
  * @author anweisen
- * CommandManager developed on 05-25-2020
- * Website: www.anweisen.net
+ * CommandManager developed on 06-04-2020
+ * https://github.com/anweisen
  */
 
-public abstract interface Command {
+public abstract class Command {
 
-    public interface AdvancedCommand extends Command {
+	public enum CommandType {
+		GENERAL,
+		PRIVATE,
+		GUILD;
+	}
 
-        public interface AdvancedGuildCommand extends AdvancedCommand { }
+	protected String name;
+	protected String[] alias;
 
-        public interface AdvancedPrivateCommand extends AdvancedCommand { }
+	protected CommandType type = CommandType.GENERAL;
+	protected boolean reactToWebhooks = false;
 
-        CommandResult onCommand(CommandEvent event);
+	public abstract void onCommand(CommandEvent event);
 
-    }
+	public CommandType getType() {
+		return type;
+	}
 
-    public interface SimpleCommand extends Command {
+	public boolean shouldReactToWebhooks() {
+		return reactToWebhooks;
+	}
 
-        public interface SimpleGuildCommand extends SimpleCommand { }
+	public String getName() {
+		return name;
+	}
 
-        public interface SimplePrivateCommand extends SimpleCommand { }
-
-        void onCommand(CommandEvent event);
-
-    }
-
+	public String[] getAlias() {
+		return alias;
+	}
 }
