@@ -21,22 +21,27 @@ public abstract class Command {
 
 	protected CommandType type = CommandType.GENERAL;
 	protected boolean reactToWebhooks = false;
+	protected boolean reactToBots = false;
 
 	public abstract void onCommand(CommandEvent event);
 
-	public CommandType getType() {
+	public final CommandType getType() {
 		return type;
 	}
 
-	public boolean shouldReactToWebhooks() {
+	public final boolean shouldReactToWebhooks() {
 		return reactToWebhooks;
 	}
 
-	public String getName() {
+	public final boolean shouldReactToBots() {
+		return reactToBots;
+	}
+
+	public final String getName() {
 		return name;
 	}
 
-	public String[] getAlias() {
+	public final String[] getAlias() {
 		return alias;
 	}
 }
