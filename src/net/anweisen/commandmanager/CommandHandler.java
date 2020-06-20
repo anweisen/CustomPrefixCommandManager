@@ -34,21 +34,18 @@ public class CommandHandler {
 
     }
 
-    /**
-     * @throws IllegalArgumentException if the command is null
-     */
     public void registerCommand(Command command) {
-
-        if (command == null) throw new IllegalArgumentException("Command cannot be null!");
-
         commands.add(command);
+    }
 
+    public void registerCommands(Command... commands) {
+        for (Command currentCommand : commands) {
+            registerCommand(currentCommand);
+        }
     }
 
     public void unregisterAllCommands() {
-
         commands.clear();
-
     }
 
     /**
