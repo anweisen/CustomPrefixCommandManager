@@ -3,15 +3,12 @@
 
 ### Installation
 Download the [CommandManager.jar](https://github.com/anweisen/CustomPrefixCommandManager/raw/master/out/artifacts/CommandManager_jar/CommandManager.jar) file and add it as libary to your project. <br>
-You will no longer need to import JDA, because it's already built-in. <br>
-The current built-in JDA version is **4.1.1_154** <br>
+But make sure that you have jda imported as well <br>
 
 ### Using
 **Adding commands** <br>
 You can simply instanciate a CommandHandler with *new CommandHandler()* <br>
-With *handler#registerCommand(new HelpCommand(), "help")* you can register a command. <br>
-You can also use *hanlder#registerCommand(new HelpCommand(), "help", "hilfe")* to register the command directly with aliases <br>
-You can use *handler#addAlias("help", "helpme", "justhelp")* to add 1 or more aliases to a command later on. <br>
+With *handler.registerCommands(new HelpCommand())* you can register a command. <br>
 
 **Handleing events** <br>
 To fully activate the CommandHanlder, you need to use *handler#hanldeCommand(prefix, event)* in  a *MessageReceivedEvent*. <br>
@@ -22,7 +19,7 @@ public void onMessageReceived(MessageReceivedEvent event) {
   String prefix = "!";
   
   if (event.isFromGuild()) {
-    prefix = PrefixManager.getGuildPrefix(event.getGuild());
+    prefix = PrefixManager.getPrefix(event.getGuild());
   }
   
   handler.handleCommand(prefix, event);
@@ -43,22 +40,20 @@ public void onMessageReceived(MessageRecievedEvent event) {
 ```
 
 **Defineing commands** <br>
-There are different types of commands <br>
-- GuildCommand (SimpleGuildCommand / AdvancedGuildCommand)
-- PrivateCommand (SimplePrivateCommand / AdvancedPrivateCommand)
+There are some variables you should know:
+- Command name: The commandname?
+- Alias: Extra command names you can use to access the command
+- CommandType: GENERAL - You can access the command everywhere; GUILD - You can only use the command in a guild; PRIVATE - You can only use the command in the private chat with   the bot
+- ProccessInNewThread: This will start an extra thread to process the command in
+- ReactToMentionPrefix: The command will also be excecuted when you use @Bot as prefix. You can use; You can set a default value with Command.REACT_TO_MENTION_PREFIX_DEFAULT = true;
 
-If you are trying to access a PrivateCommand in a guild (or a GuildCommand in a private chat) <br>
-*hanlder#handleCommand(...)* will return *CommandResult.INVALID_CHANNEL* and wont execute the command <br>
 
-**Using commands**
+**Using commands** <br>
 ```java
 class ExampleCommand extends Command {
   
   public ExampleCommand() {
-    name = "test";
-    alias = {"t"};
-    type = GUILD;
-    reactToWebhooks = false;
+    super("command name", commandyType, processInNewThread, reactToMentionPrefix, "alias1", "alias2", "alias...");
   }
   
   @Override
@@ -85,10 +80,13 @@ class ExampleCommand extends Command {
     }
     
     if (event.getMentionedMembers().isEmpty()) {
-      event.reply("Please use `" + event.getPrefix() + "ban <@User>`");
+      event.queueReply("Please use `" + event.getPrefix() + "ban <@User>`");
     }
     
   }
 
 }
 ```
+
+**EventHandler Annotation and Listener interface** <br>
+You can implement *ListenerAdapter* (JDA ListenerAdapter as interface lol) and override the methods or you can implement *Listener* and use the *@EventHandler* annotation to annotate a listener method. <br> You still have to register them in the JDA.
