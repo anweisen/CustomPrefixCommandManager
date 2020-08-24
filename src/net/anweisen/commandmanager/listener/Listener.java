@@ -29,9 +29,7 @@ public interface Listener extends EventListener {
 					try {
 						currentMethod.setAccessible(true);
 						currentMethod.invoke(this, event);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
+					} catch (Exception ignored) { }
 
 				}
 			}
@@ -40,9 +38,8 @@ public interface Listener extends EventListener {
 
 	}
 
-	public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
-		final List<Method> methods = new ArrayList<>();
-		Class<?> clazz = type;
+	public static List<Method> getMethodsAnnotatedWith(Class<?> clazz, final Class<? extends Annotation> annotation) {
+		List<Method> methods = new ArrayList<>();
 		while (clazz != Object.class) {
 			for (final Method method : clazz.getDeclaredMethods()) {
 				if (method.isAnnotationPresent(annotation)) {
