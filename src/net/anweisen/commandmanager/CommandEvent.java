@@ -105,7 +105,7 @@ public class CommandEvent {
 	}
 
 	public String getMemberID() {
-		return receivedEvent.getMember().getId();
+		return receivedEvent.getAuthor().getId();
 	}
 
 	public String getMemberAvatarURL() {
@@ -161,7 +161,11 @@ public class CommandEvent {
 	}
 
 	public List<Member> getMentionedMembers() {
-		return receivedEvent.getMessage().getMentionedMembers();
+		List<Member> mentioned = receivedEvent.getMessage().getMentionedMembers();
+		try {
+			mentioned.remove(receivedEvent.getGuild().getSelfMember());
+		} catch (Throwable ignored) { }
+		return mentioned;
 	}
 
 	public List<TextChannel> getMentionedChannels() {
@@ -178,6 +182,64 @@ public class CommandEvent {
 
 	public String getArg(int i) {
 		return args[i];
+	}
+
+	public String getArgsAsString(int startIndex, int endIndex) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = startIndex; i < endIndex; i++) {
+			builder.append(args[i] + " ");
+		}
+		return builder.toString().trim();
+	}
+
+	public String getArgsAsString(int startIndex) {
+		return getArgsAsString(startIndex, args.length);
+	}
+
+	public String getArgsAsString() {
+		return getArgsAsString(0);
+	}
+
+	public static boolean containsMention(String text) {
+
+		char[] goal = "<@!nnnnnnnnnnnnnnnnnn>".toCharArray();
+		int current = 0;
+		for (char currentChar : text.toCharArray()) {
+
+			boolean isInMention = false;
+			char expected = goal[current];
+
+			if (currentChar == expected) {
+				isInMention = true;
+			} else if (expected == 'n') {
+				try {
+					Integer.parseInt(String.valueOf(current));
+					isInMention = true;
+				} catch (NumberFormatException ignored) { }
+			}
+
+			if (isInMention) {
+				current++;
+			} else {
+				current = 0;
+			}
+
+			if (current == goal.length) return true;
+
+		}
+
+		return false;
+
+	}
+
+	public static String syntax(CommandEvent event, String syntax) {
+		return syntax(event, syntax, true);
+	}
+
+	public static String syntax(CommandEvent event, String syntax, boolean command) {
+		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;
+		boolean mark = !containsMention(message);
+		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
 	}
 
 }
