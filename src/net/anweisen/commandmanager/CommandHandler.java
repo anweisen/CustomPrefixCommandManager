@@ -1,6 +1,5 @@
 package net.anweisen.commandmanager;
 
-import net.anweisen.commandmanager.commands.Command.CommandType;
 import net.anweisen.commandmanager.commands.ICommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -24,15 +23,6 @@ public class CommandHandler {
 	private MessageReactionBehavior reactToWebhooks = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
 	private MessageReactionBehavior reactToBots = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
 	private final ArrayList<ICommand> commands = new ArrayList<>();
-	private final String mention;
-
-	public CommandHandler() {
-		mention = null;
-	}
-
-	public CommandHandler(String botID) {
-		this.mention = "<@!" + botID + ">";
-	}
 
 	public void registerCommand(ICommand command) {
 		commands.add(command);
@@ -53,17 +43,31 @@ public class CommandHandler {
 	 */
 	public ICommand getCommand(String name) {
 
+		name = name.toLowerCase();
+
 		for (ICommand currentCommand : commands) {
+
 			if (currentCommand.getName() == null) continue;
-			if (name.toLowerCase().startsWith(currentCommand.getName().toLowerCase())) return currentCommand;
+			if (correctName(name, currentCommand.getName())) return currentCommand;
+
 			if (currentCommand.getAlias() == null) continue;
 			for (String currentAlias : currentCommand.getAlias()) {
-				if (name.toLowerCase().startsWith(currentAlias.toLowerCase())) return currentCommand;
+				if (correctName(name, currentAlias)) return currentCommand;
 			}
 		}
 
 		return null;
 
+	}
+
+	private boolean correctName(String query, String current) {
+		if (!query.startsWith(current.toLowerCase())) {
+			return false;
+		} else {
+			int endIndex = current.length();
+			String after = query.substring(endIndex);
+			return after.isEmpty() || after.startsWith(" ");
+		}
 	}
 
 	private String getCommandName(ICommand command, String raw) {
@@ -88,19 +92,23 @@ public class CommandHandler {
 	/**
 	 * Returns a list with all commands registered.
 	 * It will return a empty list when there are no commands registered
-	 * @return a list with all commands
+	 * @return a copy of the list with all commands
 	 */
 	public ArrayList<ICommand> getCommands() {
 		return new ArrayList<>(this.commands);
 	}
 
 	/**
+	 * @see net.anweisen.commandmanager.CommandResult
 	 * @return returns
-	 *    CommandResult.COMMAND_NOT_FOUND if no command was found
-	 *    CommandResult.INVALID_CHANNEL_GUILD_COMMAND if a guild command was triggered in a private channel
-	 *    CommandResult.INVALID_CHANNEL_PRIVATE_COMMAND if a private command was triggered in a guild channel
-	 *    CommandResult.PREFIX_NOT_USED if the prefix was not used ^^
-	 *    CommandResult.WEBHOOK_MESSAGE_NO_REACT if the command was triggered by a webhook and react to webhooks is disabled
+	 * - INVALID_CHANNEL_PRIVATE_COMMAND the command was a private command and was performed in a guild chat <br>
+	 * - INVALID_CHANNEL_GUILD_COMMAND the command was a guild command and was performed in a private chat <br>
+	 * - WEBHOOK_MESSAGE_NO_REACT the message came from a webhook, and the command should not react <br>
+	 * - BOT_MESSAGE_NO_REACT the message came from a bot, and the command should not react <br>
+	 * - PREFIX_NOT_USED given prefix and mention prefix was not used <br>
+	 * - MENTION_PREFIX_NO_REACT the mention prefix was used, but the command should not react <br>
+	 * - COMMAND_NOT_FOUND if there was not command with the given name <br>
+	 * - SUCCESS if the command was executed <br>
 	 *
 	 * @param prefix the prefix which should be in front of the command
 	 * @param event the command event the command was received
@@ -109,9 +117,10 @@ public class CommandHandler {
 
 		String raw = event.getMessage().getContentRaw().toLowerCase().trim();
 		boolean byMention = false;
+		String mention = mention(event);
 
 		if (!raw.startsWith(prefix)) {
-			if (mention != null && raw.startsWith(mention)) {
+			if (raw.startsWith(mention)) {
 				prefix = mention;
 				byMention = true;
 			} else {
@@ -149,6 +158,10 @@ public class CommandHandler {
 
 	}
 
+	private String mention(MessageReceivedEvent event) {
+		return "<@!" + event.getJDA().getSelfUser().getId() + ">";
+	}
+
 	public void setWebhookMessageBehavior(MessageReactionBehavior behavior) {
 		this.reactToWebhooks = behavior;
 	}
@@ -166,9 +179,9 @@ public class CommandHandler {
 	}
 
 	public static final ThreadGroup THREAD_GROUP = new ThreadGroup("CommandProcessGroup");
-	public static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
+	private static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
 
-	public static void process(ICommand command, CommandEvent event) {
+	private static void process(ICommand command, CommandEvent event) {
 		if (!command.shouldProcessInNewThread()) {
 			command.onCommand(event);
 		} else {
