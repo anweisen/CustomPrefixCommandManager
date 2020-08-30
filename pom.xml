@@ -6,8 +6,7 @@
 
     <groupId>net.anweisen</groupId>
     <artifactId>JDACommandManager</artifactId>
-    <version>1.1.5</version>
-
+    <version>1.2.1</version>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -23,13 +22,17 @@
         </plugins>
     </build>
     <repositories>
+
         <repository>
             <id>jcenter</id>
             <name>jcenter-bintray</name>
             <url>https://jcenter.bintray.com</url>
         </repository>
+
     </repositories>
+
     <dependencies>
+
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
@@ -41,5 +44,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
     </dependencies>
+
 </project>
