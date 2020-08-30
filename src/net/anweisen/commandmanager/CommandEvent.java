@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * @author anweisen
  * Challenges developed on 07-12-2020
  * https://github.com/anweisen
+ * @author anweisen
  */
 
 public class CommandEvent {

@@ -7,10 +7,10 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 
 /**
- * @author anweisen
  * Challenges developed on 07-12-2020
  * https://github.com/anweisen
  */
+ * @author anweisen
 
 public class CommandHandler {
 

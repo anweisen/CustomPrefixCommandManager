@@ -1,12 +1,13 @@
 package net.anweisen.commandmanager.commands;
 
 import net.anweisen.commandmanager.CommandEvent;
-import net.anweisen.commandmanager.commands.Command.CommandType;
+import net.anweisen.commandmanager.CommandType;
 
 /**
- * @author anweisen
  * Challenges developed on 07-12-2020
  * https://github.com/anweisen
+ * @author anweisen
+ * @since 1.2
  */
 
 public interface ICommand {

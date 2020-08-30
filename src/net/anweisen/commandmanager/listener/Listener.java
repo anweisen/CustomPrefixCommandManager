@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author anweisen
  * CommandManager developed on 08-01-2020
  * https://github.com/anweisen
+ * @author anweisen
+ * @since 1.2
  */
 
 public interface Listener extends EventListener {

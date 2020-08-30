@@ -6,9 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author anweisen
  * CommandManager developed on 08-01-2020
  * https://github.com/anweisen
+ * @author anweisen
+ * @since 1.2
  */
 
 @Target(ElementType.METHOD)

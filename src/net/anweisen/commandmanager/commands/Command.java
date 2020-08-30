@@ -1,22 +1,16 @@
 package net.anweisen.commandmanager.commands;
 
 import net.anweisen.commandmanager.CommandEvent;
+import net.anweisen.commandmanager.CommandType;
 
 /**
- * @author anweisen
  * Challenges developed on 07-12-2020
  * https://github.com/anweisen
+ * @author anweisen
+ * @since 1.2
  */
 
 public abstract class Command implements ICommand {
-
-	public enum CommandType {
-		GENERAL,
-		PRIVATE,
-		GUILD;
-	}
-
-	public static boolean REACT_TO_MENTION_PREFIX_DEFAULT = true;
 
 	public Command(String name, String... alias) {
 		this(name, false, alias);
@@ -56,13 +50,23 @@ public abstract class Command implements ICommand {
 	private CommandType type = CommandType.GENERAL;
 	private boolean reactToWebhooks = false;
 	private boolean reactToBots = false;
-	private boolean reactToMentionPrefix = REACT_TO_MENTION_PREFIX_DEFAULT;
+	private boolean reactToMentionPrefix = false;
 
 	public abstract void onCommand(CommandEvent event);
 
 	@Override
 	public final CommandType getType() {
 		return type;
+	}
+
+	@Override
+	public final String[] getAlias() {
+		return alias;
+	}
+
+	@Override
+	public final String getName() {
+		return name;
 	}
 
 	@Override
@@ -76,23 +80,13 @@ public abstract class Command implements ICommand {
 	}
 
 	@Override
-	public boolean shouldProcessInNewThread() {
+	public final boolean shouldProcessInNewThread() {
 		return processInNewThread;
 	}
 
 	@Override
-	public boolean shouldReactToMentionPrefix() {
+	public final boolean shouldReactToMentionPrefix() {
 		return reactToMentionPrefix;
-	}
-
-	@Override
-	public final String getName() {
-		return name;
-	}
-
-	@Override
-	public final String[] getAlias() {
-		return alias;
 	}
 
 }
