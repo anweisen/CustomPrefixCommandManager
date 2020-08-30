@@ -1,5 +1,6 @@
 package net.anweisen.commandmanager.listener;
 
+import net.anweisen.commandmanager.exceptions.ListenerException;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
@@ -30,7 +31,9 @@ public interface Listener extends EventListener {
 					try {
 						currentMethod.setAccessible(true);
 						currentMethod.invoke(this, event);
-					} catch (Exception ignored) { }
+					} catch (Throwable ex) {
+						throw new ListenerException(ex.getCause());
+					}
 
 				}
 			}
