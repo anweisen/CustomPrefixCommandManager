@@ -1,8 +1,18 @@
 package net.anweisen.commandmanager;
+
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 /**
- * @author anweisen
- * Challenges developed on 07-12-2020
- * https://github.com/anweisen
+ * Developed in the CommandManager project
+ * on 08-30-2020
+ *
+ * {@link CommandHandler#handleCommand(String, MessageReceivedEvent)}
+ * returns one enum state of this enum, depending on how the command process went
+ *
+ * @see CommandHandler#handleCommand(String, MessageReceivedEvent)
+ *
+ * @author anweisen | https://github.com/anweisen
+ * @since 1.1
  */
 
 public enum CommandResult {

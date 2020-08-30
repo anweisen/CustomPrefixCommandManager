@@ -7,9 +7,11 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 
 /**
- * Challenges developed on 07-12-2020
- * https://github.com/anweisen
- * @author anweisen
+ * Developed in the CommandManager project
+ * on 08-30-2020
+ *
+ * @author anweisen | https://github.com/anweisen
+ * @since 1.0
  */
 
 public class CommandHandler {
@@ -111,7 +113,7 @@ public class CommandHandler {
 	 * - SUCCESS if the command was executed <br>
 	 *
 	 * @param prefix the prefix which should be in front of the command
-	 * @param event the command event the command was received
+	 * @param event the {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent} the command was received
 	 */
 	public CommandResult handleCommand(String prefix, MessageReceivedEvent event) {
 

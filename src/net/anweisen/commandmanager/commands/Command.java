@@ -4,8 +4,9 @@ import net.anweisen.commandmanager.CommandEvent;
 import net.anweisen.commandmanager.CommandType;
 
 /**
- * Challenges developed on 07-12-2020
- * https://github.com/anweisen
+ * Developed in the CommandManager project
+ * on 07-12-2020
+ *
  * @author anweisen
  * @since 1.2
  */

@@ -7,10 +7,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * CommandManager developed on 08-23-2020
- * https://github.com/anweisen
+ * Developed in the CommandManager project
+ * on 08-23-2020
+ *
  * @author anweisen
- * @since 1.2.0
+ * @since 1.2
  */
 
 public final class DefaultMessageListener implements Listener {

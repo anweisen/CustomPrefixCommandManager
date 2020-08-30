@@ -10,8 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * CommandManager developed on 08-30-2020
- * https://github.com/anweisen
+ * Developed in the CommandManager project
+ * on 08-30-2020
+ *
  * @author anweisen
  * @since 1.2.1
  */
@@ -55,6 +56,7 @@ public final class DefaultBuilder {
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public static List<GatewayIntent> allIntents() {
 		return Arrays.asList(GatewayIntent.values());
 	}
