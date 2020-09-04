@@ -1,7 +1,7 @@
 package net.anweisen.commandmanager.defaults;
 
-import net.anweisen.commandmanager.utils.loader.ConfigLoader;
-import net.anweisen.commandmanager.utils.loader.NamedValue;
+import net.anweisen.config.ConfigLoader;
+import net.anweisen.config.NamedValue;
 
 import java.io.IOException;
 
@@ -30,6 +30,10 @@ public final class DefaultConfigLoader extends ConfigLoader {
 			return new NamedValue("HOST", "127.0.0.1");
 		}
 
+		public static NamedValue port() {
+			return new NamedValue("PORT", "3306");
+		}
+
 		public static NamedValue password() {
 			return new NamedValue("PASSWORD", "secret");
 		}
@@ -42,6 +46,7 @@ public final class DefaultConfigLoader extends ConfigLoader {
 			return new NamedValue[] {
 				token(),
 				host(),
+				port(),
 				database(),
 				user(),
 				password()
@@ -54,7 +59,7 @@ public final class DefaultConfigLoader extends ConfigLoader {
 		try {
 			return new DefaultConfigLoader();
 		} catch (IOException ex) {
-			throw new RuntimeException(ex);
+			throw new NullPointerException(ex.getMessage());
 		}
 	}
 
@@ -62,36 +67,40 @@ public final class DefaultConfigLoader extends ConfigLoader {
 		try {
 			return new DefaultConfigLoader(path);
 		} catch (IOException ex) {
-			throw new RuntimeException(ex);
+			throw new NullPointerException(ex.getMessage());
 		}
 	}
 
-	private DefaultConfigLoader() throws IOException {
+	public DefaultConfigLoader() throws IOException {
 		this("config");
 	}
 
-	private DefaultConfigLoader(String path) throws IOException {
+	public DefaultConfigLoader(String path) throws IOException {
 		super(path, DefaultNamedValue.all());
 	}
 
 	public String getToken() {
-		return get("TOKEN");
+		return getString("TOKEN");
 	}
 
 	public String getUser() {
-		return get("USER");
+		return getString("USER");
 	}
 
 	public String getHost() {
-		return get("HOST");
+		return getString("HOST");
 	}
 
 	public String getPassword() {
-		return get("PASSWORD");
+		return getString("PASSWORD");
 	}
 
 	public String getDatabase() {
-		return get("DATABASE");
+		return getString("DATABASE");
+	}
+
+	public int getPort() {
+		return getInt("PORT");
 	}
 
 }
