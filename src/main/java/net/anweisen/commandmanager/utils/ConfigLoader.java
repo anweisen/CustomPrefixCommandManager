@@ -17,7 +17,7 @@ import java.util.Properties;
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */
-public class ConfigLoader {
+public class ConfigLoader implements Bindable {
 
 	public static ConfigLoader withoutException(String path, NamedValue... values) {
 		try {

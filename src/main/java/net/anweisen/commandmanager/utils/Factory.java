@@ -1,5 +1,7 @@
 package net.anweisen.commandmanager.utils;
 
+import javax.annotation.Nonnull;
+
 /**
  * Developed in the CommandManager project
  * on 08-30-2020
@@ -10,6 +12,7 @@ package net.anweisen.commandmanager.utils;
 @FunctionalInterface
 public interface Factory<R, P> {
 
+	@Nonnull
 	R get(P p);
 
 }
