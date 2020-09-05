@@ -3,6 +3,7 @@ package net.anweisen.commandmanager;
 import net.anweisen.commandmanager.commands.ICommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import javax.annotation.Nonnull;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,11 +106,11 @@ public class CommandHandler {
 	 * @param event the {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent} the command was received
 	 * @see net.anweisen.commandmanager.CommandResult
 	 * @return returns
-	 * - INVALID_CHANNEL_PRIVATE_COMMAND the command was a private command and was performed in a guild chat <br>
-	 * - INVALID_CHANNEL_GUILD_COMMAND the command was a guild command and was performed in a private chat <br>
-	 * - WEBHOOK_MESSAGE_NO_REACT the message came from a webhook, and the command should not react <br>
-	 * - BOT_MESSAGE_NO_REACT the message came from a bot, and the command should not react <br>
-	 * - PREFIX_NOT_USED given prefix and mention prefix was not used <br>
+	 * - INVALID_CHANNEL_PRIVATE_COMMAND if the command was a private command and was performed in a guild chat <br>
+	 * - INVALID_CHANNEL_GUILD_COMMAND if the command was a guild command and was performed in a private chat <br>
+	 * - WEBHOOK_MESSAGE_NO_REACT if the message came from a webhook, and the command should not react <br>
+	 * - BOT_MESSAGE_NO_REACT if the message came from a bot, and the command should not react <br>
+	 * - PREFIX_NOT_USED if the given prefix and mention prefix was not used <br>
 	 * - MENTION_PREFIX_NO_REACT the mention prefix was used, but the command should not react <br>
 	 * - COMMAND_NOT_FOUND if there was not command with the given name <br>
 	 * - SUCCESS if the command was executed <br>
@@ -161,7 +162,7 @@ public class CommandHandler {
 	}
 
 	private String mention(MessageReceivedEvent event) {
-		return "<@!" + event.getJDA().getSelfUser().getId() + ">";
+		return event.getJDA().getSelfUser().getAsMention();
 	}
 
 	public void setWebhookMessageBehavior(MessageReactionBehavior behavior) {
@@ -183,14 +184,18 @@ public class CommandHandler {
 	public static final ThreadGroup THREAD_GROUP = new ThreadGroup("CommandProcessGroup");
 	private static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
 
-	private static void process(ICommand command, CommandEvent event) {
+	private static void process(@Nonnull ICommand command, @Nonnull CommandEvent event) {
 		if (!command.shouldProcessInNewThread()) {
-			command.onCommand(event);
+			execute(command, event);
 		} else {
-			Thread thread = new Thread(THREAD_GROUP, () -> command.onCommand(event), "CommandProcess-" + (THREAD_GROUP.activeCount()+1));
+			Thread thread = new Thread(THREAD_GROUP, () -> execute(command, event), "CommandProcess-" + (THREAD_GROUP.activeCount()+1));
 			thread.setUncaughtExceptionHandler(EXCEPTION_HANDLER);
 			thread.start();
 		}
+	}
+
+	private static void execute(@Nonnull ICommand command, @Nonnull CommandEvent event) {
+		command.onCommand(event);
 	}
 
 	private static class ExceptionHandler implements UncaughtExceptionHandler {

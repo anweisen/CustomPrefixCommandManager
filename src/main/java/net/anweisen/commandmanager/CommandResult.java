@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  * returns one enum state of this enum, depending on how the command process went
  *
  * @see CommandHandler#handleCommand(String, MessageReceivedEvent)
+ * @see CommandType
  *
  * @author anweisen | https://github.com/anweisen
  * @since 1.1

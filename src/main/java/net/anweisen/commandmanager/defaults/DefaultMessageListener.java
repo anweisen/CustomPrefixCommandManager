@@ -6,7 +6,6 @@ import net.anweisen.commandmanager.listener.Listener;
 import net.anweisen.commandmanager.utils.Factory;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -27,13 +26,16 @@ public final class DefaultMessageListener implements Listener {
 		this.prefix = guild -> prefix;
 	}
 
+	/**
+	 * @param prefix The {@link Guild} param is null when the message is not from a guild
+	 */
 	public DefaultMessageListener(@Nonnull CommandHandler commandHandler, @Nonnull Factory<String, Guild> prefix) {
 		this.commandHandler = commandHandler;
 		this.prefix = prefix;
 	}
 
 	@EventHandler
-	public final void onMessageReceived(MessageReceivedEvent event) {
+	public void onMessage(MessageReceivedEvent event) {
 		commandHandler.handleCommand(prefix.get(event.isFromGuild() ? event.getGuild() : null), event);
 	}
 

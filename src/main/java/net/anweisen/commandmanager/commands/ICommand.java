@@ -3,6 +3,8 @@ package net.anweisen.commandmanager.commands;
 import net.anweisen.commandmanager.CommandEvent;
 import net.anweisen.commandmanager.CommandType;
 
+import javax.annotation.Nonnull;
+
 /**
  * Developed in the CommandManager project
  * on 07-12-2020
@@ -12,7 +14,7 @@ import net.anweisen.commandmanager.CommandType;
  */
 public interface ICommand {
 
-	void onCommand(CommandEvent event);
+	void onCommand(@Nonnull final CommandEvent event);
 
 	String getName();
 

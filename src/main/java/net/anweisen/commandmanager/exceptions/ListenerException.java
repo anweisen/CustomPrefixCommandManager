@@ -5,7 +5,7 @@ package net.anweisen.commandmanager.exceptions;
  * on 08-30-2020
  *
  * This exception is thrown when an unexpected {@link java.lang.Exception} happens while executing
- * a listener's method
+ * a {@link net.anweisen.commandmanager.listener.Listener} method
  *
  * @see net.anweisen.commandmanager.listener.Listener
  *

@@ -1,7 +1,7 @@
 package net.anweisen.commandmanager.defaults;
 
-import net.anweisen.config.ConfigLoader;
-import net.anweisen.config.NamedValue;
+import net.anweisen.commandmanager.utils.ConfigLoader;
+import net.anweisen.commandmanager.utils.NamedValue;
 
 import java.io.IOException;
 

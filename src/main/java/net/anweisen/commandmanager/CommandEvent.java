@@ -60,6 +60,10 @@ public class CommandEvent {
 		return args;
 	}
 
+	public int getArgsLength() {
+		return args.length;
+	}
+
 	public String getMessageContentRaw() {
 		return receivedEvent.getMessage().getContentRaw();
 	}
@@ -220,6 +224,14 @@ public class CommandEvent {
 			if (role.getIdLong() == roleID) return true;
 		}
 		return false;
+	}
+
+	public void deleteMessage() {
+		getMessage().delete().queue();
+	}
+
+	public void sendTyping() {
+		getChannel().sendTyping().queue();
 	}
 
 	/**

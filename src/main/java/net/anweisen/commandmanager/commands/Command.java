@@ -3,6 +3,8 @@ package net.anweisen.commandmanager.commands;
 import net.anweisen.commandmanager.CommandEvent;
 import net.anweisen.commandmanager.CommandType;
 
+import javax.annotation.Nonnull;
+
 /**
  * Developed in the CommandManager project
  * on 07-12-2020
@@ -52,7 +54,7 @@ public abstract class Command implements ICommand {
 	private boolean reactToBots = false;
 	private boolean reactToMentionPrefix = false;
 
-	public abstract void onCommand(CommandEvent event);
+	public abstract void onCommand(@Nonnull final CommandEvent event);
 
 	@Override
 	public final CommandType getType() {
