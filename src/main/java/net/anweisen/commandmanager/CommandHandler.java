@@ -1,12 +1,16 @@
 package net.anweisen.commandmanager;
 
 import net.anweisen.commandmanager.commands.ICommand;
+import net.anweisen.commandmanager.defaults.DefaultLogHandler;
+import net.anweisen.commandmanager.utils.Bindable;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.annotation.Nonnull;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  * Developed in the CommandManager project
@@ -15,7 +19,7 @@ import java.util.Arrays;
  * @author anweisen | https://github.com/anweisen
  * @since 1.0
  */
-public class CommandHandler {
+public class CommandHandler implements Bindable {
 
 	public enum MessageReactionBehavior {
 		REACT_NEVER,
@@ -190,6 +194,7 @@ public class CommandHandler {
 		} else {
 			Thread thread = new Thread(THREAD_GROUP, () -> execute(command, event), "CommandProcess-" + (THREAD_GROUP.activeCount()+1));
 			thread.setUncaughtExceptionHandler(EXCEPTION_HANDLER);
+			thread.setDaemon(true);
 			thread.start();
 		}
 	}
@@ -202,16 +207,16 @@ public class CommandHandler {
 
 		@Override
 		public void uncaughtException(Thread thread, Throwable exception) {
-			System.err.println("[" + thread.getName() + "] One of your command generated an exception: " + exceptionMessage(exception));
+			System.err.println(DefaultLogHandler.getRecordAsString(thread, new LogRecord(Level.SEVERE, exceptionMessage(exception)), CommandHandler.class));
 		}
 
 		private static String exceptionMessage(Throwable exception) {
 
 			StringBuilder builder = new StringBuilder();
-			builder.append(exception.getMessage());
+			builder.append(exception.getClass().getName() + " -> " + exception.getMessage());
 
 			for (StackTraceElement currentTraceElement : exception.getStackTrace()) {
-				builder.append("\nat " + currentTraceElement.toString());
+				builder.append("\n  at " + currentTraceElement.toString());
 			}
 
 			return builder.toString();
