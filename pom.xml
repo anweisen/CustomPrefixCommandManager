@@ -6,7 +6,7 @@
 
     <groupId>net.anweisen</groupId>
     <artifactId>CommandManager</artifactId>
-    <version>1.2.2</version>
+    <version>2.1</version>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -44,6 +44,12 @@
                     <artifactId>opus-java</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.32.3.2</version>
         </dependency>
 
     </dependencies>
