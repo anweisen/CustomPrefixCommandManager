@@ -1,0 +1,6 @@
+config.properties
+config.db
+CommandManager.iml
+
+/.idea
+/target

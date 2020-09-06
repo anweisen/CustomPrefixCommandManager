@@ -2,17 +2,19 @@
 ## A simple way to manage commands with custom prefix!
 
 ### Installation
-Download the [CommandManager.jar](https://github.com/anweisen/CustomPrefixCommandManager/raw/master/out/artifacts/CommandManager_jar/CommandManager.jar) file and add it as libary to your project. <br>
-But make sure that you have jda imported as well <br>
+Download the [CommandManager.jar](https://github.com/anweisen/CustomPrefixCommandManager/raw/master/out/artifacts/CommandManager_jar/CommandManager.jar) file and add it as library to your project. <br>
+But make sure that you have [JDA](https://github.com/DV8FromTheWorld/JDA#download) and the corresponding sql drivers (MySQL/SQLite) imported as well <br>
 
-### Using **(outdated)**
+### Using
+You may also see into the [TestPackage](https://github.com/anweisen/JDACommandManager/tree/master/src/test/java) for more code examples <br>
+<br>
 **Adding commands** <br>
 You can simply instanciate a CommandHandler with *new CommandHandler()* <br>
-With *handler.registerCommands(new HelpCommand())* you can register a command. <br>
+With *handler.registerCommands(new ExampleCommand())* you can register a command. <br>
 
 **Handleing events** <br>
-To fully activate the CommandHanlder, you need to use *handler#hanldeCommand(prefix, event)* in  a *MessageReceivedEvent*. <br>
-If you want to use a custom prefix for every guild, you use this codeexample: <br>
+To use CommandHandler, you need to use *CommandHandler#hanldeCommand(String prefix, MessageReceived event)* in a listener for a *MessageReceivedEvent*. <br>
+If you want to use a custom prefix for every guild, you can use something like this:
 ```java
 public void onMessageReceived(MessageReceivedEvent event) {
   
@@ -26,67 +28,78 @@ public void onMessageReceived(MessageReceivedEvent event) {
   
 }
 ```
-If you want to send a *Command not found message*, you can use the following codeexample: <br>
+
+You could also use the built in *DefaultMessageListener* combined with the *DefaultPrefixCache* and *SQL*: <br>
+```java
+CommandHandler handler = new CommandHandler();
+LiteSQL sql = LiteSQL.createDefault();
+DefaultPrefixCache prefixCache = new DefaultPrefixCache(true, "!", "prefix", "guildID", "prefix", sql);
+DefaultMessageListener listener = new DefaultMessageListener(handler, prefixCache);
+jda.addEventListener(listener);
+```
+
+If you want to send a *command not found message*, you can use something like this: <br>
 ```java
 public void onMessageReceived(MessageRecievedEvent event) {
   
-  CommandResult result = hanlder.hanldeCommand(...);
+  CommandResult result = hanlder.hanldeCommand("!", event);
   
   if (result == ResultType.COMMAND_NOT_FOUND) {
-    //TODO Send command not found message
+    event.getChannel().sendMessage("The command was not found").queue();
+  } else if (result == ResultType.INVALID_CHANNEL_GUILD_COMMAND) {
+    event.getChannel().sendMessage("Please use this command in a guild").queue();
   }
   
 }
 ```
 
-**Defineing commands** <br>
-There are some variables you should know:
-- Command name: The commandname?
-- Alias: Extra command names you can use to access the command
-- CommandType: GENERAL - You can access the command everywhere; GUILD - You can only use the command in a guild; PRIVATE - You can only use the command in the private chat with   the bot
-- ProccessInNewThread: This will start an extra thread to process the command in
-- ReactToMentionPrefix: The command will also be excecuted when you use @Bot as prefix. You can use; You can set a default value with Command.REACT_TO_MENTION_PREFIX_DEFAULT = true;
+**Creating commands** <br>
+A command has the following attributes:
+- Command name: The name, the command listens to
+- Alias: Extra command names which you can use to access the command
+- CommandType:
+  - GENERAL - You can access the command everywhere
+  - GUILD - You can only use the command in a guild
+  - PRIVATE - You can only use the command in the private chat with the bot
+- ProccessInNewThread: This will start an extra thread to process the command
+- ReactToMentionPrefix: The command will also be excecuted when you use @Bot as prefix
+- ReactToBots
+- ReactToWebhooks
 
-
-**Using commands** <br>
-```java
-class ExampleCommand extends Command {
-  
-  public ExampleCommand() {
-    super("command name", commandyType, processInNewThread, reactToMentionPrefix, "alias1", "alias2", "alias...");
-  }
-  
-  @Override
-  public void onCommand(CommandEvent event) {
-    ...
-  }
-
-}
-```
-
-**Using CommandEvents** <br>
+**Using Commands & CommandEvents** <br>
 ```java
 class ExampleCommand extends Command {
 
   public ExampleCommand() {
-    ...
+    super("command name", CommandType.GUILD, processInNewThread, reactToMentionPrefix, "alias1", "alias2");
   }
-
+  
   @Override
   public void onCommand(CommandEvent event) {
     
-    if (event.getArgs().lenght >= 1 && event.getArg(0).equals(...)) {
-      ...
+    if (event.getArgs().lenght >= 1 && event.getArg(0).equals("hello")) {
+      event.deleteMessage();
+      event.queueReply("I like you too <2", message -> message.delete().queue());
     }
-    
+        
+    if (!event.senderHasPermission(Permission.BAN_MEMBERS)) {
+      event.queueReply("You do not have permissions to do this!");
+      return;
+    }
+        
     if (event.getMentionedMembers().isEmpty()) {
-      event.queueReply("Please use `" + event.getPrefix() + "ban <@User>`");
+      event.queueReply("Please use " + CommandEvent.syntax(event, "<@user>"));
+      return;
     }
-    
+        
+    Member member = event.getMentionedMembers().get(0);
+    member.ban(0, "Banned by " + event.getMemberName()).queue();
+    event.queueReply(member.getUser().getAsTag() + " was banned by " + event.getUserTag());
+
   }
 
 }
 ```
 
-**EventHandler Annotation and Listener interface** <br>
-You can implement *ListenerAdapter* (JDA ListenerAdapter as interface lol) and override the methods or you can implement *Listener* and use the *@EventHandler* annotation to annotate a listener method. <br> You still have to register them in the JDA.
+**Using Listener and EventHandler** <br>
+You can annotate methods with *@EventHandler* to get them triggered when the *JDA*, the *Listener* is registered to, fires the *Event* which the method has as their only parameter <br>
