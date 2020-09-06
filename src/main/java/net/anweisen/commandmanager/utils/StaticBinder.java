@@ -37,6 +37,11 @@ public final class StaticBinder {
 		return get(String.valueOf(key));
 	}
 
+	@Nonnull
+	public static <T> T get(@Nonnull Class<T> key) {
+		return get(key.getName());
+	}
+
 	public static <T> void set(@Nonnull String key, @Nonnull T value) {
 		values.put(key, value);
 	}

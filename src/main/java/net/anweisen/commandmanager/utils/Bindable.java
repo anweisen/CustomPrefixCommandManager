@@ -1,5 +1,6 @@
 package net.anweisen.commandmanager.utils;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 
 /**
@@ -44,6 +45,15 @@ public interface Bindable {
 	 */
 	default <T> T bind(char key) {
 		return bind(String.valueOf(key));
+	}
+
+	default <T> T bind(@Nonnull Class<T> key) {
+		return bind(key.getName());
+	}
+
+	@Nonnull
+	default <T> T bindToClass() {
+		return bind(this.getClass().getName());
 	}
 
 	default Collection<String> keys() {
