@@ -1,9 +1,13 @@
 package net.anweisen.commandmanager.defaults;
 
 import net.anweisen.commandmanager.utils.Bindable;
+import net.anweisen.commandmanager.utils.LogLevel;
 
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -15,12 +19,22 @@ import java.util.logging.Logger;
  */
 public final class DefaultLogger extends Logger implements Bindable {
 
-	public DefaultLogger() {
-		this("default");
+	public static final DefaultLogger DEFAULT = new DefaultLogger("default");
+
+	public static void logDefault(Level level, Class<?> caller, String message) {
+		LogRecord record = new LogRecord(level, message);
+		record.setSourceClassName(caller.getSimpleName());
+		DEFAULT.log(record);
 	}
+
+	private final DefaultLogHandler handler;
 
 	public DefaultLogger(String name) {
 		this(name, null, null);
+	}
+
+	public DefaultLogger(@Nonnull Object caller) {
+		this(caller.getClass());
 	}
 
 	public DefaultLogger(@Nonnull Class<?> caller) {
@@ -33,7 +47,36 @@ public final class DefaultLogger extends Logger implements Bindable {
 
 	public DefaultLogger(@Nonnull String name, PrintStream stream, Class<?> caller) {
 		super(name, null);
-		addHandler(new DefaultLogHandler(stream != null ? stream : System.err, caller));
+		handler = new DefaultLogHandler(stream != null ? stream : System.err, caller);
+		addHandler(handler);
+	}
+
+	public DefaultLogHandler getDefaultHandler() {
+		return handler;
+	}
+
+	public void debug(String message) {
+		log(LogLevel.DEBUG,  message);
+	}
+
+	public void debug(Supplier<String> message) {
+		log(LogLevel.DEBUG,  message);
+	}
+
+	public void error(String message) {
+		log(LogLevel.DEBUG,  message);
+	}
+
+	public void error(Supplier<String> message) {
+		log(LogLevel.ERROR,  message);
+	}
+
+	public void log(Level level, Class<?> caller, String message) {
+		LogRecord record = new LogRecord(level, message);
+		record.setSourceClassName(caller.getSimpleName());
+		handler.setUseRecordCaller(true);
+		log(record);
+		handler.setUseRecordCaller(false);
 	}
 
 }

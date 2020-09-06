@@ -1,11 +1,12 @@
 package net.anweisen.commandmanager.defaults;
 
+import org.jetbrains.annotations.Contract;
+
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
@@ -17,15 +18,20 @@ import java.util.logging.LogRecord;
  */
 public final class DefaultLogHandler extends Handler {
 
-	public static String getRecordAsString(LogRecord record, Class<?> caller) {
-		return "[" + getCurrentTimeAsString() + " " + Thread.currentThread().getName() + "/" + getLevelAsString(record.getLevel()) + "]: " + (caller != null ? caller.getSimpleName() + " - " : "") + record.getMessage();
+	@Nonnull
+	public static String getRecordAsString(Thread thread, LogRecord record, String caller) {
+		return "[" + getCurrentTimeAsString() + " " + (thread != null ? thread : Thread.currentThread()).getName() + "/" +record.getLevel().getName() + "]: " + (caller != null ? caller + " - " : "") + record.getMessage();
 	}
 
-	public static String getLevelAsString(Level level) {
-		if (level == Level.SEVERE) {
-			return "ERROR";
-		} else {
-			return level.getName();
+	@Contract("null -> null; !null -> !null")
+	public static String getCallerName(String caller) {
+		if (caller == null) return null;
+		try {
+			Class<?> clazz = Class.forName(caller);
+			return clazz.getSimpleName();
+		} catch (ClassNotFoundException ignored) {
+			String[] args = caller.split("\\.");
+			return args[args.length-1];
 		}
 	}
 
@@ -35,8 +41,9 @@ public final class DefaultLogHandler extends Handler {
 		return time.format(formatter);
 	}
 
-	private final PrintStream stream;
 	private final Class<?> caller;
+	private PrintStream stream;
+	private transient boolean useRecordCaller = false;
 
 	public DefaultLogHandler(@Nonnull PrintStream stream) {
 		this.stream = stream;
@@ -50,7 +57,7 @@ public final class DefaultLogHandler extends Handler {
 
 	@Override
 	public void publish(LogRecord record) {
-		stream.println(getRecordAsString(record, caller));
+		stream.println(getRecordAsString(null, record, useRecordCaller || caller == null ? getCallerName(record.getSourceClassName()) : caller.getSimpleName()));
 	}
 
 	@Override
@@ -58,4 +65,21 @@ public final class DefaultLogHandler extends Handler {
 
 	@Override
 	public void close() { }
+
+	void setUseRecordCaller(boolean useRecordCaller) {
+		this.useRecordCaller = useRecordCaller;
+	}
+
+	public void setStream(@Nonnull PrintStream stream) {
+		this.stream = stream;
+	}
+
+	public Class<?> getCaller() {
+		return caller;
+	}
+
+	public PrintStream getStream() {
+		return stream;
+	}
+
 }

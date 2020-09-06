@@ -2,6 +2,7 @@ package net.anweisen.commandmanager.sql.source;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Developed in the CommandManager project
@@ -26,12 +27,16 @@ public final class FileDataSource implements DataSource {
 	@Nonnull
 	@Override
 	public String getURL() {
-		return DataSource.LITESQL_URL + file.getPath();
+		return DataSource.LITESQL_URL.replace("%file", file.getPath());
 	}
 
 	@Nonnull
 	public File getFile() {
 		return file;
+	}
+
+	public void checkFile() throws IOException {
+		if (!file.exists()) file.createNewFile();
 	}
 
 	@Override

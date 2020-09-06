@@ -3,6 +3,7 @@ package net.anweisen.commandmanager.sql;
 import net.anweisen.commandmanager.defaults.DefaultLogger;
 import net.anweisen.commandmanager.sql.source.DataSource;
 import net.anweisen.commandmanager.utils.Bindable;
+import net.anweisen.commandmanager.utils.LogLevel;
 
 import javax.annotation.Nonnull;
 import javax.sql.rowset.CachedRowSet;
@@ -63,12 +64,12 @@ public abstract class SQL implements Bindable {
 			disconnect();
 		}
 		connection = dataSource.createConnection();
-		if (logger != null) logger.info("Connection to database created");
+		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database successfully created");
 	}
 
 	public void disconnect() throws SQLException {
 		connection.close();
-		if (logger != null) logger.info("Connection to database closed");
+		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database closed");
 	}
 
 	public void verifyConnection() throws SQLException {
@@ -102,6 +103,7 @@ public abstract class SQL implements Bindable {
 		verifyConnection();
 		return connection.prepareStatement(sql);
 	}
+
 	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql);
 		fillParams(statement, params);

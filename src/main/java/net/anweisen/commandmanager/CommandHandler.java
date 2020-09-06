@@ -3,6 +3,7 @@ package net.anweisen.commandmanager;
 import net.anweisen.commandmanager.commands.ICommand;
 import net.anweisen.commandmanager.defaults.DefaultLogHandler;
 import net.anweisen.commandmanager.utils.Bindable;
+import net.anweisen.commandmanager.utils.LogLevel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.annotation.Nonnull;
@@ -207,7 +208,7 @@ public class CommandHandler implements Bindable {
 
 		@Override
 		public void uncaughtException(Thread thread, Throwable exception) {
-			System.err.println(DefaultLogHandler.getRecordAsString(thread, new LogRecord(Level.SEVERE, exceptionMessage(exception)), CommandHandler.class));
+			System.err.println(DefaultLogHandler.getRecordAsString(thread, new LogRecord(LogLevel.ERROR, exceptionMessage(exception)), "CommandHandler"));
 		}
 
 		private static String exceptionMessage(Throwable exception) {

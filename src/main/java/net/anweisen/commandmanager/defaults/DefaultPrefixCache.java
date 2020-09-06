@@ -36,6 +36,15 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		this.guildColumn = guildColumn;
 		this.prefixColumn = prefixColumn;
 		this.dataSource = dataSource;
+		checkDatabaseTable();
+	}
+
+	private void checkDatabaseTable() {
+		try {
+			dataSource.update("CREATE TABLE IF NOT EXISTS " + table + " (" + guildColumn + " VARCHAR(18), " + prefixColumn + " VARCHAR(1000))");
+		} catch (SQLException ex) {
+			throw new ExceptionInInitializerError(ex);
+		}
 	}
 
 	public String getCached(@Nonnull String guildID) {
@@ -78,7 +87,7 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 
 	public String getFromDatabase(String guildID) throws SQLException {
 		ResultSet result = dataSource.query("SELECT " + prefixColumn + " FROM " + table + " WHERE " + guildColumn + " = ?", guildID);
-		result.next();
+		if (!result.next()) throw new IllegalStateException("Database does not contain the given guild");
 		String prefix = result.getString(prefixColumn);
 		result.close();
 		return prefix;
@@ -104,7 +113,12 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 
 	public synchronized void set(String guildID, String prefix) throws SQLException {
 		if (cachePrefix) setCached(guildID, prefix);
-		dataSource.update("UPDATE " + table + " SET " + prefixColumn + " = ? WHERE " + guildColumn + " = ?", prefix, guildID);
+		try {
+			getFromDatabase(guildID);
+			dataSource.update("UPDATE " + table + " SET " + prefixColumn + " = ? WHERE " + guildColumn + " = ?", prefix, guildID);
+		} catch (IllegalStateException ignored) {
+			dataSource.update("INSERT INTO " + table + " (" + guildColumn + ", " + prefixColumn + ") VALUES (?, ?)", guildID, prefix);
+		}
 	}
 
 	@Nonnull

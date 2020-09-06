@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public interface DataSource {
 
 	String MYSQL_URL = "jdbc:mysql://%host/%database",
-		   LITESQL_URL = "jdbc:sqlite:";
+		   LITESQL_URL = "jdbc:sqlite:%file";
 
 	@Nonnull
 	default Connection createConnection() throws SQLException {

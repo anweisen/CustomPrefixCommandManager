@@ -37,7 +37,7 @@ public final class LinkAttachment extends NamedValue {
 			} else {
 				string.append("&");
 			}
-			string.append(attachment.toString());
+			string.append(attachment);
 		}
 		return string.toString();
 	}

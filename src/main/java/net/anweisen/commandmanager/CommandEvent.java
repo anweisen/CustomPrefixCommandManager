@@ -234,6 +234,14 @@ public class CommandEvent {
 		getChannel().sendTyping().queue();
 	}
 
+	public SelfUser getSelfUser() {
+		return getJDA().getSelfUser();
+	}
+
+	public Member getSelfMember() {
+		return getGuild().getSelfMember();
+	}
+
 	/**
 	 * Used in {@link CommandEvent#syntax(CommandEvent, String, boolean)}
 	 * 

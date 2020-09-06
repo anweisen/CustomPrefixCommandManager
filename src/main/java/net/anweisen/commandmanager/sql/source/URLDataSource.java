@@ -1,8 +1,12 @@
 package net.anweisen.commandmanager.sql.source;
 
 import net.anweisen.commandmanager.utils.ConfigLoader;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +21,7 @@ import java.util.List;
 public final class URLDataSource implements DataSource {
 
 	@Nonnull
-	public static URLDataSource ofConfig(ConfigLoader config) {
+	public static URLDataSource ofConfig(@Nonnull ConfigLoader config) {
 		Integer port = config.getInt("PORT");
 		String host = config.getString("HOST");
 		String user = config.getString("USER");
@@ -53,7 +57,13 @@ public final class URLDataSource implements DataSource {
 	@Nonnull
 	@Override
 	public String getURL() {
-		return MYSQL_URL.replace("%host", host + (port != null ? ":" + port : "")) + LinkAttachment.list(linkAttachments);
+		return MYSQL_URL.replace("%host", host + (port != null ? ":" + port : "")).replace("%database", database) + LinkAttachment.list(linkAttachments);
+	}
+
+	@NotNull
+	@Override
+	public Connection createConnection() throws SQLException {
+		return DriverManager.getConnection(getURL(), user, password);
 	}
 
 	@Nonnull
