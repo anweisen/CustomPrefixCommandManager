@@ -1,6 +1,8 @@
 package net.anweisen.commandmanager.sql;
 
+import net.anweisen.commandmanager.defaults.DefaultLogger;
 import net.anweisen.commandmanager.sql.source.DataSource;
+import net.anweisen.commandmanager.utils.Bindable;
 
 import javax.annotation.Nonnull;
 import javax.sql.rowset.CachedRowSet;
@@ -15,16 +17,29 @@ import java.util.logging.Logger;
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */
-public abstract class SQL {
+public abstract class SQL implements Bindable {
 
 	@Nonnull
 	public static String removeInjectionPossibility(@Nonnull String string) {
 		return string.replaceAll("[']", "\\\\'").replaceAll("[`]", "\\\\`");
 	}
 
+	@Nonnull
+	public static CachedRowSet cache(ResultSet result) throws SQLException {
+		CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
+		cachedRowSet.populate(result);
+		return cachedRowSet;
+	}
+
+	public static void fillParams(PreparedStatement statement, Object... params) throws SQLException {
+		for (int i = 0; i < params.length; i++) {
+			statement.setObject(i+1, params[i]);
+		}
+	}
+
 	protected final DataSource dataSource;
 	protected Connection connection;
-	protected Logger logger = Logger.getGlobal();
+	protected Logger logger = new DefaultLogger(this);
 
 	public SQL(@Nonnull DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -48,12 +63,18 @@ public abstract class SQL {
 			disconnect();
 		}
 		connection = dataSource.createConnection();
-		logger.info("Connection to database created");
+		if (logger != null) logger.info("Connection to database created");
 	}
 
 	public void disconnect() throws SQLException {
 		connection.close();
-		logger.info("Connection to database closed");
+		if (logger != null) logger.info("Connection to database closed");
+	}
+
+	public void verifyConnection() throws SQLException {
+		if (!connectionIsOpened()) {
+			connect();
+		}
 	}
 
 	public Statement createStatement() throws SQLException {
@@ -62,31 +83,51 @@ public abstract class SQL {
 
 	@Nonnull
 	public CachedRowSet executeQuery(@Nonnull String sql) throws SQLException {
-		if (!connectionIsOpened()) connect();
+		verifyConnection();
 		Statement statement = createStatement();
 		ResultSet resultSet = statement.executeQuery(sql);
-		CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
-		cachedRowSet.populate(resultSet);
+		CachedRowSet cachedRowSet = cache(resultSet);
 		statement.close();
 		return cachedRowSet;
 	}
 
 	public void executeUpdate(@Nonnull String sql) throws SQLException {
-		if (!connectionIsOpened()) connect();
+		verifyConnection();
 		Statement statement = createStatement();
 		statement.executeUpdate(sql);
 		statement.close();
 	}
 
-	public PreparedStatement prepareStatement(@Nonnull String sql) throws SQLException {
-		if (!connectionIsOpened()) connect();
+	public PreparedStatement prepare(@Nonnull String sql) throws SQLException {
+		verifyConnection();
 		return connection.prepareStatement(sql);
+	}
+	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+		PreparedStatement statement = prepare(sql);
+		fillParams(statement, params);
+		return statement;
+	}
+
+	public CachedRowSet query(String sql, @Nonnull Object... params) throws SQLException {
+		PreparedStatement statement = prepare(sql, params);
+		ResultSet resultSet = statement.executeQuery();
+		CachedRowSet cachedRowSet = cache(resultSet);
+		statement.close();
+		return cachedRowSet;
+	}
+
+	public int update(String sql, @Nonnull Object... params) throws SQLException {
+		PreparedStatement statement = prepare(sql, params);
+		int result = statement.executeUpdate();
+		statement.close();
+		return result;
 	}
 
 	public Connection getConnection() {
 		return connection;
 	}
 
+	@Nonnull
 	public DataSource getDataSource() {
 		return dataSource;
 	}
@@ -95,7 +136,7 @@ public abstract class SQL {
 		return logger;
 	}
 
-	public void setLogger(@Nonnull Logger logger) {
+	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
 
