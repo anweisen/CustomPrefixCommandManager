@@ -5,7 +5,7 @@
 Download the [CommandManager.jar](https://github.com/anweisen/CustomPrefixCommandManager/raw/master/out/artifacts/CommandManager_jar/CommandManager.jar) file and add it as libary to your project. <br>
 But make sure that you have jda imported as well <br>
 
-### Using
+### Using **(outdated)**
 **Adding commands** <br>
 You can simply instanciate a CommandHandler with *new CommandHandler()* <br>
 With *handler.registerCommands(new HelpCommand())* you can register a command. <br>
