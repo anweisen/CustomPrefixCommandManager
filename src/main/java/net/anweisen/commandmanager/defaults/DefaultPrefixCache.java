@@ -95,19 +95,21 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 
 	public String load(String guildID) {
 
-		String saved = defaultPrefix;
+		String prefix = defaultPrefix;
 
 		try {
-			saved = getFromDatabase(guildID);
+			prefix = getFromDatabase(guildID);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+		} catch (IllegalStateException ignored) {
+			prefix = defaultPrefix;
 		}
 
 		if (cachePrefix) {
-			setCached(guildID, saved);
+			setCached(guildID, prefix);
 		}
 
-		return saved;
+		return prefix;
 
 	}
 
