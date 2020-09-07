@@ -120,6 +120,10 @@ public class CommandEvent {
 		return receivedEvent.getAuthor().getEffectiveAvatarUrl();
 	}
 
+	public String getUserTag() {
+		return getUser().getAsTag();
+	}
+
 	public String getMemberName() {
 		return receivedEvent.isFromGuild() ? receivedEvent.getMember().getEffectiveName() : receivedEvent.getAuthor().getName();
 	}
