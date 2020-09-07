@@ -4,3 +4,4 @@ CommandManager.iml
 
 /.idea
 /target
+/src/test
