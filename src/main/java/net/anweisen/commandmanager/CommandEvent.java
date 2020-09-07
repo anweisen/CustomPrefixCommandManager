@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
+import javax.annotation.CheckReturnValue;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -80,6 +82,10 @@ public class CommandEvent {
 		return receivedEvent.getGuild();
 	}
 
+	public String getGuildID() {
+		return getGuild().getId();
+	}
+
 	public Member getMember() {
 		return receivedEvent.getMember();
 	}
@@ -137,25 +143,27 @@ public class CommandEvent {
 	}
 
 	public void queueReply(MessageEmbed message) {
-		reply(message).queue(ignored -> {}, exception -> {});
+		reply(message).queue(ignored -> {}, Throwable::printStackTrace);
 	}
 
 	public void queueReply(CharSequence message) {
-		reply(message).queue(ignored -> {}, exception -> {});
+		reply(message).queue(ignored -> {}, Throwable::printStackTrace);
 	}
 
 	public void queueReply(MessageEmbed message, Consumer<Message> messageConsumer) {
-		reply(message).queue(messageConsumer, exception -> {});
+		reply(message).queue(messageConsumer, Throwable::printStackTrace);
 	}
 
 	public void queueReply(CharSequence message, Consumer<Message> messageConsumer) {
-		reply(message).queue(messageConsumer, exception -> {});
+		reply(message).queue(messageConsumer, Throwable::printStackTrace);
 	}
 
+	@CheckReturnValue
 	public MessageAction reply(MessageEmbed message) {
 		return getChannel().sendMessage(message);
 	}
 
+	@CheckReturnValue
 	public MessageAction reply(CharSequence message) {
 		return getChannel().sendMessage(message);
 	}
@@ -166,14 +174,14 @@ public class CommandEvent {
 		});
 	}
 
-	public void replyPrivate(CharSequence sequence) {
+	public void replyPrivate(CharSequence message) {
 		getUser().openPrivateChannel().queue(channel -> {
-			channel.sendMessage(sequence).queue();
+			channel.sendMessage(message).queue();
 		});
 	}
 
 	public List<Member> getMentionedMembers() {
-		List<Member> mentioned = receivedEvent.getMessage().getMentionedMembers();
+		List<Member> mentioned = new ArrayList<>(receivedEvent.getMessage().getMentionedMembers());
 		try {
 			mentioned.remove(receivedEvent.getGuild().getSelfMember());
 		} catch (Throwable ignored) { }
