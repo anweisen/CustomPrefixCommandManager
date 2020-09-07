@@ -68,10 +68,12 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		this.defaultPrefix = defaultPrefix;
 	}
 
+	@Nonnull
 	public String getDefaultPrefix() {
 		return defaultPrefix;
 	}
 
+	@Nonnull
 	public SQL getDataSource() {
 		return dataSource;
 	}
