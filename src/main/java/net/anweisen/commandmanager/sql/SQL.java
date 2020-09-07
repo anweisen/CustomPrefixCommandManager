@@ -110,7 +110,7 @@ public abstract class SQL implements Bindable {
 		return statement;
 	}
 
-	public CachedRowSet query(String sql, @Nonnull Object... params) throws SQLException {
+	public CachedRowSet query(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql, params);
 		ResultSet resultSet = statement.executeQuery();
 		CachedRowSet cachedRowSet = cache(resultSet);
@@ -118,11 +118,18 @@ public abstract class SQL implements Bindable {
 		return cachedRowSet;
 	}
 
-	public int update(String sql, @Nonnull Object... params) throws SQLException {
+	public int update(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql, params);
 		int result = statement.executeUpdate();
 		statement.close();
 		return result;
+	}
+
+	public boolean isSet(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+		ResultSet result = query(sql, params);
+		boolean set = result.next();
+		result.close();
+		return set;
 	}
 
 	public Connection getConnection() {
