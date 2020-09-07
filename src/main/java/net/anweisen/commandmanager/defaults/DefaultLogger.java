@@ -2,6 +2,7 @@ package net.anweisen.commandmanager.defaults;
 
 import net.anweisen.commandmanager.utils.Bindable;
 import net.anweisen.commandmanager.utils.LogLevel;
+import sun.reflect.Reflection;
 
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
@@ -25,6 +26,10 @@ public final class DefaultLogger extends Logger implements Bindable {
 		LogRecord record = new LogRecord(level, message);
 		record.setSourceClassName(caller.getSimpleName());
 		DEFAULT.log(record);
+	}
+
+	public static void logDefault(Level level, String message) {
+		logDefault(level, Reflection.getCallerClass(), message);
 	}
 
 	private final DefaultLogHandler handler;
