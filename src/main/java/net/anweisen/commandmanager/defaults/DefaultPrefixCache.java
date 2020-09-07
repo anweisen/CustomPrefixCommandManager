@@ -82,7 +82,7 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 
 	public void setCachePrefix(boolean cache) {
 		this.cachePrefix = cache;
-		if (cache) this.cache.clear();
+		if (!cache) this.cache.clear();
 	}
 
 	public String getFromDatabase(String guildID) throws SQLException {
