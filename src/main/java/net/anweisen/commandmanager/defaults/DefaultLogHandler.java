@@ -46,11 +46,10 @@ public final class DefaultLogHandler extends Handler {
 	private transient boolean useRecordCaller = false;
 
 	public DefaultLogHandler(@Nonnull PrintStream stream) {
-		this.stream = stream;
-		this.caller = null;
+		this(stream, null);
 	}
 
-	public DefaultLogHandler(@Nonnull PrintStream stream, @Nonnull Class<?> caller) {
+	public DefaultLogHandler(@Nonnull PrintStream stream, Class<?> caller) {
 		this.stream = stream;
 		this.caller = caller;
 	}
