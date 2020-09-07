@@ -29,6 +29,10 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 	private final String table, guildColumn, prefixColumn;
 	private final SQL dataSource;
 
+	public DefaultPrefixCache(@Nonnull String defaultPrefix, @Nonnull SQL dataSource) {
+		this(true, defaultPrefix, "server", "guildID", "prefix", dataSource);
+	}
+
 	public DefaultPrefixCache(boolean cachePrefix, @Nonnull String defaultPrefix, @Nonnull String table, @Nonnull String guildColumn, @Nonnull String prefixColumn, @Nonnull SQL dataSource) {
 		this.cachePrefix = cachePrefix;
 		this.defaultPrefix = defaultPrefix;
