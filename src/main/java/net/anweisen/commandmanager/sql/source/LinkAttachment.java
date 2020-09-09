@@ -2,6 +2,7 @@ package net.anweisen.commandmanager.sql.source;
 
 import net.anweisen.commandmanager.utils.NamedValue;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 
 /**
@@ -29,6 +30,7 @@ public final class LinkAttachment extends NamedValue {
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public static String list(@Nonnull Iterable<LinkAttachment> attachments) {
 		StringBuilder string = new StringBuilder();
 		for (LinkAttachment attachment : attachments) {
@@ -37,14 +39,22 @@ public final class LinkAttachment extends NamedValue {
 			} else {
 				string.append("&");
 			}
-			string.append(attachment);
+			string.append(attachment.asAttachment());
 		}
 		return string.toString();
 	}
 
-	@Override
-	public String toString() {
+	@Nonnull
+	public String asAttachment() {
 		return key + '=' + value;
 	}
 
+	@Nonnull
+	@Override
+	public String toString() {
+		return "LinkAttachment{" +
+				"key='" + key + '\'' +
+				", value='" + value + '\'' +
+				'}';
+	}
 }
