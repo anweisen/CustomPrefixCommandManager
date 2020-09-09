@@ -5,6 +5,7 @@ import net.anweisen.commandmanager.sql.source.DataSource;
 import net.anweisen.commandmanager.utils.Bindable;
 import net.anweisen.commandmanager.utils.LogLevel;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
@@ -20,19 +21,37 @@ import java.util.logging.Logger;
  */
 public abstract class SQL implements Bindable {
 
+	/**
+	 * @deprecated You should use the {@link PreparedStatement} to prevent SQLInjection.
+	 *             You can use ? as placeholders and set its value afterwords using {@link PreparedStatement#setObject(int, Object)}
+	 *             If you use {@link SQL#prepare(String, Object...)} it will already set the object array as the params to the {@link PreparedStatement}
+	 */
 	@Nonnull
+	@Deprecated
+	@CheckReturnValue
 	public static String removeInjectionPossibility(@Nonnull String string) {
 		return string.replaceAll("[']", "\\\\'").replaceAll("[`]", "\\\\`");
 	}
 
+	/**
+	 * @param result The {@link ResultSet} which should be stored into the {@link CachedRowSet}
+	 * @return A new {@link CachedRowSet} using {@link RowSetProvider#newFactory()} as factory
+	 * @throws SQLException If a {@link SQLException} is thrown while creating the {@link CachedRowSet}
+	 * @see CachedRowSet#populate(ResultSet)
+	 */
 	@Nonnull
-	public static CachedRowSet cache(ResultSet result) throws SQLException {
+	@CheckReturnValue
+	public static CachedRowSet cache(@Nonnull ResultSet result) throws SQLException {
 		CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
 		cachedRowSet.populate(result);
 		return cachedRowSet;
 	}
 
-	public static void fillParams(PreparedStatement statement, Object... params) throws SQLException {
+
+	/**
+	 * @see PreparedStatement#setObject(int, Object)
+	 */
+	public static void fillParams(@Nonnull PreparedStatement statement, @Nonnull Object... params) throws SQLException {
 		for (int i = 0; i < params.length; i++) {
 			statement.setObject(i+1, params[i]);
 		}
@@ -59,6 +78,11 @@ public abstract class SQL implements Bindable {
 		}
 	}
 
+	/**
+	 * Terminates the existing connection, using {@link SQL#disconnect()}
+	 * Then it creates a new connection using {@link DataSource#createConnection()}
+	 * @throws SQLException If a {@link SQLException} happens while disconnection or creating a new connection to the sql server
+	 */
 	public void connect() throws SQLException {
 		if (connectionIsOpened()) {
 			disconnect();
@@ -67,17 +91,26 @@ public abstract class SQL implements Bindable {
 		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database successfully created");
 	}
 
+	/**
+	 * Closes the the connection ({@link SQL#getConnection()}) to the sql server using {@link Connection#close()}
+	 * @throws SQLException If a {@link SQLException} happens while closing the connection
+	 */
 	public void disconnect() throws SQLException {
 		connection.close();
 		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database closed");
 	}
 
+	/**
+	 * Connects to the sql server ({@link SQL#connect()}) if the connection is no longer opened (not {@link SQL#connectionIsOpened()})
+	 * @throws SQLException If a {@link SQLException} happens while connecting to the server
+	 */
 	public void verifyConnection() throws SQLException {
 		if (!connectionIsOpened()) {
 			connect();
 		}
 	}
 
+	@Nonnull
 	public Statement createStatement() throws SQLException {
 		return connection.createStatement();
 	}
@@ -92,6 +125,15 @@ public abstract class SQL implements Bindable {
 		return cachedRowSet;
 	}
 
+	/**
+	 * Executes a update to the database using {@link Statement#executeUpdate(String)}.
+	 * Be aware of SQLInjection
+	 * @see SQL#update(String, Object...)
+	 * @param sql The command which should be executed
+	 * @throws SQLException If a {@link SQLException} happens while creating a {@link Statement} (using {@link SQL#createStatement()}),
+	 *                      executing the update (using {@link Statement#executeUpdate(String)})
+	 *                      or closing the statement (using {@link Statement#close()})
+	 */
 	public void executeUpdate(@Nonnull String sql) throws SQLException {
 		verifyConnection();
 		Statement statement = createStatement();
@@ -104,6 +146,14 @@ public abstract class SQL implements Bindable {
 		return connection.prepareStatement(sql);
 	}
 
+	/**
+	 * Creates a {@link PreparedStatement} using {@link SQL#prepare(String)} and sets the params using {@link SQL#fillParams(PreparedStatement, Object...)}
+	 * @param sql The SQLCommand
+	 * @param params The params which replace the ?s in the command.
+	 * @return The {@link PreparedStatement} just created
+	 * @throws SQLException If a {@link SQLException} happens while preparing the {@link PreparedStatement} ({@link SQL#prepare(String)})
+	 *                      or while filling the params {@link SQL#fillParams(PreparedStatement, Object...)}
+	 */
 	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql);
 		fillParams(statement, params);
@@ -132,11 +182,14 @@ public abstract class SQL implements Bindable {
 		return set;
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public Connection getConnection() {
 		return connection;
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public DataSource getDataSource() {
 		return dataSource;
 	}
@@ -149,10 +202,12 @@ public abstract class SQL implements Bindable {
 		this.logger = logger;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "SQL{" +
-				"dataSource=" + dataSource +
+				"class=" + this.getClass().getSimpleName() +
+				", dataSource=" + dataSource +
 				", connection=" + connection +
 				'}';
 	}
