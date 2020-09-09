@@ -98,6 +98,7 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		return dataSource;
 	}
 
+	@CheckReturnValue
 	public boolean shouldCachePrefix() {
 		return cachePrefix;
 	}
