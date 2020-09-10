@@ -10,9 +10,6 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 
 /**
- * Developed in the CommandManager project
- * on 09-01-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */
@@ -21,7 +18,7 @@ public final class LiteSQL extends SQL {
 	@Nonnull
 	@CheckReturnValue
 	public static LiteSQL createDefault() throws SQLException, IOException {
-		return new LiteSQL(new FileDataSource("config.db"));
+		return new LiteSQL(new FileDataSource("data.db"));
 	}
 
 	public LiteSQL(@Nonnull String path) throws SQLException, IOException {
