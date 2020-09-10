@@ -1,22 +1,19 @@
 package net.anweisen.commandmanager;
 
 import net.anweisen.commandmanager.commands.ICommand;
-import net.anweisen.commandmanager.defaults.DefaultLogHandler;
+import net.anweisen.commandmanager.defaults.DefaultLogger;
+import net.anweisen.commandmanager.exceptions.CommandExecutionException;
 import net.anweisen.commandmanager.utils.Bindable;
-import net.anweisen.commandmanager.utils.LogLevel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.0
  */
@@ -32,11 +29,13 @@ public class CommandHandler implements Bindable {
 	private MessageReactionBehavior reactToBots = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
 	private final ArrayList<ICommand> commands = new ArrayList<>();
 
+	@Nonnull
 	public CommandHandler registerCommand(ICommand command) {
 		commands.add(command);
 		return this;
 	}
 
+	@Nonnull
 	public CommandHandler registerCommands(ICommand... commands) {
 		this.commands.addAll(Arrays.asList(commands));
 		return this;
@@ -49,16 +48,16 @@ public class CommandHandler implements Bindable {
 	/**
 	 * @return returns null when no command is registered with this name
 	 */
+	@Nullable
+	@CheckReturnValue
 	public ICommand getCommand(String name) {
 
 		name = name.toLowerCase();
 
 		for (ICommand currentCommand : commands) {
 
-			if (currentCommand.getName() == null) continue;
 			if (correctName(name, currentCommand.getName())) return currentCommand;
 
-			if (currentCommand.getAlias() == null) continue;
 			for (String currentAlias : currentCommand.getAlias()) {
 				if (correctName(name, currentAlias)) return currentCommand;
 			}
@@ -78,7 +77,9 @@ public class CommandHandler implements Bindable {
 		}
 	}
 
-	private String getCommandName(ICommand command, String raw) {
+	@Nonnull
+	@CheckReturnValue
+	private String getCommandName(@Nonnull ICommand command, @Nonnull String raw) {
 
 		raw = raw.toLowerCase();
 
@@ -86,14 +87,12 @@ public class CommandHandler implements Bindable {
 			return command.getName();
 		}
 
-		if (command.getAlias() != null) {
-			for (String currentAlias : command.getAlias()) {
-				if (currentAlias == null) continue;
-				if (raw.startsWith(currentAlias.toLowerCase())) return currentAlias;
-			}
+		for (String currentAlias : command.getAlias()) {
+			if (currentAlias == null) continue;
+			if (raw.startsWith(currentAlias.toLowerCase())) return currentAlias;
 		}
 
-		return null;
+		return raw;
 
 	}
 
@@ -108,8 +107,8 @@ public class CommandHandler implements Bindable {
 
 	/**
 	 * @param prefix the prefix which should be in front of the command
-	 * @param event the {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent} the command was received
-	 * @see net.anweisen.commandmanager.CommandResult
+	 * @param event the {@link MessageReceivedEvent} the command was received
+	 * @see CommandResult
 	 * @return returns
 	 * - INVALID_CHANNEL_PRIVATE_COMMAND if the command was a private command and was performed in a guild chat <br>
 	 * - INVALID_CHANNEL_GUILD_COMMAND if the command was a guild command and was performed in a private chat <br>
@@ -151,13 +150,15 @@ public class CommandHandler implements Bindable {
 
 		if (!command.shouldReactToMentionPrefix() && byMention) {
 			return CommandResult.MENTION_PREFIX_NO_REACT;
+		} else if (command.getPermissionNeeded() != null && event.getMember().hasPermission(command.getPermissionNeeded())) {
+			return CommandResult.NO_PERMISSIONS;
 		} else if (reactToWebhooks != MessageReactionBehavior.REACT_ALWAYS && event.isWebhookMessage() && (!command.shouldReactToWebhooks() || reactToWebhooks == MessageReactionBehavior.REACT_NEVER)) {
 			return CommandResult.WEBHOOK_MESSAGE_NO_REACT;
 		} else if (reactToBots != MessageReactionBehavior.REACT_ALWAYS && event.getAuthor().isBot() && (!command.shouldReactToBots() || reactToBots == MessageReactionBehavior.REACT_NEVER)) {
 			return CommandResult.BOT_MESSAGE_NO_REACT;
-		} else if (command.getType() != null && command.getType() == CommandType.GUILD && !event.isFromGuild()) {
+		} else if (command.getType() == CommandType.GUILD && !event.isFromGuild()) {
 			return CommandResult.INVALID_CHANNEL_GUILD_COMMAND;
-		} else if (command.getType() != null && command.getType() == CommandType.PRIVATE && event.isFromGuild()) {
+		} else if (command.getType() == CommandType.PRIVATE && event.isFromGuild()) {
 			return CommandResult.INVALID_CHANNEL_PRIVATE_COMMAND;
 		}
 
@@ -189,7 +190,7 @@ public class CommandHandler implements Bindable {
 	public static final ThreadGroup THREAD_GROUP = new ThreadGroup("CommandProcessGroup");
 	private static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
 
-	private static void process(@Nonnull ICommand command, @Nonnull CommandEvent event) {
+	private static void process(@Nonnull ICommand command, @Nonnull CommandEvent event) throws CommandExecutionException {
 		if (!command.shouldProcessInNewThread()) {
 			execute(command, event);
 		} else {
@@ -200,28 +201,19 @@ public class CommandHandler implements Bindable {
 		}
 	}
 
-	private static void execute(@Nonnull ICommand command, @Nonnull CommandEvent event) {
-		command.onCommand(event);
+	private static void execute(@Nonnull ICommand command, @Nonnull CommandEvent event) throws CommandExecutionException {
+		try {
+			command.onCommand(event);
+		} catch (Throwable ex) {
+			throw new CommandExecutionException(ex);
+		}
 	}
 
 	private static class ExceptionHandler implements UncaughtExceptionHandler {
 
 		@Override
 		public void uncaughtException(Thread thread, Throwable exception) {
-			System.err.println(DefaultLogHandler.getRecordAsString(thread, new LogRecord(LogLevel.ERROR, exceptionMessage(exception)), "CommandHandler"));
-		}
-
-		private static String exceptionMessage(Throwable exception) {
-
-			StringBuilder builder = new StringBuilder();
-			builder.append(exception.getClass().getName() + " -> " + exception.getMessage());
-
-			for (StackTraceElement currentTraceElement : exception.getStackTrace()) {
-				builder.append("\n  at " + currentTraceElement.toString());
-			}
-
-			return builder.toString();
-
+			DefaultLogger.logDefault(exception, CommandHandler.class);
 		}
 
 	}
