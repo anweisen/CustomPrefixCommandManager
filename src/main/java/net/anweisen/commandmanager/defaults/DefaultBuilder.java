@@ -10,9 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.1
  */
@@ -21,9 +18,9 @@ public final class DefaultBuilder {
 	private DefaultBuilder() { }
 
 	/**
-	 * @return Creates a {@link net.dv8tion.jda.api.JDABuilder} with every {@link net.dv8tion.jda.api.requests.GatewayIntent}
-	 * @see net.dv8tion.jda.api.JDABuilder
-	 * @see net.dv8tion.jda.api.requests.GatewayIntent
+	 * @return Creates a {@link JDABuilder} with every {@link GatewayIntent}
+	 * @see JDABuilder
+	 * @see GatewayIntent
 	 */
 	@Nonnull
 	@CheckReturnValue
@@ -38,9 +35,9 @@ public final class DefaultBuilder {
 	}
 
 	/**
-	 * @return Creates a {@link net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder} with every {@link net.dv8tion.jda.api.requests.GatewayIntent}
-	 * @see net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
-	 * @see net.dv8tion.jda.api.requests.GatewayIntent
+	 * @return Creates a {@link DefaultShardManagerBuilder} with every {@link GatewayIntent}
+	 * @see DefaultShardManagerBuilder
+	 * @see GatewayIntent
 	 */
 	@Nonnull
 	@CheckReturnValue
