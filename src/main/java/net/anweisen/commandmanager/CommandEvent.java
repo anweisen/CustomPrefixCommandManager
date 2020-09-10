@@ -1,5 +1,6 @@
 package net.anweisen.commandmanager;
 
+import net.anweisen.commandmanager.exceptions.MessageException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -7,14 +8,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Developed in the CommandManager project
- * on 07-12-2020
- *
  * @see net.anweisen.commandmanager.CommandHandler
  * @see net.anweisen.commandmanager.commands.ICommand
  *
@@ -28,7 +27,7 @@ public class CommandEvent {
 	private final String prefix;
 	private final String commandName;
 
-	public CommandEvent(String prefix, String commandName, MessageReceivedEvent event) {
+	public CommandEvent(@Nonnull String prefix, @Nonnull String commandName, @Nonnull MessageReceivedEvent event) {
 
 		receivedEvent = event;
 
@@ -90,10 +89,12 @@ public class CommandEvent {
 		return receivedEvent.getMember();
 	}
 
+	@Nonnull
 	public User getUser() {
 		return receivedEvent.getAuthor();
 	}
 
+	@Nonnull
 	public JDA getJDA() {
 		return receivedEvent.getJDA();
 	}
@@ -122,10 +123,12 @@ public class CommandEvent {
 		return receivedEvent.getAuthor().getId();
 	}
 
+	@Nonnull
 	public String getMemberAvatarURL() {
 		return receivedEvent.getAuthor().getEffectiveAvatarUrl();
 	}
 
+	@Nonnull
 	public String getUserTag() {
 		return getUser().getAsTag();
 	}
@@ -142,41 +145,43 @@ public class CommandEvent {
 		return receivedEvent.isFromGuild();
 	}
 
-	public void queueReply(MessageEmbed message) {
-		reply(message).queue(ignored -> {}, Throwable::printStackTrace);
+	public void queueReply(@Nonnull MessageEmbed message) {
+		reply(message).queue(ignored -> {}, MessageException::create);
 	}
 
-	public void queueReply(CharSequence message) {
-		reply(message).queue(ignored -> {}, Throwable::printStackTrace);
+	public void queueReply(@Nonnull CharSequence message) {
+		reply(message).queue(ignored -> {}, MessageException::create);
 	}
 
-	public void queueReply(MessageEmbed message, Consumer<Message> messageConsumer) {
-		reply(message).queue(messageConsumer, Throwable::printStackTrace);
+	public void queueReply(@Nonnull MessageEmbed message, @Nonnull Consumer<Message> messageConsumer) {
+		reply(message).queue(messageConsumer, MessageException::create);
 	}
 
-	public void queueReply(CharSequence message, Consumer<Message> messageConsumer) {
-		reply(message).queue(messageConsumer, Throwable::printStackTrace);
+	public void queueReply(@Nonnull CharSequence message, @Nonnull Consumer<Message> messageConsumer) {
+		reply(message).queue(messageConsumer, MessageException::create);
 	}
 
+	@Nonnull
 	@CheckReturnValue
-	public MessageAction reply(MessageEmbed message) {
+	public MessageAction reply(@Nonnull MessageEmbed message) {
 		return getChannel().sendMessage(message);
 	}
 
+	@Nonnull
 	@CheckReturnValue
-	public MessageAction reply(CharSequence message) {
+	public MessageAction reply(@Nonnull CharSequence message) {
 		return getChannel().sendMessage(message);
 	}
 
-	public void replyPrivate(MessageEmbed embed) {
+	public void replyPrivate(@Nonnull MessageEmbed embed) {
 		getUser().openPrivateChannel().queue(channel -> {
-			channel.sendMessage(embed).queue();
+			channel.sendMessage(embed).queue(message -> {}, MessageException::create);
 		});
 	}
 
-	public void replyPrivate(CharSequence message) {
+	public void replyPrivate(@Nonnull CharSequence message) {
 		getUser().openPrivateChannel().queue(channel -> {
-			channel.sendMessage(message).queue();
+			channel.sendMessage(message).queue(message1 -> {}, MessageException::create);
 		});
 	}
 
@@ -196,7 +201,7 @@ public class CommandEvent {
 		return receivedEvent.getMessage().getMentionedRoles();
 	}
 
-	public boolean senderHasPermission(Permission... permission) {
+	public boolean senderHasPermission(@Nonnull Permission... permission) {
 		return receivedEvent.getMember().hasPermission(permission);
 	}
 
@@ -257,12 +262,13 @@ public class CommandEvent {
 	/**
 	 * Used in {@link CommandEvent#syntax(CommandEvent, String, boolean)}
 	 * 
-	 * @return returns if the given text mentions a {@link net.dv8tion.jda.api.entities.Member}
-	 * @see net.dv8tion.jda.api.entities.IMentionable
+	 * @return returns if the given text mentions a {@link Member}
+	 * @see IMentionable
 	 * @since 1.2
 	 */
 	public static boolean containsMention(String text) {
 
+		// n is a placeholder for any number
 		char[] goal = "<@!nnnnnnnnnnnnnnnnnn>".toCharArray();
 		int current = 0;
 		for (char currentChar : text.toCharArray()) {
