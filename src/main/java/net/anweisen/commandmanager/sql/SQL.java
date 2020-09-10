@@ -13,9 +13,6 @@ import java.sql.*;
 import java.util.logging.Logger;
 
 /**
- * Developed in the CommandManager project
- * on 08-31-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */
@@ -24,7 +21,7 @@ public abstract class SQL implements Bindable {
 	/**
 	 * @deprecated You should use the {@link PreparedStatement} to prevent SQLInjection.
 	 *             You can use ? as placeholders and set its value afterwords using {@link PreparedStatement#setObject(int, Object)}
-	 *             If you use {@link SQL#prepare(String, Object...)} it will already set the object array as the params to the {@link PreparedStatement}
+	 *             If you use {@link #prepare(String, Object...)} it will already set the object array as the params to the {@link PreparedStatement}
 	 */
 	@Nonnull
 	@Deprecated
@@ -57,6 +54,13 @@ public abstract class SQL implements Bindable {
 		}
 	}
 
+	@Nonnull
+	public static SQL createAnonymous(@Nonnull DataSource dataSource) throws SQLException {
+		SQL instance = new SQL(dataSource) {};
+		instance.connect();
+		return instance;
+	}
+
 	protected final DataSource dataSource;
 	protected Connection connection;
 	protected Logger logger = new DefaultLogger(this);
@@ -79,7 +83,7 @@ public abstract class SQL implements Bindable {
 	}
 
 	/**
-	 * Terminates the existing connection, using {@link SQL#disconnect()}
+	 * Terminates the existing connection, using {@link #disconnect()}
 	 * Then it creates a new connection using {@link DataSource#createConnection()}
 	 * @throws SQLException If a {@link SQLException} happens while disconnection or creating a new connection to the sql server
 	 */
@@ -92,7 +96,7 @@ public abstract class SQL implements Bindable {
 	}
 
 	/**
-	 * Closes the the connection ({@link SQL#getConnection()}) to the sql server using {@link Connection#close()}
+	 * Closes the the connection ({@link #getConnection()}) to the sql server using {@link Connection#close()}
 	 * @throws SQLException If a {@link SQLException} happens while closing the connection
 	 */
 	public void disconnect() throws SQLException {
@@ -101,7 +105,7 @@ public abstract class SQL implements Bindable {
 	}
 
 	/**
-	 * Connects to the sql server ({@link SQL#connect()}) if the connection is no longer opened (not {@link SQL#connectionIsOpened()})
+	 * Connects to the sql server ({@link #connect()}) if the connection is no longer opened (not {@link #connectionIsOpened()})
 	 * @throws SQLException If a {@link SQLException} happens while connecting to the server
 	 */
 	public void verifyConnection() throws SQLException {
@@ -128,9 +132,9 @@ public abstract class SQL implements Bindable {
 	/**
 	 * Executes a update to the database using {@link Statement#executeUpdate(String)}.
 	 * Be aware of SQLInjection
-	 * @see SQL#update(String, Object...)
+	 * @see #update(String, Object...)
 	 * @param sql The command which should be executed
-	 * @throws SQLException If a {@link SQLException} happens while creating a {@link Statement} (using {@link SQL#createStatement()}),
+	 * @throws SQLException If a {@link SQLException} happens while creating a {@link Statement} (using {@link #createStatement()}),
 	 *                      executing the update (using {@link Statement#executeUpdate(String)})
 	 *                      or closing the statement (using {@link Statement#close()})
 	 */
@@ -147,12 +151,12 @@ public abstract class SQL implements Bindable {
 	}
 
 	/**
-	 * Creates a {@link PreparedStatement} using {@link SQL#prepare(String)} and sets the params using {@link SQL#fillParams(PreparedStatement, Object...)}
+	 * Creates a {@link PreparedStatement} using {@link #prepare(String)} and sets the params using {@link #fillParams(PreparedStatement, Object...)}
 	 * @param sql The SQLCommand
 	 * @param params The params which replace the ?s in the command.
 	 * @return The {@link PreparedStatement} just created
-	 * @throws SQLException If a {@link SQLException} happens while preparing the {@link PreparedStatement} ({@link SQL#prepare(String)})
-	 *                      or while filling the params {@link SQL#fillParams(PreparedStatement, Object...)}
+	 * @throws SQLException If a {@link SQLException} happens while preparing the {@link PreparedStatement} ({@link #prepare(String)})
+	 *                      or while filling the params {@link #fillParams(PreparedStatement, Object...)}
 	 */
 	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql);
@@ -178,6 +182,18 @@ public abstract class SQL implements Bindable {
 	public boolean isSet(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		ResultSet result = query(sql, params);
 		boolean set = result.next();
+		result.close();
+		return set;
+	}
+
+	public boolean paramIsSet(@Nonnull String sql, @Nonnull String selection, @Nonnull Object... params) throws SQLException {
+		ResultSet result = query(sql, params);
+		boolean set = false;
+		if (result.next()) {
+			if (result.getObject(selection) != null) {
+				set = true;
+			}
+		}
 		result.close();
 		return set;
 	}
