@@ -2,13 +2,12 @@ package net.anweisen.commandmanager.commands;
 
 import net.anweisen.commandmanager.CommandEvent;
 import net.anweisen.commandmanager.CommandType;
+import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * Developed in the CommandManager project
- * on 07-12-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
  */
@@ -16,10 +15,16 @@ public interface ICommand {
 
 	void onCommand(@Nonnull final CommandEvent event);
 
+	@Nonnull
 	String getName();
 
+	@Nonnull
 	String[] getAlias();
 
+	@Nullable
+	Permission getPermissionNeeded();
+
+	@Nonnull
 	default CommandType getType() {
 		return CommandType.GENERAL;
 	}
