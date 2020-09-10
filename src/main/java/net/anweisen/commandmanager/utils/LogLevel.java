@@ -3,9 +3,6 @@ package net.anweisen.commandmanager.utils;
 import java.util.logging.Level;
 
 /**
- * Developed in the CommandManager project
- * on 09-06-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */

@@ -6,9 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Developed in the CommandManager project
- * on 08-01-2020
- *
  * @see net.anweisen.commandmanager.listener.Listener
  *
  * @author anweisen | https://github.com/anweisen

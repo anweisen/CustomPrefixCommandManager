@@ -5,9 +5,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Developed in the CommandManager project
- * on 09-05-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */

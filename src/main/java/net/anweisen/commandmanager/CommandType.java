@@ -3,12 +3,8 @@ package net.anweisen.commandmanager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
- *
  * @see net.anweisen.commandmanager.commands.ICommand
  * @see net.anweisen.commandmanager.CommandHandler
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
  */

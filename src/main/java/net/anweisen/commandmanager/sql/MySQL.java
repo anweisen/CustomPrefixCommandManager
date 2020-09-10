@@ -9,9 +9,6 @@ import javax.annotation.Nonnull;
 import java.sql.SQLException;
 
 /**
- * Developed in the CommandManager project
- * on 08-31-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */

@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Developed in the CommandManager project
- * on 09-01-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */

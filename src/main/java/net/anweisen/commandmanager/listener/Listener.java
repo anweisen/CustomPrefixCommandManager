@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Developed in the CommandManager project
- * on 08-01-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
  */

@@ -1,14 +1,12 @@
 package net.anweisen.commandmanager.exceptions;
 
+import net.anweisen.commandmanager.listener.Listener;
+
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
+ * This exception is thrown when an unexpected {@link Throwable} happens while executing
+ * a {@link Listener} method
  *
- * This exception is thrown when an unexpected {@link java.lang.Exception} happens while executing
- * a {@link net.anweisen.commandmanager.listener.Listener} method
- *
- * @see net.anweisen.commandmanager.listener.Listener
- *
+ * @see Listener
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */

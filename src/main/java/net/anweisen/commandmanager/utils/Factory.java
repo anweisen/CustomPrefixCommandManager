@@ -3,8 +3,7 @@ package net.anweisen.commandmanager.utils;
 import javax.annotation.Nonnull;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
+ * This class is used to generate a object by using another object
  *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2

@@ -8,9 +8,6 @@ import java.nio.file.Files;
 import java.util.Properties;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */

@@ -6,9 +6,6 @@ import net.anweisen.commandmanager.utils.NamedValue;
 import java.io.IOException;
 
 /**
- * Developed in the CommandManager project
- * on 08-31-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.3
  */
