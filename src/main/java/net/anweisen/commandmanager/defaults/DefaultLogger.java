@@ -2,19 +2,18 @@ package net.anweisen.commandmanager.defaults;
 
 import net.anweisen.commandmanager.utils.Bindable;
 import net.anweisen.commandmanager.utils.LogLevel;
+import net.anweisen.commandmanager.utils.StringBuilderPrintWriter;
 import sun.reflect.Reflection;
 
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
- * Developed in the CommandManager project
- * on 09-05-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
@@ -22,14 +21,19 @@ public final class DefaultLogger extends Logger implements Bindable {
 
 	public static final DefaultLogger DEFAULT = new DefaultLogger("default");
 
-	public static void logDefault(Level level, Class<?> caller, String message) {
+	public static void logDefault(@Nonnull Level level, @Nonnull Class<?> caller, @Nonnull String message) {
 		LogRecord record = new LogRecord(level, message);
 		record.setSourceClassName(caller.getSimpleName());
 		DEFAULT.log(record);
 	}
 
-	public static void logDefault(Level level, String message) {
+	public static void logDefault(@Nonnull Level level, @Nonnull String message) {
 		logDefault(level, Reflection.getCallerClass(), message);
+	}
+
+	public static void logDefault(@Nonnull Throwable thrown, Class<?> caller) {
+		if (caller == null) caller = Reflection.getCallerClass();
+		DEFAULT.error(thrown, caller);
 	}
 
 	private final DefaultLogHandler handler;
@@ -69,11 +73,25 @@ public final class DefaultLogger extends Logger implements Bindable {
 	}
 
 	public void error(String message) {
-		log(LogLevel.DEBUG,  message);
+		log(LogLevel.ERROR, message);
 	}
 
 	public void error(Supplier<String> message) {
-		log(LogLevel.ERROR,  message);
+		log(LogLevel.ERROR, message);
+	}
+
+	public void error(@Nonnull Throwable ex, Class<?> caller) {
+		if (caller == null) caller = Reflection.getCallerClass();
+		StringBuilderPrintWriter writer = new StringBuilderPrintWriter();
+		ex.printStackTrace(writer);
+		LogRecord record = new LogRecord(LogLevel.ERROR, writer.getBuilder().toString());
+		record.setSourceClassName(caller.getSimpleName());
+		log(record);
+	}
+
+	public void error(@Nonnull Throwable ex) {
+		PrintWriter writer = new StringBuilderPrintWriter();
+		ex.printStackTrace(writer);
 	}
 
 	public void log(Level level, Class<?> caller, String message) {
