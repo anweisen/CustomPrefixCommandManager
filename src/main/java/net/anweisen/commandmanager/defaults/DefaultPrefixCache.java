@@ -12,11 +12,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * Developed in the CommandManager project
- * on 09-06-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
@@ -31,6 +30,9 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 	private final String table, guildColumn, prefixColumn;
 	private final SQL dataSource;
 
+	private int clearRate = 3*60;
+	private Timer timer;
+
 	public DefaultPrefixCache(@Nonnull String defaultPrefix, @Nonnull SQL dataSource) {
 		this(true, defaultPrefix, "server", "guildID", "prefix", dataSource);
 	}
@@ -43,6 +45,7 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		this.prefixColumn = prefixColumn;
 		this.dataSource = dataSource;
 		checkDatabaseTable();
+		setupTimer();
 	}
 
 	private void checkDatabaseTable() {
@@ -51,6 +54,18 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		} catch (SQLException ex) {
 			throw new ExceptionInInitializerError(ex);
 		}
+	}
+
+	private void setupTimer() {
+		if (timer != null) timer.cancel();
+		if (clearRate < 0) return;
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				cache.clear();
+			}
+		}, 0, clearRate * 1000);
 	}
 
 	/**
@@ -82,41 +97,11 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		}
 	}
 
-	public void setDefaultPrefix(@Nonnull String defaultPrefix) {
-		this.defaultPrefix = defaultPrefix;
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	public String getDefaultPrefix() {
-		return defaultPrefix;
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	public SQL getDataSource() {
-		return dataSource;
-	}
-
-	@CheckReturnValue
-	public boolean shouldCachePrefix() {
-		return cachePrefix;
-	}
-
-	/**
-	 * Sets if, when a prefix was loaded, it will be stored and
-	 */
-	public void setCachePrefix(boolean cache) {
-		if (this.cachePrefix != cache) {
-			this.cache.clear();
-		}
-		this.cachePrefix = cache;
-	}
-
 	/**
 	 * @param guildID The key, the prefix is saved to
 	 * @return The prefix saved in the database by the given guildID
-	 * @throws SQLException If the database does not contain a entry for the given guildID (or an {@link SQLException} happens while using the sql
+	 * @throws SQLException If a {@link SQLException} happens while using sql
+	 * @exception IllegalStateException If the database does not contain the given guildID
 	 */
 	public String getFromDatabase(String guildID) throws SQLException {
 		ResultSet result = dataSource.query("SELECT " + prefixColumn + " FROM " + table + " WHERE " + guildColumn + " = ?", guildID);
@@ -153,7 +138,8 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 	}
 
 	/**
-	 * @return The cached prefix, if {@link DefaultPrefixCache#shouldCachePrefix()} is enabled. Otherwise it will load the prefix using {@link DefaultPrefixCache#load(String)}
+	 * @return The cached prefix, if {@link DefaultPrefixCache#shouldCachePrefix()} is enabled.
+	 *         Otherwise it will load the prefix using {@link DefaultPrefixCache#load(String)}
 	 */
 	@Nonnull
 	@CheckReturnValue
@@ -180,7 +166,7 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 	public synchronized void set(String guildID, String prefix) throws SQLException {
 		if (cachePrefix) setCached(guildID, prefix);
 		try {
-			getFromDatabase(guildID);
+			getFromDatabase(guildID); // Checks if the guild is in the database (throws IllegalStateException if not)
 			dataSource.update("UPDATE " + table + " SET " + prefixColumn + " = ? WHERE " + guildColumn + " = ?", prefix, guildID);
 		} catch (IllegalStateException ignored) {
 			dataSource.update("INSERT INTO " + table + " (" + guildColumn + ", " + prefixColumn + ") VALUES (?, ?)", guildID, prefix);
@@ -201,6 +187,46 @@ public final class DefaultPrefixCache implements Factory<String, Guild>, Bindabl
 		} else {
 			return getPrefix(guild.getId());
 		}
+	}
+
+	public void setDefaultPrefix(@Nonnull String defaultPrefix) {
+		this.defaultPrefix = defaultPrefix;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public String getDefaultPrefix() {
+		return defaultPrefix;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public SQL getDataSource() {
+		return dataSource;
+	}
+
+	@CheckReturnValue
+	public boolean shouldCachePrefix() {
+		return cachePrefix;
+	}
+
+	/**
+	 * Sets if, when a prefix was loaded, it will be stored and
+	 */
+	public void setCachePrefix(boolean cache) {
+		if (this.cachePrefix != cache) {
+			this.cache.clear();
+		}
+		this.cachePrefix = cache;
+	}
+
+	public int getClearRate() {
+		return clearRate;
+	}
+
+	public void setClearRate(int clearRate) {
+		this.clearRate = clearRate;
+		setupTimer();
 	}
 
 }
