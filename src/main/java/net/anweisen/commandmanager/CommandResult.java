@@ -3,22 +3,19 @@ package net.anweisen.commandmanager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
- *
  * {@link CommandHandler#handleCommand(String, MessageReceivedEvent)}
  * returns one enum state of this enum, depending on how the command process went
  *
  * @see CommandHandler#handleCommand(String, MessageReceivedEvent)
  * @see CommandType
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.1
  */
 public enum CommandResult {
 
-	INVALID_CHANNEL_PRIVATE_COMMAND,
-	INVALID_CHANNEL_GUILD_COMMAND,
+	INVALID_CHANNEL_PRIVATE_COMMAND("You can only use this command in a private chat."),
+	INVALID_CHANNEL_GUILD_COMMAND("You can only use this command in a guild."),
+	NO_PERMISSIONS("You do not have permissions for that"),
 	WEBHOOK_MESSAGE_NO_REACT,
 	BOT_MESSAGE_NO_REACT,
 	PREFIX_NOT_USED,
@@ -26,4 +23,19 @@ public enum CommandResult {
 	COMMAND_NOT_FOUND,
 	SUCCESS;
 
+	private String answer;
+
+	CommandResult(String answer) {
+		this.answer = answer;
+	}
+
+	CommandResult() { }
+
+	public String getAnswer() {
+		return answer;
+	}
+
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
 }
