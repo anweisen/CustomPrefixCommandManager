@@ -1,5 +1,5 @@
 config.properties
-config.db
+data.db
 CommandManager.iml
 
 /.idea
