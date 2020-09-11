@@ -10,9 +10,6 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 /**
- * Developed in the CommandManager project
- * on 09-05-2020
- *
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
@@ -35,6 +32,7 @@ public final class DefaultLogHandler extends Handler {
 		}
 	}
 
+	@Nonnull
 	public static String getCurrentTimeAsString() {
 		OffsetDateTime time = OffsetDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
