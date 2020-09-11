@@ -266,7 +266,7 @@ public class CommandEvent {
 	 * @see IMentionable
 	 * @since 1.2
 	 */
-	public static boolean containsMention(String text) {
+	public static boolean containsMention(@Nonnull String text) {
 
 		// n is a placeholder for any number
 		char[] goal = "<@!nnnnnnnnnnnnnnnnnn>".toCharArray();
@@ -299,11 +299,13 @@ public class CommandEvent {
 
 	}
 
-	public static String syntax(CommandEvent event, String syntax) {
+	@Nonnull
+	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
 		return syntax(event, syntax, true);
 	}
 
-	public static String syntax(CommandEvent event, String syntax, boolean command) {
+	@Nonnull
+	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax, boolean command) {
 		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;
 		boolean mark = !containsMention(message);
 		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
