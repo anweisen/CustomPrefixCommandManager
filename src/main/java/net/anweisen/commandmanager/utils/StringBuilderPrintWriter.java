@@ -3,6 +3,7 @@ package net.anweisen.commandmanager.utils;
 import java.io.PrintWriter;
 
 /**
+ * Uses a {@link StringBuilderWriter} as output
  * @see StringBuilderWriter
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
