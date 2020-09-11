@@ -8,12 +8,10 @@ import java.util.Arrays;
 import java.util.Properties;
 
 /**
- * Developed in the CommandManager project
- * on 08-30-2020
+ * This class allows you to easily load data from a file by keys using {@link Properties}
  *
- * This class allows you to easily load data from a .properties file by keys
- * @see java.util.Properties
- *
+ * @see Properties
+ * @see PropertiesUtils
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */
@@ -46,11 +44,11 @@ public class ConfigLoader implements Bindable {
 
 	public ConfigLoader(String path, NamedValue... values) throws IOException {
 
-		if (values == null || values.length == 0) throw new IllegalArgumentException();
+		if (values == null || values.length == 0) throw new IllegalArgumentException("Properties keys cannot be null or empty!");
 
 		this.values = values;
 
-		if (!path.toLowerCase().endsWith(".properties")) {
+		if (!path.contains(".")) {
 			path += ".properties";
 		}
 
@@ -65,7 +63,7 @@ public class ConfigLoader implements Bindable {
 			}
 
 			PropertiesUtils.saveProperties(properties, file);
-			throw new FileNotFoundException();
+			throw new FileNotFoundException("The config file " + file + " does not exists. Created a new one.");
 		}
 
 		// We'll read every value for the given keys and set it as value to the NamedValue
