@@ -22,6 +22,12 @@ public final class MySQL extends SQL {
 
 	@Nonnull
 	@CheckReturnValue
+	public static MySQL defaultOfConfig(@Nonnull ConfigLoader config) throws SQLException {
+		return new MySQL(URLDataSource.ofConfig(config).addAttachment(LinkAttachment.DEFAULT));
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	public static MySQL createDefault(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
 		return new MySQL(host, database, user, password, LinkAttachment.DEFAULT);
 	}
