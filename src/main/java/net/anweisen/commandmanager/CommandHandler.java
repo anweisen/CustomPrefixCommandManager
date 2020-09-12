@@ -4,6 +4,8 @@ import net.anweisen.commandmanager.commands.ICommand;
 import net.anweisen.commandmanager.defaults.DefaultLogger;
 import net.anweisen.commandmanager.exceptions.CommandExecutionException;
 import net.anweisen.commandmanager.utils.Bindable;
+import net.anweisen.commandmanager.utils.CoolDownManager;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.annotation.CheckReturnValue;
@@ -28,6 +30,8 @@ public class CommandHandler implements Bindable {
 	private MessageReactionBehavior reactToWebhooks = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
 	private MessageReactionBehavior reactToBots = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
 	private final ArrayList<ICommand> commands = new ArrayList<>();
+
+	private CoolDownManager<Member> cooldownManager;
 
 	@Nonnull
 	public CommandHandler registerCommand(ICommand command) {
@@ -148,9 +152,11 @@ public class CommandHandler implements Bindable {
 
 		if (command == null) return CommandResult.COMMAND_NOT_FOUND;
 
-		if (!command.shouldReactToMentionPrefix() && byMention) {
+		if (cooldownManager != null && cooldownManager.checkCoolDown(event.getMember())) {
+			return CommandResult.MEMBER_ON_COOLDOWN;
+		} else if (!command.shouldReactToMentionPrefix() && byMention) {
 			return CommandResult.MENTION_PREFIX_NO_REACT;
-		} else if (command.getPermissionNeeded() != null && event.getMember().hasPermission(command.getPermissionNeeded())) {
+		} else if (command.getPermissionNeeded() != null && !event.getMember().hasPermission(command.getPermissionNeeded())) {
 			return CommandResult.NO_PERMISSIONS;
 		} else if (reactToWebhooks != MessageReactionBehavior.REACT_ALWAYS && event.isWebhookMessage() && (!command.shouldReactToWebhooks() || reactToWebhooks == MessageReactionBehavior.REACT_NEVER)) {
 			return CommandResult.WEBHOOK_MESSAGE_NO_REACT;
@@ -185,6 +191,14 @@ public class CommandHandler implements Bindable {
 
 	public MessageReactionBehavior getWebhookMessageBehavior() {
 		return reactToWebhooks;
+	}
+
+	public CoolDownManager<Member> getCoolDownManager() {
+		return cooldownManager;
+	}
+
+	public void setCoolDownManager(CoolDownManager<Member> cooldownManager) {
+		this.cooldownManager = cooldownManager;
 	}
 
 	public static final ThreadGroup THREAD_GROUP = new ThreadGroup("CommandProcessGroup");
