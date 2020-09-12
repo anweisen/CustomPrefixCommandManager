@@ -62,7 +62,7 @@ public abstract class Command implements ICommand {
 	private CommandType type = CommandType.GENERAL;
 	private boolean reactToWebhooks = false;
 	private boolean reactToBots = false;
-	private boolean reactToMentionPrefix = false;
+	private boolean reactToMentionPrefix = true;
 
 	public abstract void onCommand(@Nonnull final CommandEvent event);
 
