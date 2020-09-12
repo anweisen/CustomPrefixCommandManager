@@ -57,6 +57,10 @@ public class CommandEvent {
 		return prefix;
 	}
 
+	public boolean prefixContainsMention() {
+		return containsMention(prefix.trim());
+	}
+
 	public String[] getArgs() {
 		return args;
 	}
@@ -129,6 +133,11 @@ public class CommandEvent {
 	}
 
 	@Nonnull
+	public String getMemberAvatarURL(int resolution) {
+		return getMemberAvatarURL() + "?size=" + resolution;
+	}
+
+	@Nonnull
 	public String getUserTag() {
 		return getUser().getAsTag();
 	}
@@ -186,11 +195,9 @@ public class CommandEvent {
 	}
 
 	public List<Member> getMentionedMembers() {
-		List<Member> mentioned = new ArrayList<>(receivedEvent.getMessage().getMentionedMembers());
-		try {
-			mentioned.remove(receivedEvent.getGuild().getSelfMember());
-		} catch (Throwable ignored) { }
-		return mentioned;
+		List<Member> members = new ArrayList<>(receivedEvent.getMessage().getMentionedMembers());
+		if (prefixContainsMention()) members.remove(0);
+		return members;
 	}
 
 	public List<TextChannel> getMentionedChannels() {
