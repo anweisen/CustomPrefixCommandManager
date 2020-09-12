@@ -24,9 +24,9 @@ public final class ImageUtils {
 
 	private ImageUtils() { }
 
-	public static void post(@Nonnull RenderedImage image, @Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String fileType) throws IOException {
+	public static void post(@Nonnull RenderedImage image, @Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String fileType, boolean delete) throws IOException {
 
-		fileName += fileType;
+		fileName += "." + fileType;
 
 		File folder = new File("./temp");
 		if (!folder.exists()) folder.mkdir();
@@ -34,7 +34,9 @@ public final class ImageUtils {
 
 		ImageIO.write(image, fileType, file);
 
-		channel.sendFile(file, fileName).queue(message -> file.delete(), MessageException::create);
+		channel.sendFile(file, fileName).queue(message -> {
+			if (delete) file.delete();
+		}, MessageException::create);
 
 	}
 
@@ -52,6 +54,27 @@ public final class ImageUtils {
 
 		return lineWidth;
 
+	}
+
+	/**
+	 * @return The ending position of the text
+	 */
+	public static int addText(@Nonnull Graphics2D graphics, @Nonnull String text, int height, int x) {
+		TextLayout layout = getTextLayout(graphics, text);
+		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		graphics.drawString(text, x, height);
+		return (int) (x + layout.getBounds().getWidth());
+	}
+
+	/**
+	 * @return Returns where the text has started
+	 */
+	public static int addTextEndingAt(@Nonnull Graphics2D graphics, @Nonnull String text, int height, int endX) {
+		TextLayout layout = getTextLayout(graphics, text);
+		int position = (int) (endX - layout.getBounds().getWidth());
+		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		graphics.drawString(text, position, height);
+		return position;
 	}
 
 	/**
@@ -76,6 +99,11 @@ public final class ImageUtils {
 		HttpURLConnection connection = (HttpURLConnection) new URL(request).openConnection();
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
 		return ImageIO.read(connection.getInputStream());
+	}
+
+	public static BufferedImage loadResource(String path) throws IOException {
+		InputStream stream = ImageUtils.class.getClassLoader().getResourceAsStream(path);
+		return ImageIO.read(stream);
 	}
 
 	@Nonnull
