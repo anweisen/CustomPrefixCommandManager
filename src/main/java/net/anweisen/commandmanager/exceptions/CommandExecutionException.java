@@ -7,6 +7,7 @@ package net.anweisen.commandmanager.exceptions;
 public class CommandExecutionException extends RuntimeException {
 
 	public CommandExecutionException() {
+		super();
 	}
 
 	public CommandExecutionException(String message) {
