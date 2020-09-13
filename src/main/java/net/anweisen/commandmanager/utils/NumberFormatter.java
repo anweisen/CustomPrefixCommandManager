@@ -18,9 +18,40 @@ public interface NumberFormatter {
 			DEFAULT = fromPattern("0.##", ""),
 			PERCENTAGE = fromPattern("0.##", "%"),
 			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", ""),
+			TIME = value -> {
+
+				int seconds = (int) value;
+				int minutes = seconds / 60;
+				int hours = minutes / 60;
+				int days = hours / 24;
+
+				seconds %= 60;
+				minutes %= 60;
+				hours %= 24;
+
+				return (days > 0 ? days + "d " : "")
+					 + (hours > 0 ? hours + "h " : "")
+					 + (minutes > 0 ? minutes + "m " : "")
+					 + (days == 0 ? seconds + "s" : "");
+
+			},
+			BIG_TIME = value -> {
+
+				int seconds = (int) value;
+				int minutes = seconds / 60;
+				int hours = minutes / 60;
+				int days = hours / 24;
+				minutes %= 60;
+				hours %= 24;
+
+				return (days > 0 ? days + "d " : "")
+						+ (hours > 0 ? hours + "h " : "")
+						+ (days == 0 ? minutes + "m " : "");
+
+			},
 			BIG_NUMBER = value -> {
 
-				DecimalFormat format = new DecimalFormat("0.###");
+				DecimalFormat format = new DecimalFormat("0.##");
 				double divide;
 				String ending = "";
 
