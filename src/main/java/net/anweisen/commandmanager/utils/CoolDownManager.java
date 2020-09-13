@@ -17,7 +17,7 @@ public final class CoolDownManager<T> {
 	}
 
 	public CoolDownManager(float seconds) {
-		this.millis = (long) (seconds * 100);
+		this.millis = (long) (seconds * 1000);
 	}
 
 	public void setMillis(long millis) {
