@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -78,7 +79,12 @@ public final class DefaultStatusChanger implements Bindable {
 	}
 
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull String prefix, @Nonnull String... suffix) {
+		this(shardManager, ActivityType.DEFAULT, prefix, suffix);
+	}
+
+	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull ActivityType type, @Nonnull String prefix, @Nonnull String... suffix) {
 		this.shardManager = shardManager;
+		this.type = type;
 		if (suffix.length == 0) {
 			this.status = createNewFactory(prefix);
 		} else {
@@ -111,7 +117,7 @@ public final class DefaultStatusChanger implements Bindable {
 				shardManager.setActivity(createActivity(type, messages[index], "https://twitch.tv/"));
 
 			}
-		}, updateRate * 1000);
+		}, 0, updateRate * 1000);
 	}
 
 	public void stop() {
@@ -123,12 +129,28 @@ public final class DefaultStatusChanger implements Bindable {
 		start();
 	}
 
-	public void setType(ActivityType type) {
+	public void setType(@Nonnull ActivityType type) {
 		this.type = type;
 	}
 
 	public void setUpdateRate(int updateRate) {
 		this.updateRate = updateRate;
 		restart();
+	}
+
+	public ActivityType getType() {
+		return type;
+	}
+
+	public ShardManager getShardManager() {
+		return shardManager;
+	}
+
+	public Factory<String[], ShardManager> getStatus() {
+		return status;
+	}
+
+	public int getUpdateRate() {
+		return updateRate;
 	}
 }
