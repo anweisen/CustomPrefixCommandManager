@@ -152,7 +152,7 @@ public class CommandHandler implements Bindable {
 
 		if (command == null) return CommandResult.COMMAND_NOT_FOUND;
 
-		if (cooldownManager != null && cooldownManager.checkCoolDown(event.getMember())) {
+		if (cooldownManager != null && cooldownManager.isOnCoolDown(event.getMember())) {
 			return CommandResult.MEMBER_ON_COOLDOWN;
 		} else if (!command.shouldReactToMentionPrefix() && byMention) {
 			return CommandResult.MENTION_PREFIX_NO_REACT;
@@ -167,6 +167,8 @@ public class CommandHandler implements Bindable {
 		} else if (command.getType() == CommandType.PRIVATE && event.isFromGuild()) {
 			return CommandResult.INVALID_CHANNEL_PRIVATE_COMMAND;
 		}
+
+		if (cooldownManager != null) cooldownManager.addToCoolDown(event.getMember());
 
 		process(command, new CommandEvent(prefix, getCommandName(command, commandName), event));
 		return CommandResult.SUCCESS;
