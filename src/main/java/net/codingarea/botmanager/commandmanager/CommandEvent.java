@@ -87,7 +87,11 @@ public class CommandEvent {
 	}
 
 	public Guild getGuild() {
-		return receivedEvent.getGuild();
+		try {
+			return receivedEvent.getGuild();
+		} catch (IllegalStateException ignored) {
+			return null;
+		}
 	}
 
 	public String getGuildID() {
