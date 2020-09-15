@@ -1,7 +1,6 @@
 package net.codingarea.botmanager.sql.source;
 
 import net.codingarea.botmanager.utils.ConfigLoader;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.sql.Connection;
@@ -57,7 +56,7 @@ public final class URLDataSource implements DataSource {
 		return MYSQL_URL.replace("%host", host + (port != null ? ":" + port : "")).replace("%database", database) + LinkAttachment.list(linkAttachments);
 	}
 
-	@NotNull
+	@Nonnull
 	@Override
 	public Connection createConnection() throws SQLException {
 		return DriverManager.getConnection(getURL(), user, password);
