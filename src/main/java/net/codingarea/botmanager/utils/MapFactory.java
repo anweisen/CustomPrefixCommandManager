@@ -18,37 +18,7 @@ import java.util.TreeMap;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public final class MapFactory<K, V> {
-
-	public static final class DefaultFactory {
-
-		private DefaultFactory() { }
-
-		public static <T> Factory<String, T> objectToString() {
-			return String::valueOf;
-		}
-
-		public static <T extends IMentionable> Factory<String, T> mentionableToString() {
-			return IMentionable::getId;
-		}
-
-		public static Factory<Integer, String> stringToInteger() {
-			return Integer::parseInt;
-		}
-
-		public static Factory<String, String> stringToString() {
-			return string -> string;
-		}
-
-		public static Factory<Role, String> stringToRole(Guild guild) {
-			return guild::getRoleById;
-		}
-
-		public static Factory<TextChannel, String> stringToChannel(Guild guild) {
-			return guild::getTextChannelById;
-		}
-
-	}
+public final class MapFactory {
 
 	public static final String REGEX_1 = ",",
 							   REGEX_2 = "=";
