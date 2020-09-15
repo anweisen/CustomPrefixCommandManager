@@ -25,7 +25,9 @@ public final class Colors {
 			IDLE = decode("#F09F19"),
 			OFFLINE = decode("#747F8D"),
 
-			EMBED = decode("#2F3136");
+			EMBED = decode("#2F3136"),
+
+			NO_RANK = decode("#CCD8DE");
 
 	public static Color getColorForStatus(OnlineStatus status) {
 		switch (status) {
