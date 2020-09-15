@@ -134,7 +134,8 @@ public class ConfigLoader implements Bindable {
 	@Override
 	public String toString() {
 		return "SecretsLoader{" +
-				"path=" + file +
+				"file=" + file +
+				", size=" + values.length +
 				", values=" + Arrays.toString(values) +
 				'}';
 	}
