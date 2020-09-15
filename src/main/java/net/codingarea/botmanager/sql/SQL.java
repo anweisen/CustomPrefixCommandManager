@@ -7,6 +7,7 @@ import net.codingarea.botmanager.utils.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
 import java.sql.*;
@@ -74,6 +75,7 @@ public abstract class SQL implements Bindable {
 		this.logger = logger;
 	}
 
+	@CheckReturnValue
 	public boolean connectionIsOpened() {
 		try {
 			return connection != null && !connection.isClosed();
@@ -145,6 +147,8 @@ public abstract class SQL implements Bindable {
 		statement.close();
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public PreparedStatement prepare(@Nonnull String sql) throws SQLException {
 		verifyConnection();
 		return connection.prepareStatement(sql);
