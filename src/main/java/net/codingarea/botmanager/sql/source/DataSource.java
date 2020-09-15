@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
+ * Used to create database connections ({@link #createConnection()})
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */
