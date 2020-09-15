@@ -36,7 +36,8 @@ public final class CoolDownManager<T> {
 	public long getCoolDownLeft(T entity) {
 		Long last = this.last.get(entity);
 		if (last == null) return 0;
-		return last - millis - System.currentTimeMillis();
+		long until = last + millis;
+		return until - System.currentTimeMillis();
 	}
 
 	public void addToCoolDown(T entity) {
