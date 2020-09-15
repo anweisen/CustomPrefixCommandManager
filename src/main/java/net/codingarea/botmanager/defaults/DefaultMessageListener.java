@@ -36,18 +36,34 @@ public final class DefaultMessageListener implements Listener {
 		this.resultHandler = new DefaultResultHandler();
 	}
 
+	/**
+	 * @param prefix The {@link Guild} param is null when the message is not from a guild
+	 */
 	public DefaultMessageListener(@Nonnull CommandHandler commandHandler, @Nonnull Factory<String, Guild> prefix, @Nonnull TripleConsumer<MessageReceivedEvent, CommandResult, Object> resultHandler) {
 		this.commandHandler = commandHandler;
 		this.prefix = prefix;
 		this.resultHandler = resultHandler;
 	}
 
-	public void setPrefix(@Nonnull Factory<String, Guild> prefix) {
+	/**
+	 * @param prefix {@link Factory#get(Object)} is used to get the prefix which should be used
+	 *               The {@link Guild} param is null when the message is not from a guild
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public DefaultMessageListener setPrefix(@Nonnull Factory<String, Guild> prefix) {
 		this.prefix = prefix;
+		return this;
 	}
 
-	public void setResultHandler(TripleConsumer<MessageReceivedEvent, CommandResult, Object> resultHandler) {
+	/**
+	 * @param resultHandler <code>null</code> to disable results
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public DefaultMessageListener setResultHandler(TripleConsumer<MessageReceivedEvent, CommandResult, Object> resultHandler) {
 		this.resultHandler = resultHandler;
+		return this;
 	}
 
 	@EventHandler
