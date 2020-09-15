@@ -90,10 +90,12 @@ public interface Bindable {
 	/**
 	 * @return to how many keys this object was bound
 	 */
+	@CheckReturnValue
 	default int bindings() {
 		return keys().size();
 	}
 
+	@CheckReturnValue
 	default boolean isBound() {
 		return !keys().isEmpty();
 	}
