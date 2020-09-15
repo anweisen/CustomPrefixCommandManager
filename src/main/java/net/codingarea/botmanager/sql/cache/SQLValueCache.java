@@ -18,6 +18,8 @@ import java.util.TimerTask;
  */
 public class SQLValueCache implements Bindable {
 
+	public static final int DEFAULT_CLEAR_RATE = 3 * 60;
+
 	protected final Map<String, String> cache = new HashMap<>();
 	protected boolean cacheValues;
 
@@ -41,7 +43,7 @@ public class SQLValueCache implements Bindable {
 	}
 
 	public SQLValueCache(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, @Nonnull String defaultValue) {
-		this(true, defaultValue, data, table, keyColumn, valueColumn, 3 * 60);
+		this(true, defaultValue, data, table, keyColumn, valueColumn, DEFAULT_CLEAR_RATE);
 	}
 
 	private void updateTimer() {
@@ -69,8 +71,9 @@ public class SQLValueCache implements Bindable {
 
 	/**
 	 * @throws IllegalStateException If not {@link #shouldCacheValues()}
+	 * @see #set(String, String)
 	 */
-	public void setCached(@Nonnull String key, String value) {
+	public synchronized void setCached(@Nonnull String key, String value) {
 		if (!cacheValues) throw new IllegalStateException("Cannot cache values if disabled");
 		if (value == null) {
 			cache.remove(key);
@@ -80,7 +83,7 @@ public class SQLValueCache implements Bindable {
 	}
 
 	/**
-	 * @param key The key the value is assigned to. Null when there is not value
+	 * @param key The key the value is assigned to. <code>null</code> when there is no value
 	 * @throws IllegalStateException If not {@link #shouldCacheValues()}
 	 */
 	public String getCached(@Nonnull String key) {
@@ -101,12 +104,12 @@ public class SQLValueCache implements Bindable {
 	}
 
 	/**
-	 * Reads the prefix from the database by the given. If not prefix was found it will return the {@link #getDefaultValue()}
+	 * Reads the prefix from the database by the given. If no prefix was found it will return the {@link #getDefaultValue()}
 	 * If {@link #shouldCacheValues()}, it'll cache the value as well (using {@link #setCached(String, String)})
 	 * @return The loaded value
 	 */
 	@Nonnull
-	public String load(String key) {
+	public synchronized String load(String key) {
 
 		String value = null;
 
@@ -146,9 +149,9 @@ public class SQLValueCache implements Bindable {
 
 	/**
 	 * Loads the value using {@link #load(String)}, by the given key
-	 * If the guild is null, it will return the {@link #getDefaultValue()}
+	 * If the guild is <code>null</code>, it will return the {@link #getDefaultValue()}
 	 * @see #getValue(String)
-	 * @param key The key to which the searched value should be stored to. If null, it will return {@link #getDefaultValue()}
+	 * @param key The key to which the searched value should be stored to. If <code>null</code>, it will return {@link #getDefaultValue()}
 	 * @return Returns the prefix loaded
 	 */
 	@Nonnull
@@ -184,12 +187,12 @@ public class SQLValueCache implements Bindable {
 		this.cacheValues = cacheValues;
 	}
 
-	public void setClearRate(int clearRate) {
+	public synchronized void setClearRate(int clearRate) {
 		this.clearRate = clearRate;
 		updateTimer();
 	}
 
-	public void resetCache() {
+	public synchronized void resetCache() {
 		cache.clear();
 	}
 
@@ -227,6 +230,7 @@ public class SQLValueCache implements Bindable {
 		return table;
 	}
 
+	@CheckReturnValue
 	public boolean shouldCacheValues() {
 		return cacheValues;
 	}
