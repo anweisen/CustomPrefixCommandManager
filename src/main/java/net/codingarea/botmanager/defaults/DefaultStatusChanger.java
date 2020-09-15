@@ -20,6 +20,8 @@ import java.util.TimerTask;
  */
 public final class DefaultStatusChanger implements Bindable {
 
+	public static final String DEFAULT_STREAM_URL = "https://www.twitch.tv/#";
+
 	@Nonnull
 	@CheckReturnValue
 	public static Factory<String[], ShardManager> createNewFactory(@Nonnull String prefix) {
@@ -113,7 +115,7 @@ public final class DefaultStatusChanger implements Bindable {
 					index = 0;
 				}
 
-				shardManager.setActivity(createActivity(type, messages[index], "https://twitch.tv/"));
+				shardManager.setActivity(createActivity(type, messages[index], DEFAULT_STREAM_URL));
 
 			}
 		}, 0, updateRate * 1000);
