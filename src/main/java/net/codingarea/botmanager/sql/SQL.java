@@ -190,11 +190,11 @@ public abstract class SQL implements Bindable {
 		return set;
 	}
 
-	public boolean paramIsSet(@Nonnull String sql, @Nonnull String selection, @Nonnull Object... params) throws SQLException {
+	public boolean paramIsSet(@Nonnull String sql, @Nonnull String param, @Nonnull Object... params) throws SQLException {
 		ResultSet result = query(sql, params);
 		boolean set = false;
 		if (result.next()) {
-			if (result.getObject(selection) != null) {
+			if (result.getObject(param) != null) {
 				set = true;
 			}
 		}
