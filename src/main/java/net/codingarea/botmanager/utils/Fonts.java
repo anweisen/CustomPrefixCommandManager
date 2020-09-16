@@ -1,8 +1,10 @@
 package net.codingarea.botmanager.utils;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,26 +16,37 @@ public final class Fonts {
 
 	private Fonts() { }
 
-	public static Font loadFile(String path, float size) throws IOException, FontFormatException {
+	@Nonnull
+	@CheckReturnValue
+	public static Font loadFile(@Nonnull String path, float size) throws IOException, FontFormatException {
 		return loadFile(path, size, Font.PLAIN);
 	}
 
-	public static Font loadFile(String path, float size, int style) throws IOException, FontFormatException {
+	@Nonnull
+	@CheckReturnValue
+	public static Font loadFile(@Nonnull String path, float size, int style) throws IOException, FontFormatException {
 		Font font = Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(style, size);
 		register(font);
 		return font;
 	}
 
-	public static Font loadResource(String path, float size) throws IOException, FontFormatException {
+	@Nonnull
+	@CheckReturnValue
+	public static Font loadResource(@Nonnull String path, float size) throws IOException, FontFormatException {
 		return loadResource(path, size, Font.PLAIN);
 	}
 
-	public static Font loadResource(String path, float size, int style) throws IOException, FontFormatException {
+	@Nonnull
+	@CheckReturnValue
+	public static Font loadResource(@Nonnull String path, float size, int style) throws IOException, FontFormatException {
 		InputStream stream = Fonts.class.getClassLoader().getResourceAsStream(path);
+		if (stream == null) throw new FileNotFoundException("Could not find resource " + path);
 		return load(stream, size, style);
 	}
 
-	public static Font load(InputStream stream, float size, int style) throws IOException, FontFormatException {
+	@Nonnull
+	@CheckReturnValue
+	public static Font load(@Nonnull InputStream stream, float size, int style) throws IOException, FontFormatException {
 		Font font = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(style, size);
 		register(font);
 		return font;
