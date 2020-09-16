@@ -1,13 +1,16 @@
 package net.codingarea.botmanager.defaults;
 
+import jdk.internal.dynalink.beans.CallerSensitiveDetector;
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.LogLevel;
 import net.codingarea.botmanager.utils.StringBuilderPrintWriter;
+import sun.reflect.CallerSensitive;
 import sun.reflect.Reflection;
 
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.sql.Ref;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -21,18 +24,27 @@ public final class DefaultLogger extends Logger implements Bindable {
 
 	public static final DefaultLogger DEFAULT = new DefaultLogger("default");
 
-	public static void logDefault(@Nonnull Level level, @Nonnull Class<?> caller, @Nonnull String message) {
+	public static void logDefault(@Nonnull Level level, String caller, @Nonnull String message) {
 		LogRecord record = new LogRecord(level, message);
-		record.setSourceClassName(caller.getSimpleName());
+		if (caller != null) record.setSourceClassName(caller);
 		DEFAULT.log(record);
 	}
 
+	public static void logDefault(@Nonnull Level level, @Nonnull Class<?> caller, @Nonnull String message) {
+		logDefault(level, caller.getSimpleName(), message);
+	}
+
+	@CallerSensitive
 	public static void logDefault(@Nonnull Level level, @Nonnull String message) {
-		logDefault(level, Reflection.getCallerClass(), message);
+		new SecurityManager() {
+			{
+				Class<?> caller = getClassContext()[2];
+				logDefault(level, caller, message);
+			}
+		};
 	}
 
 	public static void logDefault(@Nonnull Throwable thrown, Class<?> caller) {
-		if (caller == null) caller = Reflection.getCallerClass();
 		DEFAULT.error(thrown, caller);
 	}
 
@@ -101,5 +113,4 @@ public final class DefaultLogger extends Logger implements Bindable {
 		log(record);
 		handler.setUseRecordCaller(false);
 	}
-
 }
