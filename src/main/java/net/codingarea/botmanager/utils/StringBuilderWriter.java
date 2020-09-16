@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Writer;
 
 /**
- * This class uses a {@link StringBuilder} to write to it every time called the {@link #write(char[], int, int)} method
+ * This class uses a {@link StringBuilder} to write to it every time called {@link #write(char[], int, int)}
  * @see StringBuilder
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
