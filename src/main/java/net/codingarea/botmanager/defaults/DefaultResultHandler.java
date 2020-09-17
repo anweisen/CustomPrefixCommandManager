@@ -7,6 +7,8 @@ import net.codingarea.botmanager.utils.TripleConsumer;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.sql.SQLException;
+
 /**
  * @see CommandHandler
  * @author anweisen | https://github.com/anweisen
@@ -22,8 +24,12 @@ public final class DefaultResultHandler implements TripleConsumer<MessageReceive
 
 		if (obj instanceof Throwable) {
 			Throwable thrown = (Throwable) obj;
+			String message = String.valueOf(thrown.getMessage());
+			if (thrown instanceof SQLException) {
+				message = "Database error occurred";
+			}
 			answer = answer.replace("%exception%", thrown.getClass().getName())
-						   .replace("%message%", String.valueOf(thrown.getMessage()));
+						   .replace("%message%", message);
 		} else if (obj instanceof Permission) {
 			Permission permission = (Permission) obj;
 			answer = answer.replace("%permission%", permission.getName());
