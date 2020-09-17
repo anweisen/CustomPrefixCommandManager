@@ -19,6 +19,8 @@ public interface NumberFormatter {
 			FLOATING_POINT = fromPattern("0.0", ""),
 			PERCENTAGE = fromPattern("0.##", "%"),
 			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", ""),
+
+			/* days, hours, minutes, seconds */
 			TIME = value -> {
 
 				int seconds = (int) value;
@@ -36,6 +38,8 @@ public interface NumberFormatter {
 					 + (days == 0 ? seconds + "s" : "");
 
 			},
+
+			/* days, hours, minutes */
 			BIG_TIME = value -> {
 
 				int seconds = (int) value;
@@ -47,9 +51,11 @@ public interface NumberFormatter {
 
 				return (days > 0 ? days + "d " : "")
 						+ (hours > 0 ? hours + "h " : "")
-						+ (days == 0 ? minutes + "m " : "");
+						+ (minutes > 0 ? minutes + "m " : "");
 
 			},
+
+			/* billion, million, thousand, number */
 			BIG_NUMBER = value -> {
 
 				DecimalFormat format = new DecimalFormat("0.##");
@@ -60,15 +66,15 @@ public interface NumberFormatter {
 				if (value < 1000) {
 					divide = 1;
 					format = new DecimalFormat("0.#");
-					// Thousand
+				// Thousand
 				} else if (value < 1000000) {
 					divide = 1000;
 					ending = "k";
-					// Million
+				// Million
 				} else if (value < 1000000000) {
 					divide = 1000000;
 					ending = "m";
-					// Billion
+				// Billion
 				} else {
 					divide = 1000000000;
 					ending = "b";
