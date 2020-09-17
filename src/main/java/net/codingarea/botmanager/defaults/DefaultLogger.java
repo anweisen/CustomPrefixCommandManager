@@ -1,6 +1,5 @@
 package net.codingarea.botmanager.defaults;
 
-import jdk.internal.dynalink.beans.CallerSensitiveDetector;
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.LogLevel;
 import net.codingarea.botmanager.utils.StringBuilderPrintWriter;
@@ -10,7 +9,6 @@ import sun.reflect.Reflection;
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.sql.Ref;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

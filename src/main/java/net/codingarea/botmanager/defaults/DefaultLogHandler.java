@@ -17,7 +17,7 @@ public final class DefaultLogHandler extends Handler {
 
 	@Nonnull
 	public static String getRecordAsString(Thread thread, LogRecord record, String caller) {
-		return "[" + getCurrentTimeAsString() + " " + (thread != null ? thread : Thread.currentThread()).getName() + "/" +record.getLevel().getName() + "]: " + (caller != null ? caller + " - " : "") + record.getMessage();
+		return "[" + getCurrentTimeAsString() + " " + (thread != null ? thread : Thread.currentThread()).getName() + "/" + record.getLevel().getName() + "]: " + (caller != null ? caller + " - " : "") + record.getMessage();
 	}
 
 	@Contract("null -> null; !null -> !null")
