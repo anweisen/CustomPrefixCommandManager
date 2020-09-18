@@ -17,6 +17,8 @@
 
 package net.codingarea.botmanager.utils;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -66,6 +68,7 @@ public final class Validate {
      * @param value      the value to append to the message when invalid
      * @throws IllegalArgumentException if expression is <code>false</code>
      */
+    @Contract("false, _, _ -> fail")
     public static void isTrue(final boolean expression, final String message, final Object value) {
         if (!expression) {
             throw new IllegalArgumentException(message + value);
@@ -88,6 +91,7 @@ public final class Validate {
      * @param value      the value to append to the message when invalid
      * @throws IllegalArgumentException if expression is <code>false</code>
      */
+    @Contract("false, _, _ -> fail")
     public static void isTrue(final boolean expression, final String message, final long value) {
         if (!expression) {
             throw new IllegalArgumentException(message + value);
@@ -110,6 +114,7 @@ public final class Validate {
      * @param value      the value to append to the message when invalid
      * @throws IllegalArgumentException if expression is <code>false</code>
      */
+    @Contract("false, _, _ -> fail")
     public static void isTrue(final boolean expression, final String message, final double value) {
         if (!expression) {
             throw new IllegalArgumentException(message + value);
@@ -131,6 +136,7 @@ public final class Validate {
      * @param message    the exception message if invalid
      * @throws IllegalArgumentException if expression is <code>false</code>
      */
+    @Contract("false, _ -> fail")
     public static void isTrue(final boolean expression, final String message) {
         if (!expression) {
             throw new IllegalArgumentException(message);
@@ -153,6 +159,7 @@ public final class Validate {
      * @param expression the boolean expression to check
      * @throws IllegalArgumentException if expression is <code>false</code>
      */
+    @Contract("false -> fail")
     public static void isTrue(final boolean expression) {
         if (!expression) {
             throw new IllegalArgumentException("The validated expression is false");
@@ -173,6 +180,7 @@ public final class Validate {
      * @param object the object to check
      * @throws IllegalArgumentException if the object is <code>null</code>
      */
+    @Contract("null -> fail")
     public static void notNull(final Object object) {
         Validate.notNull(object, "The validated object is null");
     }
@@ -186,6 +194,7 @@ public final class Validate {
      * @param object  the object to check
      * @param message the exception message if invalid
      */
+    @Contract("null, _ -> fail")
     public static void notNull(final Object object, final String message) {
         if (object == null) {
             throw new IllegalArgumentException(message);
