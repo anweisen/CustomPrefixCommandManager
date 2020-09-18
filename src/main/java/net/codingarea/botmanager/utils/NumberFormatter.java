@@ -1,5 +1,7 @@
 package net.codingarea.botmanager.utils;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
 
 /**
@@ -8,8 +10,12 @@ import java.text.DecimalFormat;
  */
 public interface NumberFormatter {
 
+	@Nonnull
+	@CheckReturnValue
 	String format(double value);
 
+	@Nonnull
+	@CheckReturnValue
 	default String format(long value) {
 		return format((double) (value));
 	}
@@ -85,7 +91,9 @@ public interface NumberFormatter {
 
 			};
 
-	public static NumberFormatter fromPattern(String pattern, String ending) {
+	@Nonnull
+	@CheckReturnValue
+	public static NumberFormatter fromPattern(@Nonnull String pattern, @Nonnull String ending) {
 		return value -> new DecimalFormat(pattern).format(value) + ending;
 	}
 
