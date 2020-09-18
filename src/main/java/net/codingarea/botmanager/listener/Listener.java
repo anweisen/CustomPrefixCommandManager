@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.hooks.EventListener;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,10 @@ public interface Listener extends EventListener {
 					try {
 						currentMethod.setAccessible(true);
 						currentMethod.invoke(this, event);
-					} catch (Throwable ex) {
+					} catch (InvocationTargetException ex) {
 						throw new ListenerException(ex.getCause());
+					} catch (Throwable ex) {
+						throw new ListenerException(ex);
 					}
 
 				}
