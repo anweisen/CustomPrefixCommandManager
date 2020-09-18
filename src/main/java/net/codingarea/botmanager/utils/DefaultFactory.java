@@ -22,6 +22,12 @@ public final class DefaultFactory {
 
 	@Nonnull
 	@CheckReturnValue
+	public static <T> Factory<Integer, T> objectToInt() {
+		return NumberConversions::toInt;
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	public static <T extends ISnowflake> Factory<String, T> mentionableToID() {
 		return ISnowflake::getId;
 	}
@@ -29,7 +35,13 @@ public final class DefaultFactory {
 	@Nonnull
 	@CheckReturnValue
 	public static Factory<Integer, String> stringToInteger() {
-		return Integer::parseInt;
+		return Integer::valueOf;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Factory<Double, String> stringToDouble() {
+		return Double::valueOf;
 	}
 
 	@Nonnull
@@ -58,6 +70,12 @@ public final class DefaultFactory {
 
 	@Nonnull
 	@CheckReturnValue
+	public static Factory<Member, String> stringToMember(Guild guild) {
+		return guild::getMemberById;
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	public static Factory<User, String> stringToUser(ShardManager shardManager) {
 		return shardManager::getUserById;
 	}
@@ -72,6 +90,18 @@ public final class DefaultFactory {
 	@CheckReturnValue
 	public static Factory<String, IMentionable> mentionableToMention() {
 		return IMentionable::getAsMention;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Factory<String, Enum<?>> enumToName() {
+		return Enum::name;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Factory<Integer, Enum<?>> enumToOrdinal() {
+		return Enum::ordinal;
 	}
 
 }
