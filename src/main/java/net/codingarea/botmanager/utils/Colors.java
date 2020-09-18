@@ -29,6 +29,8 @@ public final class Colors {
 
 			NO_RANK = decode("#CCD8DE");
 
+	@Nonnull
+	@CheckReturnValue
 	public static Color getColorForStatus(OnlineStatus status) {
 		switch (status) {
 			case ONLINE:
@@ -43,28 +45,16 @@ public final class Colors {
 	}
 
 	@Nonnull
-	public static Color getColorForMember(@Nullable Member member) {
-		if (member == null) return EMBED;
-		Color color = member.getColor();
-		if (color != null) {
-			return color;
-		} else {
-			return EMBED;
-		}
-	}
-
-	@Nonnull
 	@CheckReturnValue
-	public static String toHTML(@Nonnull Color color) {
+	public static String asHTML(@Nonnull Color color) {
 
 		String red = Integer.toHexString(color.getRed());
 		String green = Integer.toHexString(color.getGreen());
 		String blue = Integer.toHexString(color.getBlue());
 
-		return "#" +
-				(red.length() == 1 ? "0" + red : red) +
-				(green.length() == 1 ? "0" + green : green) +
-				(blue.length() == 1 ? "0" + blue : blue);
+		return "#" + (red.length() == 1 ? "0" + red : red) +
+					 (green.length() == 1 ? "0" + green : green) +
+					 (blue.length() == 1 ? "0" + blue : blue);
 
 	}
 
