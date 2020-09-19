@@ -28,7 +28,7 @@ public final class DefaultResultHandler implements TripleConsumer<MessageReceive
 			if (thrown instanceof SQLException) {
 				message = "Database error occurred";
 			}
-			answer = answer.replace("%exception%", thrown.getClass().getName())
+			answer = answer.replace("%exception%", thrown.getClass().getSimpleName())
 						   .replace("%message%", message);
 		} else if (obj instanceof Permission) {
 			Permission permission = (Permission) obj;
