@@ -1,10 +1,13 @@
 package net.codingarea.botmanager.utils;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -35,17 +38,25 @@ public class ConfigLoader implements Bindable {
 	}
 
 	protected final File file;
-	protected final NamedValue[] values;
+	protected final List<NamedValue> values;
 
-	public ConfigLoader(String path, String... values) throws IOException {
-		this(path, NamedValue.ofStrings(values));
+	public ConfigLoader(final String path, final String... defaults) throws IOException {
+		this(path, NamedValue.ofStrings(defaults));
 	}
 
-	public ConfigLoader(String path, NamedValue... values) throws IOException {
+	public ConfigLoader(final String path, final boolean exception, final String... defaults) throws IOException {
+		this(path, exception, NamedValue.ofStrings(defaults));
+	}
 
-		if (values == null || values.length == 0) throw new IllegalArgumentException("Properties keys cannot be null or empty!");
+	public ConfigLoader(String path, final NamedValue... defaults) throws IOException {
+		this(path, true, defaults);
+	}
 
-		this.values = values;
+	public ConfigLoader(String path, final boolean exception, final NamedValue... defaults) throws IOException {
+
+		if (defaults == null) throw new IllegalArgumentException("Properties keys cannot be null or empty!");
+
+		this.values = new ArrayList<>(Arrays.asList(defaults));
 
 		if (!path.contains(".")) {
 			path += ".properties";
@@ -61,22 +72,33 @@ public class ConfigLoader implements Bindable {
 				properties.setProperty(value.getKey(), value.getValue() != null ? value.getValue() : "UNKNOWN");
 			}
 
+			File parent = file.getParentFile();
+			if (parent != null && !parent.exists()) {
+				parent.mkdirs();
+			}
+
 			PropertiesUtils.saveProperties(properties, file);
-			throw new FileNotFoundException("The config file " + file + " does not exists. Created a new one.");
+			if (exception) {
+				throw new FileNotFoundException("The config file " + file + " does not exists. Created a new one.");
+			}
+
+		} else {
+
+			// We'll read every value for the given keys and set it as value to the NamedValue
+			Properties properties = PropertiesUtils.readProperties(file);
+			for (NamedValue value : values) {
+				value.setValue(properties.getProperty(value.getKey()));
+			}
+
 		}
 
-		// We'll read every value for the given keys and set it as value to the NamedValue
-		Properties properties = PropertiesUtils.readProperties(file);
-		for (NamedValue value : values) {
-			value.setValue(properties.getProperty(value.getKey()));
-		}
 
 	}
 
 	/**
 	 * @return returns null when no value was found by the name
 	 */
-	public NamedValue get(String key) {
+	public NamedValue get(@Nonnull String key) {
 		for (NamedValue value : values) {
 			if (value.getKey().equals(key)) {
 				return value;
@@ -85,11 +107,11 @@ public class ConfigLoader implements Bindable {
 		return null;
 	}
 
-	public String getString(String key) {
+	public String getString(@Nonnull String key) {
 		return get(key).value;
 	}
 
-	public Integer getInt(String key) {
+	public Integer getInt(@Nonnull String key) {
 		try {
 			return Integer.parseInt(getString(key));
 		} catch (Exception ignored) {
@@ -97,7 +119,7 @@ public class ConfigLoader implements Bindable {
 		}
 	}
 
-	public Float getFloat(String key) {
+	public Float getFloat(@Nonnull String key) {
 		try {
 			return Float.parseFloat(getString(key));
 		} catch (Exception ignored) {
@@ -105,7 +127,7 @@ public class ConfigLoader implements Bindable {
 		}
 	}
 
-	public Double getDouble(String key) {
+	public Double getDouble(@Nonnull String key) {
 		try {
 			return Double.parseDouble(getString(key));
 		} catch (Exception ignored) {
@@ -113,7 +135,7 @@ public class ConfigLoader implements Bindable {
 		}
 	}
 
-	public Long getLong(String key) {
+	public Long getLong(@Nonnull String key) {
 		try {
 			return Long.parseLong(getString(key));
 		} catch (Exception ignored) {
@@ -122,21 +144,23 @@ public class ConfigLoader implements Bindable {
 	}
 
 	@Nonnull
-	public NamedValue[] getValues() {
+	@CheckReturnValue
+	public List<NamedValue> getValues() {
 		return values;
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public File getFile() {
 		return file;
 	}
 
 	@Override
 	public String toString() {
-		return "SecretsLoader{" +
+		return "ConfigLoader{" +
 				"file=" + file +
-				", size=" + values.length +
-				", values=" + Arrays.toString(values) +
+				", size=" + values.size() +
+				", values=" + values +
 				'}';
 	}
 }
