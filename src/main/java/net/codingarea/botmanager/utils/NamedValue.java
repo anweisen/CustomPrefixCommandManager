@@ -23,6 +23,10 @@ public class NamedValue implements Entry<String, String> {
 	protected final String key;
 	protected String value;
 
+	public NamedValue(@Nonnull String key, Object value) {
+		this(key, String.valueOf(value));
+	}
+
 	public NamedValue(@Nonnull String key, String value) {
 		this.key = key;
 		this.value = value;
