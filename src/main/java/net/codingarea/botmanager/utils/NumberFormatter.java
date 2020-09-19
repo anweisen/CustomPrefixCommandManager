@@ -89,6 +89,59 @@ public interface NumberFormatter {
 				value /= divide;
 				return format.format(value) + ending;
 
+			},
+
+			/* kilobyte, megabyte, gigabyte, terrabyte */
+			DATA_SIZE = value -> {
+
+				DecimalFormat format = new DecimalFormat("0.##");
+				double divide;
+				String ending;
+
+				// KiloByte
+				if (value < 1000000L) {
+					divide = 1000;
+					format = new DecimalFormat("0.#");
+					ending = "KB";
+				} else if (value < 1000000000L) {
+				// MegaByte
+					divide = 1000000L;
+					ending = "MB";
+				// GigaByte
+				} else if (value < 1000000000000L) {
+					divide = 1000000000L;
+					ending = "GB";
+				// TerraByte
+				} else {
+					divide = 1000000000000L;
+					ending = "TB";
+				}
+
+				value /= divide;
+				return format.format(value) + ending;
+
+			},
+
+			/* gigabyte, terrabyte */
+			BIG_DATA_SIZE = value -> {
+
+				DecimalFormat format = new DecimalFormat("0.##");
+				double divide;
+				String ending;
+
+				// GigaByte
+				if (value < 1000000000000L) {
+					divide = 1000000000L;
+					ending = "GB";
+				// TerraByte
+				} else {
+					divide = 1000000000000L;
+					ending = "TB";
+				}
+
+				value /= divide;
+				return format.format(value) + ending;
+
 			};
 
 	@Nonnull
