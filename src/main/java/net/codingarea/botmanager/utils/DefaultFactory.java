@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.NoSuchElementException;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -60,6 +61,21 @@ public final class DefaultFactory {
 	@CheckReturnValue
 	public static Factory<TextChannel, String> stringToTextChannel(Guild guild) {
 		return guild::getTextChannelById;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Factory<TextChannel, String> stringToTextChannel(ShardManager shardManager) {
+		return id -> {
+			for (Guild guild : shardManager.getGuilds()) {
+				for (TextChannel channel : guild.getTextChannels()) {
+					if (channel.getId().equals(id)) {
+						return channel;
+					}
+				}
+			}
+			throw new NoSuchElementException("There is no textchannel with the given id on the given guild");
+		};
 	}
 
 	@Nonnull
