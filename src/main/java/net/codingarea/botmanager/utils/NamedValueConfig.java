@@ -66,6 +66,18 @@ public abstract class NamedValueConfig {
 		return NumberConversions.toLong(getString(key));
 	}
 
+	public short getShort(@Nonnull String key) {
+		return NumberConversions.toShort(getString(key));
+	}
+
+	public byte getByte(@Nonnull String key) {
+		return NumberConversions.toByte(getString(key));
+	}
+
+	public boolean getBoolean(@Nonnull String key) {
+		return Boolean.getBoolean(getString(key));
+	}
+
 	@Nonnull
 	@CheckReturnValue
 	public List<NamedValue> getValues() {
