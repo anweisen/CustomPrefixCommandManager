@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Contract;
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -34,7 +35,7 @@ public final class DefaultLogHandler extends Handler {
 
 	@Nonnull
 	public static String getCurrentTimeAsString() {
-		OffsetDateTime time = OffsetDateTime.now();
+		OffsetDateTime time = OffsetDateTime.now(ZoneId.of("Europe/Paris"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 		return time.format(formatter);
 	}
