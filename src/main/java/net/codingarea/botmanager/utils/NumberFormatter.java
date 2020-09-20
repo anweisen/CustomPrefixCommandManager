@@ -21,10 +21,10 @@ public interface NumberFormatter {
 	}
 
 	public static final NumberFormatter
-			DEFAULT = fromPattern("0.##", ""),
-			FLOATING_POINT = fromPattern("0.0", ""),
-			PERCENTAGE = fromPattern("0.##", "%"),
-			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", ""),
+			DEFAULT = fromPattern("0.##", "", false),
+			FLOATING_POINT = fromPattern("0.0", "", false),
+			PERCENTAGE = fromPattern("0.##", "%", true),
+			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", "", false),
 
 			/* days, hours, minutes, seconds */
 			TIME = value -> {
@@ -94,6 +94,8 @@ public interface NumberFormatter {
 			/* kilobyte, megabyte, gigabyte, terrabyte */
 			DATA_SIZE = value -> {
 
+				if (value < 0) value = 0;
+
 				DecimalFormat format = new DecimalFormat("0.##");
 				double divide;
 				String ending;
@@ -125,6 +127,8 @@ public interface NumberFormatter {
 			/* gigabyte, terrabyte */
 			BIG_DATA_SIZE = value -> {
 
+				if (value < 0) value = 0;
+
 				DecimalFormat format = new DecimalFormat("0.##");
 				double divide;
 				String ending;
@@ -146,8 +150,8 @@ public interface NumberFormatter {
 
 	@Nonnull
 	@CheckReturnValue
-	public static NumberFormatter fromPattern(@Nonnull String pattern, @Nonnull String ending) {
-		return value -> new DecimalFormat(pattern).format(value) + ending;
+	public static NumberFormatter fromPattern(@Nonnull String pattern, @Nonnull String ending, boolean plus) {
+		return value -> new DecimalFormat(pattern).format(plus ? (value > 0 ? value : 0) : value) + ending;
 	}
 
 }
