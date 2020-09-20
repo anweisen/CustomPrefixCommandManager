@@ -17,7 +17,7 @@ import java.util.Properties;
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */
-public class ConfigLoader implements Bindable {
+public class ConfigLoader extends NamedValueConfig implements Bindable {
 
 	public static ConfigLoader withoutException(String path, NamedValue... values) {
 		try {
@@ -38,7 +38,6 @@ public class ConfigLoader implements Bindable {
 	}
 
 	protected final File file;
-	protected final List<NamedValue> values;
 
 	public ConfigLoader(final String path, final String... defaults) throws IOException {
 		this(path, NamedValue.ofStrings(defaults));
@@ -56,7 +55,7 @@ public class ConfigLoader implements Bindable {
 
 		if (defaults == null) throw new IllegalArgumentException("Properties keys cannot be null or empty!");
 
-		this.values = new ArrayList<>(Arrays.asList(defaults));
+		this.values.addAll(Arrays.asList(defaults));
 
 		if (!path.contains(".")) {
 			path += ".properties";
@@ -86,67 +85,14 @@ public class ConfigLoader implements Bindable {
 
 			// We'll read every value for the given keys and set it as value to the NamedValue
 			Properties properties = PropertiesUtils.readProperties(file);
-			for (NamedValue value : values) {
-				value.setValue(properties.getProperty(value.getKey()));
+			for (String key : properties.stringPropertyNames()) {
+				String stringValue = properties.getProperty(key);
+				create(key, stringValue);
 			}
 
 		}
 
 
-	}
-
-	/**
-	 * @return returns null when no value was found by the name
-	 */
-	public NamedValue get(@Nonnull String key) {
-		for (NamedValue value : values) {
-			if (value.getKey().equals(key)) {
-				return value;
-			}
-		}
-		return null;
-	}
-
-	public String getString(@Nonnull String key) {
-		return get(key).value;
-	}
-
-	public Integer getInt(@Nonnull String key) {
-		try {
-			return Integer.parseInt(getString(key));
-		} catch (Exception ignored) {
-			return null;
-		}
-	}
-
-	public Float getFloat(@Nonnull String key) {
-		try {
-			return Float.parseFloat(getString(key));
-		} catch (Exception ignored) {
-			return null;
-		}
-	}
-
-	public Double getDouble(@Nonnull String key) {
-		try {
-			return Double.parseDouble(getString(key));
-		} catch (Exception ignored) {
-			return null;
-		}
-	}
-
-	public Long getLong(@Nonnull String key) {
-		try {
-			return Long.parseLong(getString(key));
-		} catch (Exception ignored) {
-			return null;
-		}
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	public List<NamedValue> getValues() {
-		return values;
 	}
 
 	@Nonnull
@@ -163,4 +109,5 @@ public class ConfigLoader implements Bindable {
 				", values=" + values +
 				'}';
 	}
+
 }
