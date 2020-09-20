@@ -3,6 +3,7 @@ package net.codingarea.botmanager.commandmanager;
 import net.codingarea.botmanager.commandmanager.commands.ICommand;
 import net.codingarea.botmanager.exceptions.MessageException;
 import net.codingarea.botmanager.utils.Colors;
+import net.codingarea.botmanager.utils.ThrowingConsumer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -16,7 +17,6 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @see CommandHandler
@@ -209,11 +209,11 @@ public class CommandEvent {
 		reply(message).queue(ignored -> {}, MessageException::create);
 	}
 
-	public void queueReply(@Nonnull MessageEmbed message, @Nonnull Consumer<Message> messageConsumer) {
+	public void queueReply(@Nonnull MessageEmbed message, @Nonnull ThrowingConsumer<Message> messageConsumer) {
 		reply(message).queue(messageConsumer, MessageException::create);
 	}
 
-	public void queueReply(@Nonnull CharSequence message, @Nonnull Consumer<Message> messageConsumer) {
+	public void queueReply(@Nonnull CharSequence message, @Nonnull ThrowingConsumer<Message> messageConsumer) {
 		reply(message).queue(messageConsumer, MessageException::create);
 	}
 
