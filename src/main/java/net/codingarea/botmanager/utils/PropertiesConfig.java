@@ -34,13 +34,7 @@ public class PropertiesConfig extends ConfigLoader {
 	 */
 	@Nonnull
 	public PropertiesConfig set(String key, Object value) {
-		NamedValue entry = get(key);
-		if (entry != null) {
-			entry.setValue(String.valueOf(value));
-			return this;
-		}
-		entry = new NamedValue(key, value);
-		values.add(entry);
+		create(key, value);
 		return this;
 	}
 
