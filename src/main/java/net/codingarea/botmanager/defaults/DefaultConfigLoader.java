@@ -16,27 +16,27 @@ public final class DefaultConfigLoader extends ConfigLoader {
 		private DefaultNamedValue() { }
 
 		public static NamedValue token() {
-			return new NamedValue("TOKEN", "secret");
+			return new NamedValue("token", "secret");
 		}
 
 		public static NamedValue user() {
-			return new NamedValue("USER", "root");
+			return new NamedValue("user", "root");
 		}
 
 		public static NamedValue host() {
-			return new NamedValue("HOST", "127.0.0.1");
+			return new NamedValue("host", "127.0.0.1");
 		}
 
 		public static NamedValue port() {
-			return new NamedValue("PORT", "3306");
+			return new NamedValue("port", "3306");
 		}
 
 		public static NamedValue password() {
-			return new NamedValue("PASSWORD", "secret");
+			return new NamedValue("password", "secret");
 		}
 
 		public static NamedValue database() {
-			return new NamedValue("DATABASE", "database");
+			return new NamedValue("database", "database");
 		}
 
 		public static NamedValue[] all() {
@@ -77,27 +77,27 @@ public final class DefaultConfigLoader extends ConfigLoader {
 	}
 
 	public String getToken() {
-		return getString("TOKEN");
+		return getString("token");
 	}
 
 	public String getUser() {
-		return getString("USER");
+		return getString("user");
 	}
 
 	public String getHost() {
-		return getString("HOST");
+		return getString("host");
 	}
 
 	public String getPassword() {
-		return getString("PASSWORD");
+		return getString("password");
 	}
 
 	public String getDatabase() {
-		return getString("DATABASE");
+		return getString("database");
 	}
 
 	public int getPort() {
-		return getInt("PORT");
+		return getInt("port");
 	}
 
 }
