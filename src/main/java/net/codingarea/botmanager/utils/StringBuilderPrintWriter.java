@@ -21,4 +21,8 @@ public class StringBuilderPrintWriter extends PrintWriter {
 		return writer.builder;
 	}
 
+	@Override
+	public String toString() {
+		return getBuilder().toString();
+	}
 }
