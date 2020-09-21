@@ -1,4 +1,4 @@
-package net.codingarea.botmanager.utils;
+package net.codingarea.botmanager.defaults;
 
 import net.codingarea.botmanager.listener.EventHandler;
 import net.codingarea.botmanager.listener.Listener;
@@ -11,11 +11,11 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public final class ReadyListener implements Listener {
+public final class DefaultReadyListener implements Listener {
 
 	private final Runnable online;
 
-	public ReadyListener(@Nonnull Runnable online) {
+	public DefaultReadyListener(@Nonnull Runnable online) {
 		this.online = online;
 	}
 
