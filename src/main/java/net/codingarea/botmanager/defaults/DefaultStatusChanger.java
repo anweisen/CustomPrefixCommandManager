@@ -63,26 +63,31 @@ public final class DefaultStatusChanger implements Bindable {
 
 	private ActivityType type = ActivityType.DEFAULT;
 
+	@CheckReturnValue
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager) {
 		this.shardManager = shardManager;
 		this.status = createNewFactory("");
 	}
 
+	@CheckReturnValue
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull Factory<String[], ShardManager> status) {
 		this.shardManager = shardManager;
 		this.status = status;
 	}
 
+	@CheckReturnValue
 	public DefaultStatusChanger(int updateRate, @Nonnull ShardManager shardManager, @Nonnull Factory<String[], ShardManager> status) {
 		this.updateRate = updateRate;
 		this.shardManager = shardManager;
 		this.status = status;
 	}
 
+	@CheckReturnValue
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull String prefix, @Nonnull String... suffix) {
 		this(shardManager, ActivityType.DEFAULT, prefix, suffix);
 	}
 
+	@CheckReturnValue
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull ActivityType type, @Nonnull String prefix, @Nonnull String... suffix) {
 		this.shardManager = shardManager;
 		this.type = type;
@@ -134,9 +139,14 @@ public final class DefaultStatusChanger implements Bindable {
 		this.type = type;
 	}
 
-	public void setUpdateRate(int updateRate) {
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public DefaultStatusChanger setUpdateRate(int updateRate) {
 		this.updateRate = updateRate;
 		restart();
+		return this;
 	}
 
 	public ActivityType getType() {
@@ -154,4 +164,5 @@ public final class DefaultStatusChanger implements Bindable {
 	public int getUpdateRate() {
 		return updateRate;
 	}
+
 }
