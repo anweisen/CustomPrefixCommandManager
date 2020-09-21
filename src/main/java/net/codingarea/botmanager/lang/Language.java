@@ -29,8 +29,8 @@ public final class Language {
 
 	public Language(@Nonnull InputStream input, @Nonnull String path) throws IOException {
 		value.load(input);
-		String name = value.getProperty("NAME");
-		String alias = value.getProperty("ALIAS");
+		String name = value.getProperty("name");
+		String alias = value.getProperty("alias");
 		if (name != null) {
 			this.name = name;
 		} else {
