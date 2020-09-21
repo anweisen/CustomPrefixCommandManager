@@ -41,7 +41,7 @@ public interface NumberFormatter {
 				return (days > 0 ? days + "d " : "")
 					 + (hours > 0 ? hours + "h " : "")
 					 + (minutes > 0 ? minutes + "m " : "")
-					 + (days == 0 ? seconds + "s" : "");
+					 + (days == 0 || (hours == 0 && minutes == 0) ? seconds + "s" : "");
 
 			},
 
@@ -56,8 +56,8 @@ public interface NumberFormatter {
 				hours %= 24;
 
 				return (days > 0 ? days + "d " : "")
-						+ (hours > 0 ? hours + "h " : "")
-						+ (minutes > 0 ? minutes + "m " : "");
+					 + (hours > 0 ? hours + "h " : "")
+				     + (minutes > 0 || (days == 0 && hours == 0) ? minutes + "m " : "");
 
 			},
 
