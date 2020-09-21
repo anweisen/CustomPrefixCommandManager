@@ -39,21 +39,19 @@ public class ConfigLoader extends NamedValueConfig implements Bindable {
 
 	protected final File file;
 
-	public ConfigLoader(final String path, final String... defaults) throws IOException {
+	public ConfigLoader(@Nonnull String path, @Nonnull String... defaults) throws IOException {
 		this(path, NamedValue.ofStrings(defaults));
 	}
 
-	public ConfigLoader(final String path, final boolean exception, final String... defaults) throws IOException {
+	public ConfigLoader(@Nonnull String path, boolean exception, @Nonnull String... defaults) throws IOException {
 		this(path, exception, NamedValue.ofStrings(defaults));
 	}
 
-	public ConfigLoader(String path, final NamedValue... defaults) throws IOException {
+	public ConfigLoader(@Nonnull String path, @Nonnull NamedValue... defaults) throws IOException {
 		this(path, true, defaults);
 	}
 
-	public ConfigLoader(String path, final boolean exception, final NamedValue... defaults) throws IOException {
-
-		if (defaults == null) throw new IllegalArgumentException("Properties keys cannot be null or empty!");
+	public ConfigLoader(@Nonnull String path, boolean exception, @Nonnull NamedValue... defaults) throws IOException {
 
 		this.values.addAll(Arrays.asList(defaults));
 
