@@ -30,7 +30,7 @@ public final class ListFactory {
 		return list;
 	}
 
-	public static <T> String listToString(@Nonnull List<T> list, @Nonnull Factory<String, T> factory) {
+	public static <T> String listToString(@Nonnull List<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
 			if (builder.length() != 0) builder.append(REGEX);
