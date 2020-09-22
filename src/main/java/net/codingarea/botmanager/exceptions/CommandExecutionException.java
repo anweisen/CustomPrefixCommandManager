@@ -4,7 +4,7 @@ package net.codingarea.botmanager.exceptions;
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public class CommandExecutionException extends RuntimeException {
+public class CommandExecutionException extends ExecutionException {
 
 	public CommandExecutionException() {
 		super();
