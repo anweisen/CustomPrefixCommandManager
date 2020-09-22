@@ -30,6 +30,7 @@ public class SQLValueCache implements Bindable {
 	protected int clearRate;
 	protected Timer timer;
 
+	@CheckReturnValue
 	public SQLValueCache(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		this.cacheValues = cacheValues;
 		this.defaultValue = defaultValue;
@@ -42,11 +43,12 @@ public class SQLValueCache implements Bindable {
 		updateTimer();
 	}
 
+	@CheckReturnValue
 	public SQLValueCache(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, @Nonnull String defaultValue) {
 		this(true, defaultValue, data, table, keyColumn, valueColumn, DEFAULT_CLEAR_RATE);
 	}
 
-	private void updateTimer() {
+	private synchronized void updateTimer() {
 		if (timer != null) timer.cancel();
 		if (clearRate <= 0) {
 			timer = null;
@@ -182,7 +184,7 @@ public class SQLValueCache implements Bindable {
 	 * Sets if values are saved in the ram when they were loaded from the database once
 	 * @see #shouldCacheValues()
 	 */
-	public void setCacheValues(boolean cacheValues) {
+	public synchronized void setCacheValues(boolean cacheValues) {
 		if (cacheValues != this.cacheValues) resetCache();
 		this.cacheValues = cacheValues;
 	}
@@ -233,6 +235,12 @@ public class SQLValueCache implements Bindable {
 	@CheckReturnValue
 	public boolean shouldCacheValues() {
 		return cacheValues;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public Map<String, String> getCache() {
+		return cache;
 	}
 }
 
