@@ -26,7 +26,9 @@ public interface NumberFormatter {
 			PERCENTAGE = fromPattern("0.##", "%", true),
 			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", "", false),
 
-			/* days, hours, minutes, seconds */
+			/**
+			 *  days, hours, minutes, seconds
+			 */
 			TIME = value -> {
 
 				int seconds = (int) value;
@@ -45,7 +47,9 @@ public interface NumberFormatter {
 
 			},
 
-			/* days, hours, minutes */
+			/**
+			 * days, hours, minutes
+			 */
 			BIG_TIME = value -> {
 
 				int seconds = (int) value;
@@ -61,7 +65,9 @@ public interface NumberFormatter {
 
 			},
 
-			/* billion, million, thousand, number */
+			/**
+			 *  billion, million, thousand, number
+			 */
 			BIG_NUMBER = value -> {
 
 				DecimalFormat format = new DecimalFormat("0.##");
@@ -91,7 +97,10 @@ public interface NumberFormatter {
 
 			},
 
-			/* kilobyte, megabyte, gigabyte, terrabyte */
+			/**
+			 * input in bytes
+			 * kilobyte, megabyte, gigabyte, terrabyte
+			 */
 			DATA_SIZE = value -> {
 
 				if (value < 0) value = 0;
@@ -124,7 +133,10 @@ public interface NumberFormatter {
 
 			},
 
-			/* gigabyte, terrabyte */
+			/**
+			 * inputs in bytes
+			 * gigabyte, terrabyte
+			 */
 			BIG_DATA_SIZE = value -> {
 
 				if (value < 0) value = 0;
