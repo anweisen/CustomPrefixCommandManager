@@ -18,12 +18,12 @@ public final class URLDataSource implements DataSource {
 
 	@Nonnull
 	public static URLDataSource ofConfig(@Nonnull ConfigLoader config) {
-		Integer port = config.getInt("PORT");
-		String host = config.getString("HOST");
-		String user = config.getString("USER");
-		String password = config.getString("PASSWORD");
-		String database = config.getString("DATABASE");
-		if (port != null) {
+		int port = config.getInt("port");
+		String host = config.getString("host");
+		String user = config.getString("user");
+		String password = config.getString("password");
+		String database = config.getString("database");
+		if (config.isSet("port")) {
 			return new URLDataSource(host, database, user, password, port);
 		} else {
 			return new URLDataSource(host, database, user, password);
