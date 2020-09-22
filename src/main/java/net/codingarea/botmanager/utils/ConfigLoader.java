@@ -83,13 +83,9 @@ public class ConfigLoader extends NamedValueConfig implements Bindable {
 
 			// We'll read every value for the given keys and set it as value to the NamedValue
 			Properties properties = PropertiesUtils.readProperties(file);
-			for (String key : properties.stringPropertyNames()) {
-				String stringValue = properties.getProperty(key);
-				create(key, stringValue);
-			}
+			load(properties);
 
 		}
-
 
 	}
 
