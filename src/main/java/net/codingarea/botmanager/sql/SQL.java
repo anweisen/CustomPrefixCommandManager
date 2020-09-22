@@ -55,6 +55,7 @@ public abstract class SQL implements Bindable {
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public static SQL createAnonymous(@Nonnull DataSource dataSource) throws SQLException {
 		SQL instance = new SQL(dataSource) {};
 		instance.connect();
@@ -78,7 +79,7 @@ public abstract class SQL implements Bindable {
 	public boolean connectionIsOpened() {
 		try {
 			return connection != null && !connection.isClosed();
-		} catch (SQLException ignored) {
+		} catch (Exception ignored) {
 			return false;
 		}
 	}
@@ -86,7 +87,7 @@ public abstract class SQL implements Bindable {
 	/**
 	 * Terminates the existing connection, using {@link #disconnect()}
 	 * Then it creates a new connection using {@link DataSource#createConnection()}
-	 * @throws SQLException If a {@link SQLException} happens while disconnection or creating a new connection to the sql server
+	 * @throws SQLException If a {@link SQLException} is thrown while disconnection or creating a new connection to the sql server
 	 */
 	public void connect() throws SQLException {
 		if (connectionIsOpened()) {
@@ -98,7 +99,7 @@ public abstract class SQL implements Bindable {
 
 	/**
 	 * Closes the the connection ({@link #getConnection()}) to the sql server using {@link Connection#close()}
-	 * @throws SQLException If a {@link SQLException} happens while closing the connection
+	 * @throws SQLException If a {@link SQLException} is thrown while closing the connection
 	 */
 	public void disconnect() throws SQLException {
 		connection.close();
@@ -107,7 +108,7 @@ public abstract class SQL implements Bindable {
 
 	/**
 	 * Connects to the sql server ({@link #connect()}) if the connection is no longer opened (not {@link #connectionIsOpened()})
-	 * @throws SQLException If a {@link SQLException} happens while connecting to the server
+	 * @throws SQLException If a {@link SQLException} is thrown while connecting to the server
 	 */
 	public void verifyConnection() throws SQLException {
 		if (!connectionIsOpened()) {
@@ -135,7 +136,7 @@ public abstract class SQL implements Bindable {
 	 * Be aware of SQLInjection
 	 * @see #update(String, Object...)
 	 * @param sql The command which should be executed
-	 * @throws SQLException If a {@link SQLException} happens while creating a {@link Statement} (using {@link #createStatement()}),
+	 * @throws SQLException If a {@link SQLException} is thrown while creating a {@link Statement} (using {@link #createStatement()}),
 	 *                      executing the update (using {@link Statement#executeUpdate(String)})
 	 *                      or closing the statement (using {@link Statement#close()})
 	 */
@@ -158,7 +159,7 @@ public abstract class SQL implements Bindable {
 	 * @param sql The SQLCommand
 	 * @param params The params which replace the ?s in the command.
 	 * @return The {@link PreparedStatement} just created
-	 * @throws SQLException If a {@link SQLException} happens while preparing the {@link PreparedStatement} ({@link #prepare(String)})
+	 * @throws SQLException If a {@link SQLException} is thrown while preparing the {@link PreparedStatement} ({@link #prepare(String)})
 	 *                      or while filling the params {@link #fillParams(PreparedStatement, Object...)}
 	 */
 	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
@@ -193,9 +194,7 @@ public abstract class SQL implements Bindable {
 		ResultSet result = query(sql, params);
 		boolean set = false;
 		if (result.next()) {
-			if (result.getObject(param) != null) {
-				set = true;
-			}
+			set = result.getObject(param) != null;
 		}
 		result.close();
 		return set;
