@@ -1,6 +1,6 @@
 package net.codingarea.botmanager.utils;
 
-import net.codingarea.botmanager.exceptions.ConsumerExecutionException;
+import net.codingarea.botmanager.exceptions.ConsumeException;
 
 import java.util.function.BiConsumer;
 
@@ -15,7 +15,7 @@ public interface ThrowingBiConsumer<A, B> extends BiConsumer<A, B> {
 		try {
 			acceptThrowing(a, b);
 		} catch (Throwable ex) {
-			throw new ConsumerExecutionException(ex);
+			throw new ConsumeException(ex);
 		}
 	}
 

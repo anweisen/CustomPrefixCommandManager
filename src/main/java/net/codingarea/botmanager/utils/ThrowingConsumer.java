@@ -1,6 +1,6 @@
 package net.codingarea.botmanager.utils;
 
-import net.codingarea.botmanager.exceptions.ConsumerExecutionException;
+import net.codingarea.botmanager.exceptions.ConsumeException;
 
 import java.util.function.Consumer;
 
@@ -15,7 +15,7 @@ public interface ThrowingConsumer<T> extends Consumer<T> {
 		try {
 			acceptThrowing(t);
 		} catch (Throwable ex) {
-			throw new ConsumerExecutionException(ex);
+			throw new ConsumeException(ex);
 		}
 	}
 

@@ -1,6 +1,6 @@
 package net.codingarea.botmanager.utils;
 
-import net.codingarea.botmanager.exceptions.ConsumerExecutionException;
+import net.codingarea.botmanager.exceptions.ConsumeException;
 
 import javax.annotation.Nonnull;
 
@@ -16,7 +16,7 @@ public interface ThrowingBiFactory<R, A, B> extends BiFactory<R, A, B> {
 		try {
 			return getThrowing(a, b);
 		} catch (Throwable ex) {
-			throw new ConsumerExecutionException(ex);
+			throw new ConsumeException(ex);
 		}
 	}
 

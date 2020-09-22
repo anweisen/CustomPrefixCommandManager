@@ -1,6 +1,6 @@
 package net.codingarea.botmanager.utils;
 
-import net.codingarea.botmanager.exceptions.ConsumerExecutionException;
+import net.codingarea.botmanager.exceptions.ConsumeException;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -13,7 +13,7 @@ public interface ThrowingTripleConsumer<A, B, C> extends TripleConsumer<A, B, C>
 		try {
 			acceptThrowing(a, b, c);
 		} catch (Throwable ex) {
-			throw new ConsumerExecutionException(ex);
+			throw new ConsumeException(ex);
 		}
 	}
 
