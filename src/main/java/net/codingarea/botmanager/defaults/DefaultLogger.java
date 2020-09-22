@@ -28,15 +28,18 @@ public final class DefaultLogger extends Logger implements Bindable {
 		DEFAULT.log(record);
 	}
 
-	public static void logDefault(@Nonnull Level level, @Nonnull Class<?> caller, @Nonnull String message) {
-		logDefault(level, caller.getSimpleName(), message);
+	public static void logDefault(@Nonnull Level level, Class<?> caller, @Nonnull String message) {
+		logDefault(level, caller != null ? caller.getSimpleName() : null, message);
 	}
 
 	@CallerSensitive
 	public static void logDefault(@Nonnull Level level, @Nonnull String message) {
 		new SecurityManager() {
 			{
-				Class<?> caller = getClassContext()[2];
+				Class<?> caller = null;
+				try {
+					caller = getClassContext()[2];
+				} catch (Exception ignored) { }
 				logDefault(level, caller, message);
 			}
 		};
