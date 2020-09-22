@@ -3,15 +3,17 @@ package net.codingarea.botmanager.utils;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public abstract class NamedValueConfig {
+public abstract class NamedValueConfig implements Iterable<NamedValue> {
 
-	protected final List<NamedValue> values = new ArrayList<>();
+	protected final ArrayList<NamedValue> values = new ArrayList<>();
 
 	/**
 	 * @return returns null when no value was found by the name
@@ -40,6 +42,19 @@ public abstract class NamedValueConfig {
 		entry = new NamedValue(key, value);
 		values.add(entry);
 		return entry;
+	}
+
+	protected void load(@Nonnull Properties properties) {
+		for (String key : properties.stringPropertyNames()) {
+			String stringValue = properties.getProperty(key);
+			create(key, stringValue);
+		}
+	}
+
+	@Nonnull
+	public NamedValue add(@Nonnull NamedValue value) {
+		values.add(value);
+		return value;
 	}
 
 	public String getString(@Nonnull String key) {
@@ -78,10 +93,20 @@ public abstract class NamedValueConfig {
 		return Boolean.getBoolean(getString(key));
 	}
 
+	public boolean isSet(@Nonnull String key) {
+		return get(key) != null;
+	}
+
 	@Nonnull
 	@CheckReturnValue
-	public List<NamedValue> getValues() {
+	public List<NamedValue> entries() {
 		return values;
+	}
+
+	@Nonnull
+	@Override
+	public Iterator<NamedValue> iterator() {
+		return values.iterator();
 	}
 
 	@Override
@@ -90,4 +115,5 @@ public abstract class NamedValueConfig {
 				"values=" + values +
 				'}';
 	}
+
 }
