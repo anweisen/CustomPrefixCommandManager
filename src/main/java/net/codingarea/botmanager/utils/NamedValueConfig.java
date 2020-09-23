@@ -36,7 +36,7 @@ public abstract class NamedValueConfig implements Iterable<NamedValue> {
 	protected NamedValue create(@Nonnull String key, Object value) {
 		NamedValue entry = get(key);
 		if (entry != null) {
-			entry.setValue(String.valueOf(value));
+			entry.setValue(value);
 			return entry;
 		}
 		entry = new NamedValue(key, value);
@@ -49,6 +49,20 @@ public abstract class NamedValueConfig implements Iterable<NamedValue> {
 			String stringValue = properties.getProperty(key);
 			create(key, stringValue);
 		}
+	}
+
+	protected void store(@Nonnull Properties properties) {
+		for (NamedValue value : values) {
+			properties.setProperty(value.getKey(), value.getValue());
+		}
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public Properties asProperties() {
+		Properties properties = new Properties();
+		store(properties);
+		return properties;
 	}
 
 	@Nonnull
@@ -106,7 +120,7 @@ public abstract class NamedValueConfig implements Iterable<NamedValue> {
 	@Nonnull
 	@Override
 	public Iterator<NamedValue> iterator() {
-		return values.iterator();
+		return values.parallelStream().iterator();
 	}
 
 	@Override
