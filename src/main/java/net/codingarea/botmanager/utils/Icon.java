@@ -2,6 +2,9 @@ package net.codingarea.botmanager.utils;
 
 import net.dv8tion.jda.api.OnlineStatus;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.2
@@ -17,6 +20,8 @@ public final class Icon {
 			IDLE = "https://cdn.discordapp.com/emojis/739897763902521415.png?v=1",
 			OFFLINE = "https://cdn.discordapp.com/emojis/739897759057969353.png?v=1";
 
+	@Nonnull
+	@CheckReturnValue
 	public static String getIconByStatus(OnlineStatus status) {
 		switch (status) {
 			case IDLE:
