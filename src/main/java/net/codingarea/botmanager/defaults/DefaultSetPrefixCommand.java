@@ -15,6 +15,10 @@ public final class DefaultSetPrefixCommand extends Command {
 
 	private final DefaultPrefixCache cache;
 
+	public DefaultSetPrefixCommand(@Nonnull DefaultPrefixCache cache) {
+		this("setprefix", Permission.ADMINISTRATOR, cache);
+	}
+
 	public DefaultSetPrefixCommand(@Nonnull String name, @Nonnull Permission permission, @Nonnull DefaultPrefixCache cache, @Nonnull String... alias) {
 		super(name, permission, alias);
 		this.cache = cache;
