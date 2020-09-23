@@ -36,14 +36,8 @@ public class PropertiesConfig extends ConfigLoader {
 	}
 
 	public void save() throws IOException {
-		
-		Properties properties = new Properties();
-		for (NamedValue value : values) {
-			properties.setProperty(value.getKey(), value.getValue());
-		}
-
+		Properties properties = this.asProperties();
 		PropertiesUtils.saveProperties(properties, file);
-
 	}
 
 	/**
