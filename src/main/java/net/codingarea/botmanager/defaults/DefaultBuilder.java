@@ -20,7 +20,6 @@ public final class DefaultBuilder {
 	/**
 	 * @return Creates a {@link JDABuilder} with every {@link GatewayIntent}
 	 * @see JDABuilder
-	 * @see GatewayIntent
 	 */
 	@Nonnull
 	@CheckReturnValue
@@ -37,7 +36,6 @@ public final class DefaultBuilder {
 	/**
 	 * @return Creates a {@link DefaultShardManagerBuilder} with every {@link GatewayIntent}
 	 * @see DefaultShardManagerBuilder
-	 * @see GatewayIntent
 	 */
 	@Nonnull
 	@CheckReturnValue
