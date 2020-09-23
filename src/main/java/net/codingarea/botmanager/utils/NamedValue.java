@@ -1,13 +1,12 @@
 package net.codingarea.botmanager.utils;
 
 import javax.annotation.Nonnull;
-import java.util.Map.Entry;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */
-public class NamedValue implements Entry<String, String> {
+public class NamedValue {
 
 	public static NamedValue[] ofStrings(String... values) {
 
@@ -24,7 +23,7 @@ public class NamedValue implements Entry<String, String> {
 	protected String value;
 
 	public NamedValue(@Nonnull String key, Object value) {
-		this(key, String.valueOf(value));
+		this(key, value == null ? null : value.toString());
 	}
 
 	public NamedValue(@Nonnull String key, String value) {
@@ -40,18 +39,22 @@ public class NamedValue implements Entry<String, String> {
 		return value;
 	}
 
+	public String setValue(String value) {
+		return this.value = value;
+	}
+
+	public String setValue(Object value) {
+		return setValue(value == null ? null : value.toString());
+	}
+
 	@Nonnull
 	public String getKey() {
 		return key;
 	}
 
-	public String setValue(String value) {
-		return this.value = value;
-	}
-
 	@Override
 	public String toString() {
-		return "NameSpacedValue{" +
+		return "NamedValue{" +
 				"key='" + key + '\'' +
 				", value='" + value + '\'' +
 				'}';
