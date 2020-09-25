@@ -26,8 +26,10 @@ public final class Colors {
 			OFFLINE = decode("#747F8D"),
 
 			EMBED = decode("#2F3136"),
+			NO_RANK = decode("#CCD8DE"),
 
-			NO_RANK = decode("#CCD8DE");
+			TRANSPARENT = new Color(0, 0, 0, 0),
+			LIGHT_BLACK = decode("#1c1c1c");
 
 	@Nonnull
 	@CheckReturnValue
