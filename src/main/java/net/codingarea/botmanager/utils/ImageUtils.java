@@ -3,6 +3,7 @@ package net.codingarea.botmanager.utils;
 import net.codingarea.botmanager.exceptions.MessageException;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -116,6 +117,19 @@ public final class ImageUtils {
 				image.setRGB(i, j, new Color(image.getRGB(i, j)).darker().getRGB());
 			}
 		}
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static BufferedImage removeTransparency(@Nonnull BufferedImage image, Color replacementColor) {
+		if (replacementColor == null) replacementColor = Colors.TRANSPARENT;
+		BufferedImage created = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = created.createGraphics();
+		graphics.setColor(replacementColor);
+		graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+		graphics.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+		graphics.dispose();
+		return created;
 	}
 
 }
