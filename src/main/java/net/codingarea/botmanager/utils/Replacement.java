@@ -2,6 +2,7 @@ package net.codingarea.botmanager.utils;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -10,6 +11,10 @@ import javax.annotation.Nonnull;
 public final class Replacement {
 
 	private final String origin, replacement;
+
+	public Replacement(@Nonnull String origin, @Nonnull Object replacement) {
+		this(origin, String.valueOf(replacement));
+	}
 
 	public Replacement(@Nonnull String origin, @Nonnull String replacement) {
 		this.origin = origin;
@@ -34,9 +39,11 @@ public final class Replacement {
 
 	@Nonnull
 	@CheckReturnValue
-	public static String replaceAll(@Nonnull String string, @Nonnull Replacement... replacements) {
-		for (Replacement replacement : replacements) {
-			string = replacement.replace(string);
+	public static String replaceAll(@Nonnull String string, Replacement... replacements) {
+		if (replacements != null) {
+			for (Replacement replacement : replacements) {
+				string = replacement.replace(string);
+			}
 		}
 		return string;
 	}
