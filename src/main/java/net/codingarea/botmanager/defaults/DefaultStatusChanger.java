@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Supplier;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -36,6 +37,12 @@ public final class DefaultStatusChanger implements Bindable {
 			return status.toArray(new String[0]);
 
 		};
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Activity createActivity(ActivityType type, @Nonnull String text) {
+		return createActivity(type, text, DEFAULT_STREAM_URL);
 	}
 
 	@Nonnull
