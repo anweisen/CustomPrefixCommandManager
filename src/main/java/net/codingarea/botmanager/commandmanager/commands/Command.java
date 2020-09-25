@@ -2,16 +2,22 @@ package net.codingarea.botmanager.commandmanager.commands;
 
 import net.codingarea.botmanager.commandmanager.CommandEvent;
 import net.codingarea.botmanager.commandmanager.CommandType;
+import net.codingarea.botmanager.commandmanager.helper.CommandHelper;
+import net.codingarea.botmanager.lang.LanguageManager;
+import net.codingarea.botmanager.utils.Replacement;
+import net.codingarea.botmanager.utils.StaticBinder;
 import net.dv8tion.jda.api.Permission;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
  */
-public abstract class Command implements ICommand {
+public abstract class Command extends CommandHelper implements ICommand {
 
 	public Command(@Nonnull String name, @Nonnull String... alias) {
 		this(name, false, alias);
@@ -43,20 +49,22 @@ public abstract class Command implements ICommand {
 		this.reactToMentionPrefix = reactToMentionPrefix;
 	}
 
-	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull String... alias) {
+	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, boolean reactToMentionPrefix,
+	               @Nonnull String... alias) {
 		this(name, commandType, processInNewThread, alias);
 		this.reactToMentionPrefix = reactToMentionPrefix;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull Permission permission, @Nonnull String... alias) {
+	public Command(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull Permission permission,
+	               @Nonnull String... alias) {
 		this(name, CommandType.GUILD, processInNewThread, reactToMentionPrefix, alias);
 		this.permission = permission;
 	}
 
-	private final String name;
-	private final String[] alias;
+	private String name;
+	private String[] alias;
 
-	private final boolean processInNewThread;
+	private boolean processInNewThread;
 	private Permission permission;
 
 	private CommandType type = CommandType.GENERAL;
