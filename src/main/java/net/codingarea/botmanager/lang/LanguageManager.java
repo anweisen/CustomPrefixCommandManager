@@ -90,6 +90,7 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 
 	@Nonnull
 	public Language getLanguageByName(String name) {
+		if (name == null || name.isEmpty()) return getDefaultLanguage();
 		for (Language language : languages) {
 			if (language.getName().equalsIgnoreCase(name)) return language;
 			for (String alias : language.getAlias()) {
@@ -106,10 +107,15 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public Language getLanguageForGuild(Guild guild) {
 		if (guild == null) return getDefaultLanguage();
 		String name = getValue(guild.getId());
-		return getLanguageByName(name);
+		try {
+			return getLanguageByName(name);
+		} catch (Exception ignored) {
+			return getDefaultLanguage();
+		}
 	}
 
 	@Nonnull
@@ -122,7 +128,11 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	@Override
 	@CheckReturnValue
 	public String get(Guild guild, String key) {
-		return getLanguageForGuild(guild).get(key);
+		try {
+			return getLanguageForGuild(guild).get(key);
+		} catch (Exception ignored) {
+			return getDefaultLanguage().get(key);
+		}
 	}
 
 }
