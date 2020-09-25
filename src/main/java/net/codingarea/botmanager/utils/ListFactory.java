@@ -2,6 +2,7 @@ package net.codingarea.botmanager.utils;
 
 import net.codingarea.botmanager.defaults.DefaultLogger;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +40,23 @@ public final class ListFactory {
 		return builder.toString();
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public static <T> String listToFancyString(@Nonnull List<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
+			if (builder.length() != 0) builder.append(", ");
+			builder.append(factory.get(current));
+		}
+		return builder.toString();
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T> String arrayToFancyString(@Nonnull Factory<String, T> factory, @Nonnull T... array) {
+		StringBuilder builder = new StringBuilder();
+		for (T current : array) {
 			if (builder.length() != 0) builder.append(", ");
 			builder.append(factory.get(current));
 		}
