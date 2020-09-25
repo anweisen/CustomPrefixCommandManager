@@ -2,6 +2,7 @@ package net.codingarea.botmanager.defaults;
 
 import net.codingarea.botmanager.commandmanager.CommandEvent;
 import net.codingarea.botmanager.commandmanager.commands.Command;
+import net.codingarea.botmanager.utils.Replacement;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,16 +30,18 @@ public final class DefaultSetPrefixCommand extends Command {
 
 		String prefix = event.getArgsAsString().replace("`", "");
 		if (prefix.isEmpty()) {
-			event.queueReply("Please use " + event.syntax("<prefix>"));
+			sendSyntax(event, "<prefix>");
 			return;
 		}
 		if (prefix.length() > 10) {
-			event.queueReply("Your prefix cannot be longer than 10 characters.");
+			event.queueReply(getMessage(event, "prefix-too-long", "The prefix cannot be longer than %max% characters",
+							 new Replacement("%max%", 10)));
 			return;
 		}
 
 		cache.set(event.getGuildID(), prefix);
-		event.queueReply("Your prefix was set to `" + prefix + "`");
+		event.queueReply(getMessage(event, "prefix-set", "The prefix was set to `%prefix%`",
+						 new Replacement("%prefix%", removeMarkdown(prefix))));
 
 	}
 
