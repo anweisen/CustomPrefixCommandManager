@@ -14,6 +14,22 @@ public final class StaticBinder {
 
 	private static final HashMap<String, Object> values = new HashMap<>();
 
+	public static <T> T getNullAble(@Nonnull String key) {
+		try {
+			return get(key);
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
+	public static <T> T getNullAble(@Nonnull Class<T> clazz) {
+		try {
+			return get(clazz);
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
 	@Nonnull
 	public static <T> T get(@Nonnull String key) {
 		return (T) values.get(key);
@@ -35,7 +51,7 @@ public final class StaticBinder {
 	}
 
 	@Nonnull
-	public static <T> T get(@Nonnull Class<? extends T> key) {
+	public static <T> T get(@Nonnull Class<T> key) {
 		return get(key.getName());
 	}
 
@@ -55,7 +71,7 @@ public final class StaticBinder {
 	}
 
 	@Nonnull
-	public static <T> Collection<T> byClass(Class<? extends T> clazz) {
+	public static <T> Collection<T> byClass(Class<T> clazz) {
 		List<T> list = new ArrayList<>();
 		for (Entry<String, Object> currentEntry : values.entrySet()) {
 			if (currentEntry.getValue().getClass() == clazz) {
