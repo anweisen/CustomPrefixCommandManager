@@ -125,7 +125,7 @@ public class CommandHandler implements Bindable {
 	 * - {@link CommandResult#PREFIX_NOT_USED} if the given prefix and mention prefix was not used <br>
 	 * - {@link CommandResult#MENTION_PREFIX_NO_REACT} the mention prefix was used, but the command should not react <br>
 	 * - {@link CommandResult#COMMAND_NOT_FOUND} if there was not command with the given name <br>
-	 * -
+	 * - {@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown ({@link #setCoolDownManager(CoolDownManager)})
 	 * - {@link CommandResult#SUCCESS} if the command was executed <br>
 	 */
 	public void handleCommand(@Nonnull String prefix, @Nonnull MessageReceivedEvent event, @Nullable TripleConsumer<MessageReceivedEvent, CommandResult, Object> result) {
@@ -193,7 +193,7 @@ public class CommandHandler implements Bindable {
 	}
 
 	private String mention(MessageReceivedEvent event) {
-		return event.getJDA().getSelfUser().getAsMention();
+		return "<@!" + event.getJDA().getSelfUser().getId() + ">";
 	}
 
 	public void setWebhookMessageBehavior(MessageReactionBehavior behavior) {
