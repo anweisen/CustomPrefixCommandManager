@@ -7,9 +7,11 @@ import net.codingarea.botmanager.utils.ThrowingConsumer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Message.MentionType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.internal.entities.MemberImpl;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -316,6 +318,8 @@ public class CommandEvent {
 	/**
 	 * @see #syntax(CommandEvent, String)
 	 */
+	@Nonnull
+	@CheckReturnValue
 	public String syntax(String syntax) {
 		return syntax(this, syntax);
 	}
@@ -361,15 +365,25 @@ public class CommandEvent {
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
 		return syntax(event, syntax, true);
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax, boolean command) {
 		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;
 		boolean mark = !containsMention(message);
 		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String removeMarkdown(@Nonnull String string) {
+		return string.replace("`", "\\`")
+					 .replace("_", "\\_")
+					 .replace("*", "\\*");
 	}
 
 }
