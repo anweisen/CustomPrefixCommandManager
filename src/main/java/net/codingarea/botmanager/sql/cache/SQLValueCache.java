@@ -30,8 +30,19 @@ public class SQLValueCache implements Bindable {
 	protected int clearRate;
 	protected Timer timer;
 
+	/**
+	 * Be careful using this constructor, you won't be able to use the functions of
+	 * this class. This may be helpful if you override every method and throw a {@link UnsupportedOperationException}
+	 */
+	protected SQLValueCache() {
+		this.data = null;
+		this.table = null;
+		this.keyColumn = null;
+		this.valueColumn = null;
+	}
+
 	@CheckReturnValue
-	public SQLValueCache(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
+	public SQLValueCache(boolean cacheValues, String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		this.cacheValues = cacheValues;
 		this.defaultValue = defaultValue;
 		this.data = data;
@@ -44,12 +55,16 @@ public class SQLValueCache implements Bindable {
 	}
 
 	@CheckReturnValue
-	public SQLValueCache(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, @Nonnull String defaultValue) {
+	public SQLValueCache(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, String defaultValue) {
 		this(true, defaultValue, data, table, keyColumn, valueColumn, DEFAULT_CLEAR_RATE);
 	}
 
 	private synchronized void updateTimer() {
-		if (timer != null) timer.cancel();
+		if (timer != null) {
+			try {
+				timer.cancel();
+			} catch (IllegalStateException ignored) { }
+		}
 		if (clearRate <= 0) {
 			timer = null;
 			return;
@@ -101,7 +116,7 @@ public class SQLValueCache implements Bindable {
 		ResultSet result = data.query("SELECT " + valueColumn + " FROM " + table + " WHERE " + keyColumn + " = ?", key);
 		if (!result.next()) throw new IllegalStateException("Database does not contain the given key");
 		String value = result.getString(valueColumn);
-		result.close();;
+		result.close();
 		return value;
 	}
 
@@ -202,7 +217,6 @@ public class SQLValueCache implements Bindable {
 		return clearRate;
 	}
 
-	@Nonnull
 	@CheckReturnValue
 	public String getDefaultValue() {
 		return defaultValue;
