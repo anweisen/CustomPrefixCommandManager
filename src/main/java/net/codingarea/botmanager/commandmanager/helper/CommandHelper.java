@@ -4,37 +4,139 @@ import net.codingarea.botmanager.commandmanager.CommandEvent;
 import net.codingarea.botmanager.lang.LanguageManager;
 import net.codingarea.botmanager.utils.Replacement;
 import net.codingarea.botmanager.utils.StaticBinder;
+import net.codingarea.botmanager.utils.Utils;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.sql.ResultSet;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public abstract class CommandHelper {
+public abstract class CommandHelper extends LogHelper {
+
+	public static <T> T getInstance(Class<T> clazz) {
+		return StaticBinder.getNullAble(clazz);
+	}
 
 	public static LanguageManager getLanguageManager() {
-		return StaticBinder.getNullAble(LanguageManager.class);
+		return getInstance(LanguageManager.class);
 	}
 
 	@CheckReturnValue
-	public final String getMessage(@Nonnull CommandEvent event, @Nonnull String key, Replacement... replacements) {
-		return Replacement.replaceAll(getLanguageManager().getMessage(event.getGuild(), key), replacements);
+	public static long parseTime(String string) {
+		long current = 0;
+		long seconds = 0;
+		for (String c : string.split("")) {
+			try {
+
+				int i = Integer.parseInt(c);
+				current *= 10;
+				current += i;
+
+			} catch (Exception ignored) {
+
+				int multiplier = 1;
+				switch (c.toLowerCase()) {
+					case "m":
+						multiplier = 60;
+						break;
+					case "h":
+						multiplier = 60*60;
+						break;
+					case "d":
+						multiplier = 24*60*60;
+						break;
+				}
+
+				seconds += current * multiplier;
+				current = 0;
+
+			}
+		}
+		seconds += current;
+		return seconds;
+	}
+
+	@CheckReturnValue
+	public static Member findMember(CommandEvent event, String search) {
+		if (CommandEvent.containsMention(search.trim())) {
+			try {
+				String id = search.substring(3).substring(0, 18);
+				return event.getGuild().getMemberById(id);
+			} catch (Exception ignored) { }
+		}
+		try {
+			return event.getGuild().getMemberById(search);
+		} catch (Exception ignored) { }
+		try {
+			return event.getGuild().getMemberByTag(search);
+		} catch (Exception ignored) { }
+		try {
+			return event.getGuild().getMembersByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		try {
+			return event.getGuild().getMembersByEffectiveName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public final String getMessage(@Nonnull CommandEvent event, @Nonnull String key, @Nonnull String defaultValue, Replacement... replacements) {
+	public static String fancyEnumName(@Nonnull Enum<?> enun) {
+		return Utils.getEnumName(enun);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String fancyEnumName(@Nonnull String enun) {
+		return Utils.getEnumName(enun);
+	}
+
+	@CheckReturnValue
+	public static boolean isValidID(String id) {
+		if (id == null) return false;
+		if (id.length() != 18) return false;
+		try {
+			Integer.parseInt(id);
+			return true;
+		} catch (Exception ignored) {
+			return false;
+		}
+	}
+
+	@CheckReturnValue
+	public static String getMessage(@Nonnull Guild guild, @Nonnull String key, Replacement... replacements) {
+		return getMessage(guild, key, "Message: `" + key + "`", replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String getMessage(@Nonnull Guild guild, @Nonnull String key, @Nonnull String defaultValue, Replacement... replacements) {
 		if (getLanguageManager() == null) {
 			return Replacement.replaceAll(defaultValue, replacements);
 		} else {
 			try {
-				return getMessage(event, key, replacements);
+				return Replacement.replaceAll(getLanguageManager().getMessage(guild, key), replacements);
 			} catch (Exception ignored) {
 				return Replacement.replaceAll(defaultValue, replacements);
 			}
 		}
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String getMessage(@Nonnull CommandEvent event, @Nonnull String key, @Nonnull String defaultValue, Replacement... replacements) {
+		return getMessage(event.getGuild(), key, defaultValue, replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String getMessage(@Nonnull CommandEvent event, @Nonnull String key, Replacement... replacements) {
+		return getMessage(event.getGuild(), key, replacements);
 	}
 
 	@Nonnull
