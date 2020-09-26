@@ -6,6 +6,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -34,8 +35,13 @@ public final class ListFactory {
 	public static <T> String listToString(@Nonnull List<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
-			if (builder.length() != 0) builder.append(REGEX);
-			builder.append(factory.get(current));
+			try {
+				String string = factory.get(current);
+				if (builder.length() != 0) builder.append(REGEX);
+				builder.append(string);
+			} catch (Exception ex) {
+				DefaultLogger.logDefault(Level.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
+			}
 		}
 		return builder.toString();
 	}
@@ -45,8 +51,13 @@ public final class ListFactory {
 	public static <T> String listToFancyString(@Nonnull List<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
-			if (builder.length() != 0) builder.append(", ");
-			builder.append(factory.get(current));
+			try {
+				String string = factory.get(current);
+				if (builder.length() != 0) builder.append(", ");
+				builder.append(string);
+			} catch (Exception ex) {
+				DefaultLogger.logDefault(Level.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
+			}
 		}
 		return builder.toString();
 	}
@@ -57,8 +68,13 @@ public final class ListFactory {
 	public static <T> String arrayToFancyString(@Nonnull Factory<String, T> factory, @Nonnull T... array) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : array) {
-			if (builder.length() != 0) builder.append(", ");
-			builder.append(factory.get(current));
+			try {
+				String string = factory.get(current);
+				if (builder.length() != 0) builder.append(", ");
+				builder.append(string);
+			} catch (Exception ex) {
+				DefaultLogger.logDefault(Level.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
+			}
 		}
 		return builder.toString();
 	}
