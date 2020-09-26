@@ -45,4 +45,8 @@ public interface ICommand {
 		return false;
 	}
 
+	default boolean isTeamCommand() {
+		return false;
+	}
+
 }

@@ -61,6 +61,36 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this.permission = permission;
 	}
 
+	public Command(@Nonnull String name, boolean processInNewThread, Permission permission, boolean reactToWebhooks,
+	               boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, @Nonnull String... alias) {
+		this.name = name;
+		this.alias = alias;
+		this.processInNewThread = processInNewThread;
+		this.reactToWebhooks = reactToWebhooks;
+		this.reactToBots = reactToBots;
+		this.reactToMentionPrefix = reactToMentionPrefix;
+		this.teamCommand = teamCommand;
+		this.permission = permission;
+		this.type = CommandType.GUILD;
+	}
+
+	public Command(@Nonnull String name, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
+		this.name = name;
+		this.alias = alias;
+		this.permission = permission;
+		this.teamCommand = teamCommand;
+		this.type = CommandType.GUILD;
+	}
+
+	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
+		this.name = name;
+		this.alias = alias;
+		this.processInNewThread = processInNewThread;
+		this.permission = permission;
+		this.teamCommand = teamCommand;
+		this.type = CommandType.GUILD;
+	}
+
 	private String name;
 	private String[] alias;
 
@@ -71,6 +101,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 	private boolean reactToWebhooks = false;
 	private boolean reactToBots = false;
 	private boolean reactToMentionPrefix = true;
+	private boolean teamCommand;
 
 	public abstract void onCommand(@Nonnull final CommandEvent event) throws Throwable;
 
@@ -118,4 +149,8 @@ public abstract class Command extends CommandHelper implements ICommand {
 		return reactToMentionPrefix;
 	}
 
+	@Override
+	public final boolean isTeamCommand() {
+		return teamCommand;
+	}
 }
