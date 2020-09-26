@@ -124,12 +124,7 @@ public class CommandEvent {
 
 	@Nonnull
 	public Color getSelfColorNotNull() {
-		Color color = getSelfColor();
-		if (color != null) {
-			return color;
-		} else {
-			return Colors.EMBED;
-		}
+		return Colors.getMemberColorNotNull(getSelfMember());
 	}
 
 	@Nonnull
@@ -255,6 +250,30 @@ public class CommandEvent {
 
 	public List<Role> getMentionedRoles() {
 		return receivedEvent.getMessage().getMentionedRoles();
+	}
+
+	public TextChannel getFirstMentionedChannel() {
+		if (!getMentionedChannels().isEmpty()) {
+			return getMentionedChannels().get(0);
+		} else {
+			return null;
+		}
+	}
+
+	public Role getFirstMentionedRole() {
+		if (!getMentionedChannels().isEmpty()) {
+			return getMentionedRoles().get(0);
+		} else {
+			return null;
+		}
+	}
+
+	public Member getFirstMentionedMember() {
+		if (!getMentionedChannels().isEmpty()) {
+			return getMentionedMembers().get(0);
+		} else {
+			return null;
+		}
 	}
 
 	public boolean senderHasPermission(@Nonnull Permission... permission) {
