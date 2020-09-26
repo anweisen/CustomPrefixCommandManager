@@ -2,6 +2,8 @@ package net.codingarea.botmanager.defaults;
 
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.Factory;
+import net.codingarea.botmanager.utils.NumberFormatter;
+import net.codingarea.botmanager.utils.ScheduleTimer;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -29,9 +31,9 @@ public final class DefaultStatusChanger implements Bindable {
 		return manager -> {
 
 			List<String> status = new ArrayList<>();
-			status.add(prefix + manager.getGuilds().size() + " Server");
+			status.add(prefix + NumberFormatter.MIDDLE_NUMBER.format(manager.getGuilds().size()) + " Server");
 			if (manager.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-				status.add(prefix + manager.getUsers().size() + " User");
+				status.add(prefix + NumberFormatter.MIDDLE_NUMBER.format(manager.getUsers().size()) + " User");
 			}
 
 			return status.toArray(new String[0]);
@@ -66,7 +68,7 @@ public final class DefaultStatusChanger implements Bindable {
 	private final ShardManager shardManager;
 	private final Factory<String[], ShardManager> status;
 
-	private final Timer timer = new Timer();
+	private Timer timer;
 
 	private ActivityType type = ActivityType.DEFAULT;
 
@@ -105,8 +107,8 @@ public final class DefaultStatusChanger implements Bindable {
 				List<String> strings = new ArrayList<>();
 				for (String s : suffix) {
 					strings.add((prefix + s)
-							.replace("%guilds%", String.valueOf(shardManager.getGuilds().size()))
-							.replace("%user%", String.valueOf(shardManager.getUsers().size())));
+							.replace("%guilds%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getGuilds().size()))
+							.replace("%user%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getUsers().size())));
 				}
 				return strings.toArray(new String[0]);
 			};
@@ -114,6 +116,7 @@ public final class DefaultStatusChanger implements Bindable {
 	}
 
 	public void start() {
+		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -134,7 +137,9 @@ public final class DefaultStatusChanger implements Bindable {
 	}
 
 	public void stop() {
-		timer.cancel();
+		try {
+			timer.cancel();
+		} catch (Exception ignored) { }
 	}
 
 	public void restart() {
@@ -142,8 +147,9 @@ public final class DefaultStatusChanger implements Bindable {
 		start();
 	}
 
-	public void setType(@Nonnull ActivityType type) {
+	public DefaultStatusChanger setType(@Nonnull ActivityType type) {
 		this.type = type;
+		return this;
 	}
 
 	/**
@@ -153,6 +159,18 @@ public final class DefaultStatusChanger implements Bindable {
 	public DefaultStatusChanger setUpdateRate(int updateRate) {
 		this.updateRate = updateRate;
 		restart();
+		return this;
+	}
+
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public DefaultStatusChanger sync(int updateRate) {
+		this.updateRate = updateRate;
+		stop();
+		shardManager.setActivity(null);
+		new ScheduleTimer(this::start);
 		return this;
 	}
 
