@@ -1,4 +1,4 @@
-package net.codingarea.botmanager.defaults;
+package net.codingarea.botmanager.defaults.commands;
 
 import net.codingarea.botmanager.commandmanager.CommandEvent;
 import net.codingarea.botmanager.commandmanager.commands.Command;
@@ -20,7 +20,7 @@ public final class DefaultLanguageCommand extends Command {
 	}
 
 	public DefaultLanguageCommand(@Nonnull String name, @Nonnull String... alias) {
-		super(name, Permission.ADMINISTRATOR, alias);
+		super(name, Permission.ADMINISTRATOR, true, alias);
 	}
 
 	public DefaultLanguageCommand(@Nonnull String name, @Nonnull Permission permission, @Nonnull String... alias) {
