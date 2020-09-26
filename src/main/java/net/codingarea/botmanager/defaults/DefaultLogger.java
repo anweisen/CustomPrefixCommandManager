@@ -22,6 +22,10 @@ public final class DefaultLogger extends Logger implements Bindable {
 
 	public static final DefaultLogger DEFAULT = new DefaultLogger("default");
 
+	static {
+		DEFAULT.setLevel(Level.ALL);
+	}
+
 	public static void logDefault(@Nonnull Level level, String caller, @Nonnull String message) {
 		LogRecord record = new LogRecord(level, message);
 		if (caller != null) record.setSourceClassName(caller);
