@@ -120,4 +120,10 @@ public final class DefaultFactory {
 		return Enum::ordinal;
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	public static Factory<String, Role> roleToName() {
+		return Role::getName;
+	}
+
 }
