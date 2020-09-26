@@ -40,7 +40,7 @@ public final class DefaultResultHandler implements TripleConsumer<MessageReceive
 			answer = answer.replace("%cooldown%", formatted);
 		} else {
 			String command = String.valueOf(obj);
-			answer = answer.replace("%command%", command);
+			answer = answer.replace("%command%", command).replace("%permission%", "TeamRank");
 		}
 
 		event.getChannel().sendMessage(answer).queue();
