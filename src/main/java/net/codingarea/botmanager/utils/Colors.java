@@ -60,4 +60,11 @@ public final class Colors {
 
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	public static Color getMemberColorNotNull(@Nonnull Member member) {
+		Color color = member.getColor();
+		return color != null ? color : EMBED;
+	}
+
 }
