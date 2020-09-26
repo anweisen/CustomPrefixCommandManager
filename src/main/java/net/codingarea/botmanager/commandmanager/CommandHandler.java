@@ -2,6 +2,7 @@ package net.codingarea.botmanager.commandmanager;
 
 import net.codingarea.botmanager.commandmanager.commands.ICommand;
 import net.codingarea.botmanager.defaults.DefaultLogger;
+import net.codingarea.botmanager.defaults.DefaultPermissionChecker;
 import net.codingarea.botmanager.exceptions.CommandExecutionException;
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.CoolDownManager;
@@ -32,6 +33,7 @@ public class CommandHandler implements Bindable {
 	protected MessageReactionBehavior reactToBots = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
 	protected final ArrayList<ICommand> commands = new ArrayList<>();
 	protected CoolDownManager<Member> cooldownManager;
+	protected PermissionChecker permissionChecker = new DefaultPermissionChecker();
 
 	@Nonnull
 	public CommandHandler registerCommand(ICommand command) {
@@ -175,7 +177,7 @@ public class CommandHandler implements Bindable {
 		} else if (!command.shouldReactToMentionPrefix() && byMention) {
 			result.accept(event, CommandResult.MENTION_PREFIX_NO_REACT, null);
 			return;
-		} else if (command.getPermissionNeeded() != null && !event.getMember().hasPermission(command.getPermissionNeeded())) {
+		} else if (event.getMember() != null && permissionChecker != null && !permissionChecker.isAllowed(event.getMember(), command)) {
 			result.accept(event, CommandResult.NO_PERMISSIONS, command.getPermissionNeeded());
 			return;
 		} else if (reactToWebhooks != MessageReactionBehavior.REACT_ALWAYS && event.isWebhookMessage() && (!command.shouldReactToWebhooks() || reactToWebhooks == MessageReactionBehavior.REACT_NEVER)) {
@@ -192,16 +194,26 @@ public class CommandHandler implements Bindable {
 
 	}
 
-	private String mention(MessageReceivedEvent event) {
+	protected String mention(MessageReceivedEvent event) {
 		return "<@!" + event.getJDA().getSelfUser().getId() + ">";
 	}
 
-	public void setWebhookMessageBehavior(MessageReactionBehavior behavior) {
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public CommandHandler setWebhookMessageBehavior(MessageReactionBehavior behavior) {
 		this.reactToWebhooks = behavior;
+		return this;
 	}
 
-	public void setBotMessageBehavior(MessageReactionBehavior behavior) {
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public CommandHandler setBotMessageBehavior(MessageReactionBehavior behavior) {
 		this.reactToBots = behavior;
+		return this;
 	}
 
 	public MessageReactionBehavior getBotMessageBehavior() {
@@ -216,8 +228,26 @@ public class CommandHandler implements Bindable {
 		return cooldownManager;
 	}
 
-	public void setCoolDownManager(CoolDownManager<Member> cooldownManager) {
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public CommandHandler setCoolDownManager(CoolDownManager<Member> cooldownManager) {
 		this.cooldownManager = cooldownManager;
+		return this;
+	}
+
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public CommandHandler setPermissionChecker(PermissionChecker permissionChecker) {
+		this.permissionChecker = permissionChecker;
+		return this;
+	}
+
+	public PermissionChecker getPermissionChecker() {
+		return permissionChecker;
 	}
 
 	public static final ThreadGroup THREAD_GROUP = new ThreadGroup("CommandProcessGroup");
