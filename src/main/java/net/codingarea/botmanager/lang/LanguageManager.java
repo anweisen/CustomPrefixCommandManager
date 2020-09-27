@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 
 	protected final ArrayList<Language> languages = new ArrayList<>();
 
+	protected LanguageManager() {
+		super();
+	}
+
 	public LanguageManager(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
 	}
@@ -41,8 +46,8 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	 * @return <code>this</code> for chaining
 	 */
 	@Nonnull
-	public LanguageManager loadLanguagesFromFolder(File folder) {
-		if (!folder.exists()) throw new IllegalArgumentException("Directory does not exist");
+	public LanguageManager loadLanguagesFromFolder(@Nonnull File folder) {
+		if (!folder.exists()) throw new IllegalArgumentException("File does not exists");
 		if (!folder.isDirectory()) throw new IllegalArgumentException("File is not a directory");
 		for (File file : folder.listFiles()) {
 			try {
@@ -59,8 +64,8 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	 * @return <code>this</code> for chaining
 	 */
 	@Nonnull
-	public LanguageManager loadLanguageFromResource(String path) throws IOException {
-		Language language = new Language(this.getClass().getClassLoader().getResourceAsStream(path), path);
+	public LanguageManager loadLanguageFromResource(@Nonnull String path) throws IOException {
+		Language language = Language.loadResource(path);
 		registerLanguage(language);
 		return this;
 	}
@@ -69,8 +74,8 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	 * @return <code>this</code> for chaining
 	 */
 	@Nonnull
-	public LanguageManager loadLanguageFromFile(String path) throws IOException {
-		Language language = new Language(new File(path));
+	public LanguageManager loadLanguageFromFile(@Nonnull String path) throws IOException {
+		Language language = Language.loadFile(path);
 		registerLanguage(language);
 		return this;
 	}
