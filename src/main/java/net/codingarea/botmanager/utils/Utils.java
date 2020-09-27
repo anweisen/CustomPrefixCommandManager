@@ -1,5 +1,9 @@
 package net.codingarea.botmanager.utils;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import java.time.format.DateTimeFormatter;
+
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 1.0
@@ -42,6 +46,24 @@ public final class Utils {
 				.replace(" In ", " in ")
 				.replace(" On " , " on ")
 				.replace(" Off ", " off ");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter yearDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter dayDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM HH:mm");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter timeDateTime() {
+		return DateTimeFormatter.ofPattern("HH:mm");
 	}
 
 }
