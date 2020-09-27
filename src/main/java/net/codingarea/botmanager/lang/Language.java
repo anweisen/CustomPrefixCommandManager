@@ -3,6 +3,7 @@ package net.codingarea.botmanager.lang;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -14,9 +15,16 @@ import java.util.Properties;
  */
 public final class Language {
 
-	public static Language load(String path) throws IOException {
+	public static Language loadFile(@Nonnull String path) throws IOException {
 		if (!path.contains(".")) path += ".lang";
 		return new Language(new File(path));
+	}
+
+	public static Language loadResource(@Nonnull String path) throws IOException {
+		if (!path.contains(".")) path += ".lang";
+		InputStream input = Language.class.getClassLoader().getResourceAsStream(path);
+		if (input == null) throw new FileNotFoundException(path);
+		return new Language(input, path);
 	}
 
 	private final String name;
