@@ -12,13 +12,13 @@ public final class Replacement {
 
 	private final String origin, replacement;
 
-	public Replacement(@Nonnull String origin, @Nonnull Object replacement) {
+	public Replacement(@Nonnull String origin, Object replacement) {
 		this(origin, String.valueOf(replacement));
 	}
 
-	public Replacement(@Nonnull String origin, @Nonnull String replacement) {
+	public Replacement(@Nonnull String origin, String replacement) {
 		this.origin = origin;
-		this.replacement = replacement;
+		this.replacement = String.valueOf(replacement);
 	}
 
 	@Nonnull
