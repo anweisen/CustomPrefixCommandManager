@@ -32,7 +32,7 @@ public final class ListFactory {
 		return list;
 	}
 
-	public static <T> String listToString(@Nonnull List<? extends T> list, @Nonnull Factory<String, T> factory) {
+	public static <T> String listToString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
 			try {
@@ -48,7 +48,7 @@ public final class ListFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> String listToFancyString(@Nonnull List<? extends T> list, @Nonnull Factory<String, T> factory) {
+	public static <T> String listToFancyString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
 			try {
