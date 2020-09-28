@@ -1,5 +1,6 @@
 package net.codingarea.botmanager.utils;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.*;
 
@@ -132,6 +133,7 @@ public abstract class ListImitator<T> implements List<T>, RandomAccess {
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public List<T> realList() {
 		return list;
 	}
