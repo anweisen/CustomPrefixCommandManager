@@ -54,6 +54,10 @@ public abstract class LogHelper {
 		LogHelper.log(LogLevel.INFO, String.valueOf(message));
 	}
 
+	public static void error(Throwable ex) {
+		LogHelper.log(ex, null);
+	}
+
 	public static void error(Object message) {
 		LogHelper.log(LogLevel.ERROR, String.valueOf(message));
 	}
