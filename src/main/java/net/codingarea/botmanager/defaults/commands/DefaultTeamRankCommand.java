@@ -1,6 +1,5 @@
 package net.codingarea.botmanager.defaults.commands;
 
-import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory.Default;
 import net.codingarea.botmanager.commandmanager.CommandEvent;
 import net.codingarea.botmanager.commandmanager.commands.Command;
 import net.codingarea.botmanager.defaults.DefaultTeamRankCache;
@@ -24,7 +23,7 @@ public final class DefaultTeamRankCommand extends Command {
 	}
 
 	public DefaultTeamRankCommand(@Nonnull DefaultTeamRankCache rankCache) {
-		super("setteamrank", Permission.ADMINISTRATOR, true);
+		super("setteamrank", Permission.ADMINISTRATOR, true, "setteamrole");
 		this.rankCache = rankCache;
 	}
 
