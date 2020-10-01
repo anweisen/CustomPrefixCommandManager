@@ -19,12 +19,10 @@ public final class DefaultMessageListener implements Listener {
 
 	private final CommandHandler commandHandler;
 	private Factory<String, Guild> prefix;
-	private TripleConsumer<MessageReceivedEvent, CommandResult, Object> resultHandler;
 
 	public DefaultMessageListener(@Nonnull CommandHandler commandHandler, @Nonnull String prefix) {
 		this.commandHandler = commandHandler;
 		this.prefix = guild -> prefix;
-		this.resultHandler = new DefaultResultHandler();
 	}
 
 	/**
@@ -33,16 +31,6 @@ public final class DefaultMessageListener implements Listener {
 	public DefaultMessageListener(@Nonnull CommandHandler commandHandler, @Nonnull Factory<String, Guild> prefix) {
 		this.commandHandler = commandHandler;
 		this.prefix = prefix;
-		this.resultHandler = new DefaultResultHandler();
-	}
-
-	/**
-	 * @param prefix The {@link Guild} param is null when the message is not from a guild
-	 */
-	public DefaultMessageListener(@Nonnull CommandHandler commandHandler, @Nonnull Factory<String, Guild> prefix, @Nonnull TripleConsumer<MessageReceivedEvent, CommandResult, Object> resultHandler) {
-		this.commandHandler = commandHandler;
-		this.prefix = prefix;
-		this.resultHandler = resultHandler;
 	}
 
 	/**
@@ -56,19 +44,9 @@ public final class DefaultMessageListener implements Listener {
 		return this;
 	}
 
-	/**
-	 * @param resultHandler <code>null</code> to disable results
-	 * @return <code>this</code> for chaining
-	 */
-	@Nonnull
-	public DefaultMessageListener setResultHandler(TripleConsumer<MessageReceivedEvent, CommandResult, Object> resultHandler) {
-		this.resultHandler = resultHandler;
-		return this;
-	}
-
 	@EventHandler
 	public void onMessage(MessageReceivedEvent event) {
-		commandHandler.handleCommand(prefix.get(event.isFromGuild() ? event.getGuild() : null), event, resultHandler);
+		commandHandler.handleCommand(prefix.get(event.isFromGuild() ? event.getGuild() : null), event);
 	}
 
 }
