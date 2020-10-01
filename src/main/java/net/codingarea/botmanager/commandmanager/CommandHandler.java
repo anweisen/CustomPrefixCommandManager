@@ -6,7 +6,6 @@ import net.codingarea.botmanager.defaults.DefaultPermissionChecker;
 import net.codingarea.botmanager.exceptions.CommandExecutionException;
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.CoolDownManager;
-import net.codingarea.botmanager.utils.TripleConsumer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -23,17 +22,12 @@ import java.util.Arrays;
  */
 public class CommandHandler implements Bindable {
 
-	public enum MessageReactionBehavior {
-		REACT_NEVER,
-		REACT_IF_COMMAND_WANTS,
-		REACT_ALWAYS;
-	}
-
-	protected MessageReactionBehavior reactToWebhooks = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
-	protected MessageReactionBehavior reactToBots = MessageReactionBehavior.REACT_IF_COMMAND_WANTS;
+	protected ReactionBehavior reactToWebhooks = ReactionBehavior.COMMAND_DECISION;
+	protected ReactionBehavior reactToBots = ReactionBehavior.COMMAND_DECISION;
 	protected final ArrayList<ICommand> commands = new ArrayList<>();
 	protected CoolDownManager<Member> cooldownManager;
 	protected PermissionChecker permissionChecker = new DefaultPermissionChecker();
+	protected ResultHandler resultHandler;
 
 	@Nonnull
 	public CommandHandler registerCommand(ICommand command) {
@@ -111,15 +105,7 @@ public class CommandHandler implements Bindable {
 		return new ArrayList<>(this.commands);
 	}
 
-	public void handleCommand(@Nonnull String prefix, @Nonnull MessageReceivedEvent event) {
-		handleCommand(prefix, event, null);
-	}
-
 	/**
-	 * @param prefix the prefix which should be in front of the command
-	 * @param event the {@link MessageReceivedEvent} the command was received
-	 * @see CommandResult
-	 * @param result
 	 * - {@link CommandResult#INVALID_CHANNEL_PRIVATE_COMMAND} if the command was a private command and was performed in a guild chat <br>
 	 * - {@link CommandResult#INVALID_CHANNEL_GUILD_COMMAND} if the command was a guild command and was performed in a private chat <br>
 	 * - {@link CommandResult#WEBHOOK_MESSAGE_NO_REACT} if the message came from a webhook, and the command should not react <br>
@@ -127,12 +113,16 @@ public class CommandHandler implements Bindable {
 	 * - {@link CommandResult#PREFIX_NOT_USED} if the given prefix and mention prefix was not used <br>
 	 * - {@link CommandResult#MENTION_PREFIX_NO_REACT} the mention prefix was used, but the command should not react <br>
 	 * - {@link CommandResult#COMMAND_NOT_FOUND} if there was not command with the given name <br>
-	 * - {@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown ({@link #setCoolDownManager(CoolDownManager)})
+	 * - {@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown ({@link #setCoolDownManager(CoolDownManager)}) <br>
 	 * - {@link CommandResult#SUCCESS} if the command was executed <br>
+	 * @param prefix the prefix which should be in front of the command
+	 * @param event the {@link MessageReceivedEvent} the command was received
+	 * @see CommandResult
 	 */
-	public void handleCommand(@Nonnull String prefix, @Nonnull MessageReceivedEvent event, @Nullable TripleConsumer<MessageReceivedEvent, CommandResult, Object> result) {
+	public void handleCommand(@Nonnull String prefix, @Nonnull MessageReceivedEvent event) {
 
-		if (result == null) result = (e, r, o) -> {};
+		ResultHandler resultHandler = this.resultHandler;
+		if (resultHandler == null) resultHandler = (e, r, a) -> {};
 
 		String raw = event.getMessage().getContentRaw().toLowerCase().trim();
 		boolean byMention = false;
@@ -143,7 +133,7 @@ public class CommandHandler implements Bindable {
 				prefix = mention;
 				byMention = true;
 			} else {
-				result.accept(event, CommandResult.PREFIX_NOT_USED, null);
+				resultHandler.handle(event, CommandResult.PREFIX_NOT_USED, null);
 				return;
 			}
 		}
@@ -161,36 +151,36 @@ public class CommandHandler implements Bindable {
 		ICommand command = getCommand(commandName);
 
 		if (command == null) {
-			result.accept(event, CommandResult.COMMAND_NOT_FOUND, commandName.trim());
+			resultHandler.handle(event, CommandResult.COMMAND_NOT_FOUND, commandName.trim());
 			return;
 		}
 
 		if (cooldownManager != null && cooldownManager.isOnCoolDown(event.getMember())) {
-			result.accept(event, CommandResult.MEMBER_ON_COOLDOWN, cooldownManager.getCoolDownLeft(event.getMember()));
+			resultHandler.handle(event, CommandResult.MEMBER_ON_COOLDOWN, cooldownManager.getCoolDownLeft(event.getMember()));
 			return;
 		} else if (command.getType() == CommandType.GUILD && !event.isFromGuild()) {
-			result.accept(event, CommandResult.INVALID_CHANNEL_GUILD_COMMAND, commandName.trim());
+			resultHandler.handle(event, CommandResult.INVALID_CHANNEL_GUILD_COMMAND, commandName.trim());
 			return;
 		} else if (command.getType() == CommandType.PRIVATE && event.isFromGuild()) {
-			result.accept(event, CommandResult.INVALID_CHANNEL_PRIVATE_COMMAND, commandName.trim());
+			resultHandler.handle(event, CommandResult.INVALID_CHANNEL_PRIVATE_COMMAND, commandName.trim());
 			return;
 		} else if (!command.shouldReactToMentionPrefix() && byMention) {
-			result.accept(event, CommandResult.MENTION_PREFIX_NO_REACT, null);
+			resultHandler.handle(event, CommandResult.MENTION_PREFIX_NO_REACT, null);
 			return;
 		} else if (event.getMember() != null && permissionChecker != null && !permissionChecker.isAllowed(event.getMember(), command)) {
-			result.accept(event, CommandResult.NO_PERMISSIONS, command.getPermissionNeeded());
+			resultHandler.handle(event, CommandResult.NO_PERMISSIONS, command.getPermissionNeeded());
 			return;
-		} else if (reactToWebhooks != MessageReactionBehavior.REACT_ALWAYS && event.isWebhookMessage() && (!command.shouldReactToWebhooks() || reactToWebhooks == MessageReactionBehavior.REACT_NEVER)) {
-			result.accept(event, CommandResult.WEBHOOK_MESSAGE_NO_REACT, null);
+		} else if (reactToWebhooks != ReactionBehavior.ALWAYS && event.isWebhookMessage() && (!command.shouldReactToWebhooks() || reactToWebhooks == ReactionBehavior.NEVER)) {
+			resultHandler.handle(event, CommandResult.WEBHOOK_MESSAGE_NO_REACT, null);
 			return;
-		} else if (reactToBots != MessageReactionBehavior.REACT_ALWAYS && event.getAuthor().isBot() && (!command.shouldReactToBots() || reactToBots == MessageReactionBehavior.REACT_NEVER)) {
-			result.accept(event, CommandResult.BOT_MESSAGE_NO_REACT, null);
+		} else if (reactToBots != ReactionBehavior.ALWAYS && event.getAuthor().isBot() && (!command.shouldReactToBots() || reactToBots == ReactionBehavior.NEVER)) {
+			resultHandler.handle(event, CommandResult.BOT_MESSAGE_NO_REACT, null);
 			return;
 		}
 
 		if (cooldownManager != null) cooldownManager.addToCoolDown(event.getMember());
 
-		process(command, new CommandEvent(prefix, getCommandName(command, commandName), event), result);
+		process(command, new CommandEvent(prefix, getCommandName(command, commandName), event), resultHandler);
 
 	}
 
@@ -202,7 +192,7 @@ public class CommandHandler implements Bindable {
 	 * @return <code>this</code> for chaining
 	 */
 	@Nonnull
-	public CommandHandler setWebhookMessageBehavior(MessageReactionBehavior behavior) {
+	public CommandHandler setWebhookMessageBehavior(ReactionBehavior behavior) {
 		this.reactToWebhooks = behavior;
 		return this;
 	}
@@ -211,16 +201,16 @@ public class CommandHandler implements Bindable {
 	 * @return <code>this</code> for chaining
 	 */
 	@Nonnull
-	public CommandHandler setBotMessageBehavior(MessageReactionBehavior behavior) {
+	public CommandHandler setBotMessageBehavior(ReactionBehavior behavior) {
 		this.reactToBots = behavior;
 		return this;
 	}
 
-	public MessageReactionBehavior getBotMessageBehavior() {
+	public ReactionBehavior getBotMessageBehavior() {
 		return reactToBots;
 	}
 
-	public MessageReactionBehavior getWebhookMessageBehavior() {
+	public ReactionBehavior getWebhookMessageBehavior() {
 		return reactToWebhooks;
 	}
 
@@ -250,10 +240,23 @@ public class CommandHandler implements Bindable {
 		return permissionChecker;
 	}
 
+	/**
+	 * @return <code>this</code> for chaining
+	 */
+	@Nonnull
+	public CommandHandler setResultHandler(ResultHandler resultHandler) {
+		this.resultHandler = resultHandler;
+		return this;
+	}
+
+	public ResultHandler getResultHandler() {
+		return resultHandler;
+	}
+
 	public static final ThreadGroup THREAD_GROUP = new ThreadGroup("CommandProcessGroup");
 	private static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
 
-	private static void process(@Nonnull ICommand command, @Nonnull CommandEvent event, @Nonnull TripleConsumer<MessageReceivedEvent, CommandResult, Object> result) {
+	private static void process(@Nonnull ICommand command, @Nonnull CommandEvent event, @Nonnull ResultHandler result) {
 		if (!command.shouldProcessInNewThread()) {
 			execute(command, event, result);
 		} else {
@@ -264,12 +267,12 @@ public class CommandHandler implements Bindable {
 		}
 	}
 
-	private static void execute(@Nonnull ICommand command, @Nonnull CommandEvent event, @Nonnull TripleConsumer<MessageReceivedEvent, CommandResult, Object> result) throws CommandExecutionException {
+	private static void execute(@Nonnull ICommand command, @Nonnull CommandEvent event, ResultHandler result) throws CommandExecutionException {
 		try {
 			command.onCommand(event);
-			result.accept(event.getReceivedEvent(), CommandResult.SUCCESS, null);
+			result.handle(event.getReceivedEvent(), CommandResult.SUCCESS, null);
 		} catch (Throwable ex) {
-			result.accept(event.getReceivedEvent(), CommandResult.EXCEPTION, ex);
+			result.handle(event.getReceivedEvent(), CommandResult.EXCEPTION, ex);
 			throw new CommandExecutionException(ex);
 		}
 	}
