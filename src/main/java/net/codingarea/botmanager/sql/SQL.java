@@ -56,8 +56,8 @@ public abstract class SQL implements Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	public static SQL createAnonymous(@Nonnull DataSource dataSource) throws SQLException {
-		SQL instance = new SQL(dataSource) {};
+	public static SQL anonymous(@Nonnull DataSource dataSource) throws SQLException {
+		SQL instance = new SQL(dataSource) { };
 		instance.connect();
 		return instance;
 	}
