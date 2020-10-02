@@ -26,18 +26,20 @@ public final class ListFactory {
 				T t = factory.get(arg);
 				list.add(t);
 			} catch (Exception ex) {
-				DefaultLogger.logDefault(LogLevel.WARNING, ListFactory.class, "Cannot generate entry: " + ex.getMessage());
+				DefaultLogger.logDefault(LogLevel.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
 			}
 		}
 		return list;
 	}
 
-	public static <T> String listToString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
+	@Nonnull
+	@CheckReturnValue
+	public static <T> String listToString(@Nonnull String split, @Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
 			try {
 				String string = factory.get(current);
-				if (builder.length() != 0) builder.append(REGEX);
+				if (builder.length() != 0) builder.append(split);
 				builder.append(string);
 			} catch (Exception ex) {
 				DefaultLogger.logDefault(Level.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
@@ -46,14 +48,25 @@ public final class ListFactory {
 		return builder.toString();
 	}
 
+	public static <T> String listToString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
+		return listToString(REGEX, list, factory);
+	}
+
 	@Nonnull
 	@CheckReturnValue
 	public static <T> String listToFancyString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
+		return listToString(", ", list, factory);
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T> String arrayToString(@Nonnull String split, @Nonnull Factory<String, T> factory, @Nonnull T... array) {
 		StringBuilder builder = new StringBuilder();
-		for (T current : list) {
+		for (T current : array) {
 			try {
 				String string = factory.get(current);
-				if (builder.length() != 0) builder.append(", ");
+				if (builder.length() != 0) builder.append(split);
 				builder.append(string);
 			} catch (Exception ex) {
 				DefaultLogger.logDefault(Level.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
@@ -66,17 +79,7 @@ public final class ListFactory {
 	@SafeVarargs
 	@CheckReturnValue
 	public static <T> String arrayToFancyString(@Nonnull Factory<String, T> factory, @Nonnull T... array) {
-		StringBuilder builder = new StringBuilder();
-		for (T current : array) {
-			try {
-				String string = factory.get(current);
-				if (builder.length() != 0) builder.append(", ");
-				builder.append(string);
-			} catch (Exception ex) {
-				DefaultLogger.logDefault(Level.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
-			}
-		}
-		return builder.toString();
+		return arrayToString(", ", factory, array);
 	}
 
 }
