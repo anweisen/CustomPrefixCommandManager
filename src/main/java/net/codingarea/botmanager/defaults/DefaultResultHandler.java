@@ -28,10 +28,15 @@ public final class DefaultResultHandler implements ResultHandler {
 			case WEBHOOK_MESSAGE_NO_REACT:
 			case MENTION_PREFIX_NO_REACT:
 			case BOT_MESSAGE_NO_REACT:
-			case COMMAND_NOT_FOUND:
 			case SUCCESS:
 			case PREFIX_NOT_USED:
 			default:
+				break;
+
+			case COMMAND_NOT_FOUND:
+				if (arg instanceof String) {
+					answer = answer.replace("%command%", (String) arg);
+				}
 				break;
 
 			case MEMBER_ON_COOLDOWN:
@@ -47,6 +52,7 @@ public final class DefaultResultHandler implements ResultHandler {
 					answer = answer.replace("%permission%", "TeamRank");
 				}
 				break;
+
 			case EXCEPTION:
 				Throwable ex = null;
 				if (arg instanceof Throwable) {
@@ -55,7 +61,8 @@ public final class DefaultResultHandler implements ResultHandler {
 						ex = ex.getCause();
 					}
 				}
-				answer = answer.replace("%exception%", ex != null ? ex.getClass().getSimpleName() : "null");
+				answer = answer.replace("%exception%", ex != null ? ex.getClass().getSimpleName() : "null")
+							   .replace("%messages%", ex != null ? ex.getMessage() : "null");
 				break;
 		}
 
