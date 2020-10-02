@@ -1,5 +1,6 @@
 package net.codingarea.botmanager.defaults;
 
+import net.codingarea.botmanager.utils.Utils;
 import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nonnull;
@@ -35,7 +36,7 @@ public final class DefaultLogHandler extends Handler {
 
 	@Nonnull
 	public static String getCurrentTimeAsString() {
-		OffsetDateTime time = OffsetDateTime.now(ZoneId.of("Europe/Paris"));
+		OffsetDateTime time = Utils.centralEuropeTime();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 		return time.format(formatter);
 	}
