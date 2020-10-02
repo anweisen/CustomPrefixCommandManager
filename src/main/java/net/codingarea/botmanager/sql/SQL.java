@@ -106,6 +106,14 @@ public abstract class SQL implements Bindable {
 		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database closed");
 	}
 
+	public void disconnectSafely() {
+		try {
+			disconnect();
+		} catch (Throwable ex) {
+			logger.log(LogLevel.WARNING, "Exception while disconnecting", ex);
+		}
+	}
+
 	/**
 	 * Connects to the sql server ({@link #connect()}) if the connection is no longer opened (not {@link #connectionIsOpened()})
 	 * @throws SQLException If a {@link SQLException} is thrown while connecting to the server
