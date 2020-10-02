@@ -24,49 +24,58 @@ public class ConstantLanguageManager extends LanguageManager {
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public LanguageManager loadLanguagesFromFolder(@Nonnull File folder) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public LanguageManager loadLanguageFromResource(@Nonnull String path) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public LanguageManager loadLanguageFromFile(@Nonnull String path) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public void registerLanguage(Language language) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public void setLanguage(Guild guild, String language) throws SQLException, LanguageNotFoundException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public void setLanguage(Guild guild, Language language) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public Language getLanguageByName(String name) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public synchronized void setCached(@Nonnull String key, String value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public String getCached(@Nonnull String key) {
 		throw new UnsupportedOperationException();
 	}
@@ -78,89 +87,105 @@ public class ConstantLanguageManager extends LanguageManager {
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public synchronized String load(String key) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public String getValue(@Nonnull String key) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public String get(String key) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public synchronized void set(@Nonnull String key, @Nonnull String value) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public void setDefaultValue(String defaultValue) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public synchronized void setCacheValues(boolean cacheValues) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public synchronized void setClearRate(int clearRate) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public synchronized void resetCache() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public int getClearRate() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public String getDefaultValue() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public SQL getDataSource() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public String getKeyColumn() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public String getValueColumn() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public String getTable() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public boolean shouldCacheValues() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
+	@Deprecated
 	public Map<String, String> getCache() {
 		throw new UnsupportedOperationException();
 	}
