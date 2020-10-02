@@ -2,7 +2,11 @@ package net.codingarea.botmanager.utils;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -50,20 +54,38 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static DateTimeFormatter yearDateTime() {
+	public static DateTimeFormatter yearTimeDateTime() {
 		return DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static DateTimeFormatter dayDateTime() {
-		return DateTimeFormatter.ofPattern("dd.MM HH:mm");
+	public static DateTimeFormatter yearDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM.yyyy");
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static DateTimeFormatter timeDateTime() {
+	public static DateTimeFormatter dayDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter minuteDateTime() {
 		return DateTimeFormatter.ofPattern("HH:mm");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter secondDateTime() {
+		return DateTimeFormatter.ofPattern("HH:mm:ss");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static OffsetDateTime centralEuropeTime() {
+		return OffsetDateTime.now(ZoneId.of("Europe/Paris"));
 	}
 
 }
