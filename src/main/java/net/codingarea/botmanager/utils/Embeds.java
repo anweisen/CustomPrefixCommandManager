@@ -50,7 +50,7 @@ public final class Embeds {
 	@Nonnull
 	@CheckReturnValue
 	public static EmbedBuilder construct(@Nonnull Member member, String authorURL, String suffix) {
-		return new EmbedBuilder().setColor(Colors.getMemberColorNotNull(member))
+		return new EmbedBuilder().setColor(Colors.getMemberColorNotNull(member.getGuild().getSelfMember()))
 								 .setAuthor(title(member, suffix), authorURL, member.getUser().getEffectiveAvatarUrl());
 	}
 
