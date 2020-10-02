@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.Member;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import java.sql.ResultSet;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -66,6 +65,10 @@ public abstract class CommandHelper extends LogHelper {
 		if (CommandEvent.containsMention(search.trim())) {
 			try {
 				String id = search.substring(3).substring(0, 18);
+				return event.getGuild().getMemberById(id);
+			} catch (Exception ignored) { }
+			try {
+				String id = search.substring(2).substring(0, 18);
 				return event.getGuild().getMemberById(id);
 			} catch (Exception ignored) { }
 		}
@@ -141,18 +144,18 @@ public abstract class CommandHelper extends LogHelper {
 
 	@Nonnull
 	@CheckReturnValue
-	public final String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
+	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
 		return getMessage(event, "syntax", "Please use **%syntax%**",
 						  new Replacement("%syntax%", event.syntax(syntax)));
 	}
 
-	public final void sendSyntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
+	public static void sendSyntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
 		event.queueReply(syntax(event, syntax));
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public final String removeMarkdown(@Nonnull String string) {
+	public static String removeMarkdown(@Nonnull String string) {
 		return CommandEvent.removeMarkdown(string);
 	}
 
