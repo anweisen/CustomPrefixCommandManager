@@ -16,7 +16,7 @@ public enum CommandResult {
 	INVALID_CHANNEL_PRIVATE_COMMAND("You can only use this command in a private chat."),
 	INVALID_CHANNEL_GUILD_COMMAND("You can only use this command in a guild."),
 	NO_PERMISSIONS("You need `%permission%` for that!"),
-	MEMBER_ON_COOLDOWN("You are currently on cooldown for `%cooldown%s`."),
+	MEMBER_ON_COOLDOWN("You are currently on cooldown for `%cooldown%`."),
 	EXCEPTION("Something went wrong: `%exception%`"),
 	WEBHOOK_MESSAGE_NO_REACT,
 	BOT_MESSAGE_NO_REACT,
