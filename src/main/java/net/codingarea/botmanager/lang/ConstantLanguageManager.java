@@ -19,6 +19,7 @@ public class ConstantLanguageManager extends LanguageManager {
 	protected final Language language;
 
 	public ConstantLanguageManager(@Nonnull Language language) {
+		super();
 		this.language = language;
 	}
 
@@ -81,6 +82,7 @@ public class ConstantLanguageManager extends LanguageManager {
 	}
 
 	@Override
+	@Deprecated
 	public String getFromDatabase(String key) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
