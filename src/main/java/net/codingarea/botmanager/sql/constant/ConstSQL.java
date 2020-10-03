@@ -61,16 +61,21 @@ public final class ConstSQL {
 		}
 	}
 
+	@CheckReturnValue
+	public static SQL currentInstance() {
+		return instance;
+	}
+
+	public static void setInstance(SQL sql) {
+		closeCurrent();
+		instance = sql;
+	}
+
 	/*
 	 * ===============================
 	 * Begin of implementation methods
 	 * ===============================
 	 */
-
-	@CheckReturnValue
-	public static SQL currentInstance() {
-		return instance;
-	}
 
 	@CheckReturnValue
 	public boolean connectionIsOpened() {
