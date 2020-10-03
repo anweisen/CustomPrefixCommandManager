@@ -3,6 +3,7 @@ package net.codingarea.botmanager.commandmanager;
 import net.codingarea.botmanager.commandmanager.commands.ICommand;
 import net.codingarea.botmanager.defaults.DefaultLogger;
 import net.codingarea.botmanager.defaults.DefaultPermissionChecker;
+import net.codingarea.botmanager.defaults.DefaultResultHandler;
 import net.codingarea.botmanager.exceptions.CommandExecutionException;
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.CoolDownManager;
@@ -27,7 +28,7 @@ public class CommandHandler implements Bindable {
 	protected final ArrayList<ICommand> commands = new ArrayList<>();
 	protected CoolDownManager<Member> cooldownManager;
 	protected PermissionChecker permissionChecker = new DefaultPermissionChecker();
-	protected ResultHandler resultHandler;
+	protected ResultHandler resultHandler = new DefaultResultHandler();
 
 	@Nonnull
 	public CommandHandler registerCommand(ICommand command) {
