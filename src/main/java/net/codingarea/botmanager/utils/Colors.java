@@ -24,6 +24,7 @@ public final class Colors {
 			DO_NOT_DISTURB = decode("#E84444"),
 			IDLE = decode("#F09F19"),
 			OFFLINE = decode("#747F8D"),
+			STREAMING = decode("#573591"),
 
 			EMBED = decode("#2F3136"),
 			NO_RANK = decode("#CCD8DE"),
