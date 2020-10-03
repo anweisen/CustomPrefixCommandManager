@@ -4,6 +4,7 @@ import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.Factory;
 import net.codingarea.botmanager.utils.NumberFormatter;
 import net.codingarea.botmanager.utils.ScheduleTimer;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
  * @author anweisen | https://github.com/anweisen
  * @since 2.2
  */
-public final class DefaultStatusChanger implements Bindable {
+public class DefaultStatusChanger implements Bindable {
 
 	public static final String DEFAULT_STREAM_URL = "https://www.twitch.tv/#";
 
@@ -170,7 +171,7 @@ public final class DefaultStatusChanger implements Bindable {
 		this.updateRate = updateRate;
 		stop();
 		shardManager.setActivity(null);
-		new ScheduleTimer(this::start);
+		new ScheduleTimer(this::start, Math.max(Math.min(updateRate, 60), 0));
 		return this;
 	}
 

@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
  */
-public final class DefaultMessageListener implements Listener {
+public class DefaultMessageListener implements Listener {
 
 	private final CommandHandler commandHandler;
 	private Factory<String, Guild> prefix;

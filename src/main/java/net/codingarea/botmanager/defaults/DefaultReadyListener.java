@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public final class DefaultReadyListener implements Listener {
+public class DefaultReadyListener implements Listener {
 
 	@Nonnull
 	@CheckReturnValue

@@ -16,7 +16,7 @@ import java.sql.SQLException;
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public final class DefaultResultHandler implements ResultHandler {
+public class DefaultResultHandler implements ResultHandler {
 
 	@Override
 	public void handle(@Nonnull MessageReceivedEvent event, @Nonnull CommandResult result, Object arg) {
@@ -62,7 +62,7 @@ public final class DefaultResultHandler implements ResultHandler {
 					}
 				}
 				answer = answer.replace("%exception%", ex != null ? ex.getClass().getSimpleName() : "null")
-							   .replace("%messages%", ex != null ? ex.getMessage() : "null");
+							   .replace("%messages%", ex != null && ex.getMessage() != null ? ex.getMessage() : "null");
 				break;
 		}
 

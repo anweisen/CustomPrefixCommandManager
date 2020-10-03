@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.3
  */
-public final class DefaultConfigLoader extends ConfigLoader {
+public class DefaultConfigLoader extends ConfigLoader {
 
 	public static final class DefaultNamedValue {
 

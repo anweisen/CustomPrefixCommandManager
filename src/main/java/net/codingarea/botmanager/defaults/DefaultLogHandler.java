@@ -15,7 +15,7 @@ import java.util.logging.LogRecord;
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public final class DefaultLogHandler extends Handler {
+public class DefaultLogHandler extends Handler {
 
 	@Nonnull
 	public static String getRecordAsString(Thread thread, LogRecord record, String caller) {

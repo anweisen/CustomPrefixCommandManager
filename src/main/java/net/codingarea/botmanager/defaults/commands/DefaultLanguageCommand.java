@@ -13,14 +13,14 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public final class DefaultLanguageCommand extends Command {
+public class DefaultLanguageCommand extends Command {
 
 	public DefaultLanguageCommand() {
 		this("setlanguage");
 	}
 
 	public DefaultLanguageCommand(@Nonnull String name, @Nonnull String... alias) {
-		super(name, Permission.ADMINISTRATOR, true, alias);
+		super(name, Permission.ADMINISTRATOR, alias);
 	}
 
 	public DefaultLanguageCommand(@Nonnull String name, @Nonnull Permission permission, @Nonnull String... alias) {

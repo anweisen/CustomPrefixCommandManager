@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public final class DefaultTeamRankCommand extends Command {
+public class DefaultTeamRankCommand extends Command {
 
 	private final DefaultTeamRankCache rankCache;
 
@@ -23,7 +23,7 @@ public final class DefaultTeamRankCommand extends Command {
 	}
 
 	public DefaultTeamRankCommand(@Nonnull DefaultTeamRankCache rankCache) {
-		super("setteamrank", Permission.ADMINISTRATOR, true, "setteamrole");
+		super("setteamrank", Permission.ADMINISTRATOR, "setteamrole");
 		this.rankCache = rankCache;
 	}
 

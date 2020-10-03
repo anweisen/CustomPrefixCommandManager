@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public final class DefaultPrefixCache extends SQLValueCache implements Factory<String, Guild> {
+public class DefaultPrefixCache extends SQLValueCache implements Factory<String, Guild> {
 
 	@CheckReturnValue
 	public DefaultPrefixCache(@Nonnull SQL data, @Nonnull String defaultPrefix) {

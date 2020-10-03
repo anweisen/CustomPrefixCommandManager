@@ -3,6 +3,7 @@ package net.codingarea.botmanager.defaults.commands;
 import net.codingarea.botmanager.commandmanager.CommandEvent;
 import net.codingarea.botmanager.commandmanager.commands.Command;
 import net.codingarea.botmanager.defaults.DefaultPrefixCache;
+import net.codingarea.botmanager.utils.InviteManager;
 import net.codingarea.botmanager.utils.Replacement;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public final class DefaultSetPrefixCommand extends Command {
+public class DefaultSetPrefixCommand extends Command {
 
 	private final DefaultPrefixCache cache;
 

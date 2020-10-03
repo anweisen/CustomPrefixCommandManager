@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public final class DefaultPermissionChecker implements PermissionChecker {
+public class DefaultPermissionChecker implements PermissionChecker {
 
 	@Override
 	public boolean isAllowed(@Nonnull Member member, @Nonnull ICommand command) {

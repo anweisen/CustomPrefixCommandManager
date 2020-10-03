@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public final class DefaultLogger extends Logger implements Bindable {
+public class DefaultLogger extends Logger implements Bindable {
 
 	public static final DefaultLogger DEFAULT = new DefaultLogger("default");
 
