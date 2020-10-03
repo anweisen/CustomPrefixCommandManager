@@ -5,8 +5,7 @@ import net.codingarea.botmanager.lang.LanguageManager;
 import net.codingarea.botmanager.utils.Replacement;
 import net.codingarea.botmanager.utils.StaticBinder;
 import net.codingarea.botmanager.utils.Utils;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -58,6 +57,49 @@ public abstract class CommandHelper extends LogHelper {
 		}
 		seconds += current;
 		return seconds;
+	}
+
+	@CheckReturnValue
+	public static TextChannel findTextChannel(CommandEvent event, String search) {
+		if (CommandEvent.containsMention(search.trim())) {
+			try {
+				String id = search.substring(3).substring(0, 18);
+				return event.getGuild().getTextChannelById(id);
+			} catch (Exception ignored) { }
+			try {
+				String id = search.substring(2).substring(0, 18);
+				return event.getGuild().getTextChannelById(id);
+			} catch (Exception ignored) { }
+		}
+		try {
+			return event.getGuild().getTextChannelById(search);
+		} catch (Exception ignored) { }
+		try {
+			return event.getGuild().getTextChannelsByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@CheckReturnValue
+	public static VoiceChannel findVoiceChannel(CommandEvent event, String search) {
+		try {
+			return event.getGuild().getVoiceChannelById(search);
+		} catch (Exception ignored) { }
+		try {
+			return event.getGuild().getVoiceChannelsByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@CheckReturnValue
+	public static Category findCategory(CommandEvent event, String search) {
+		try {
+			return event.getGuild().getCategoryById(search);
+		} catch (Exception ignored) { }
+		try {
+			return event.getGuild().getCategoriesByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
 	}
 
 	@CheckReturnValue
