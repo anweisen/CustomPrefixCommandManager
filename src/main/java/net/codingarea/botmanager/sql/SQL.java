@@ -1,6 +1,7 @@
 package net.codingarea.botmanager.sql;
 
 import net.codingarea.botmanager.defaults.DefaultLogger;
+import net.codingarea.botmanager.sql.constant.ConstSQL;
 import net.codingarea.botmanager.sql.source.DataSource;
 import net.codingarea.botmanager.utils.Bindable;
 import net.codingarea.botmanager.utils.LogLevel;
@@ -226,6 +227,12 @@ public abstract class SQL implements Bindable {
 
 	public void setLogger(Logger logger) {
 		this.logger = logger;
+	}
+
+	@Nonnull
+	public <T extends SQL> T setConstant() {
+		ConstSQL.setInstance(this);
+		return (T) this;
 	}
 
 	@Nonnull
