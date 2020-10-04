@@ -18,9 +18,9 @@ public final class ListFactory {
 
 	private ListFactory() { }
 
-	public static <T> List<T> stringToList(@Nonnull String string, @Nonnull Factory<T, String> factory) {
+	public static <T> List<T> stringToList(String string, @Nonnull Factory<T, String> factory) {
 		List<T> list = new ArrayList<>();
-		if (string.isEmpty()) return list;
+		if (string == null || string.isEmpty()) return list;
 		for (String arg : string.split(REGEX)) {
 			try {
 				T t = factory.get(arg);
