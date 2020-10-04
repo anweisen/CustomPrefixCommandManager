@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +34,12 @@ public final class DefaultBuilder {
 		return JDABuilder.createDefault(token);
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	public static JDABuilder createJDA(String token, GatewayIntent intent, GatewayIntent... intents) {
+		return JDABuilder.create(token, intent, intents);
+	}
+
 	/**
 	 * @return Creates a {@link DefaultShardManagerBuilder} with every {@link GatewayIntent}
 	 * @see DefaultShardManagerBuilder
@@ -48,6 +55,18 @@ public final class DefaultBuilder {
 	public static DefaultShardManagerBuilder createDefaultShardManager(String token) {
 		return DefaultShardManagerBuilder.createDefault(token);
 	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DefaultShardManagerBuilder createDefaultShardManager(String token, GatewayIntent gatewayIntent, GatewayIntent... gatewayIntents) {
+		return DefaultShardManagerBuilder.createDefault(token, gatewayIntent, gatewayIntents);
+	}
+	@Nonnull
+	@CheckReturnValue
+	public static DefaultShardManagerBuilder createShardManager(String token, GatewayIntent gatewayIntent, GatewayIntent... gatewayIntents) {
+		return DefaultShardManagerBuilder.create(token, gatewayIntent, gatewayIntents);
+	}
+
 
 	@Nonnull
 	@CheckReturnValue
