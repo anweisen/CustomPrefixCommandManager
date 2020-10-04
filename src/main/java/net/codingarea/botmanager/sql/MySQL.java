@@ -1,8 +1,8 @@
 package net.codingarea.botmanager.sql;
 
-import net.codingarea.botmanager.utils.ConfigLoader;
 import net.codingarea.botmanager.sql.source.LinkAttachment;
 import net.codingarea.botmanager.sql.source.URLDataSource;
+import net.codingarea.botmanager.utils.NamedValueConfig;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -16,13 +16,13 @@ public final class MySQL extends SQL {
 
 	@Nonnull
 	@CheckReturnValue
-	public static MySQL ofConfig(@Nonnull ConfigLoader config) throws SQLException {
+	public static MySQL ofConfig(@Nonnull NamedValueConfig config) throws SQLException {
 		return new MySQL(URLDataSource.ofConfig(config));
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static MySQL defaultOfConfig(@Nonnull ConfigLoader config) throws SQLException {
+	public static MySQL defaultOfConfig(@Nonnull NamedValueConfig config) throws SQLException {
 		return new MySQL(URLDataSource.ofConfig(config).addAttachment(LinkAttachment.DEFAULT));
 	}
 
