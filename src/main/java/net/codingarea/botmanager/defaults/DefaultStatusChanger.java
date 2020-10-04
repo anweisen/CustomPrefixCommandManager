@@ -171,7 +171,7 @@ public class DefaultStatusChanger implements Bindable {
 		this.updateRate = updateRate;
 		stop();
 		shardManager.setActivity(null);
-		new ScheduleTimer(this::start, Math.max(Math.min(updateRate, 60), 0));
+		new ScheduleTimer(this::restart, Math.max(Math.min(updateRate, 60), 0));
 		return this;
 	}
 
