@@ -63,7 +63,8 @@ public final class Colors {
 
 	@Nonnull
 	@CheckReturnValue
-	public static Color getMemberColorNotNull(@Nonnull Member member) {
+	public static Color getMemberColorNotNull(Member member) {
+		if (member == null) return EMBED;
 		Color color = member.getColor();
 		return color != null ? color : EMBED;
 	}
