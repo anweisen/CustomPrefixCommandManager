@@ -192,6 +192,12 @@ public class ConstantLanguageManager extends LanguageManager {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	@Deprecated
+	public synchronized void setNull(@Nonnull String key) throws SQLException {
+		throw new UnsupportedOperationException();
+	}
+
 	/*
 	 * =============================
 	 * Begin of supported operations
