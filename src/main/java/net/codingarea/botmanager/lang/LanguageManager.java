@@ -5,6 +5,7 @@ import net.codingarea.botmanager.sql.SQL;
 import net.codingarea.botmanager.sql.cache.SQLValueCache;
 import net.codingarea.botmanager.utils.BiFactory;
 import net.codingarea.botmanager.utils.Factory;
+import net.codingarea.botmanager.utils.StaticBinder;
 import net.dv8tion.jda.api.entities.Guild;
 
 import javax.annotation.CheckReturnValue;
@@ -32,14 +33,21 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 
 	protected LanguageManager() {
 		super();
+		setup();
 	}
 
 	public LanguageManager(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
+		setup();
 	}
 
 	public LanguageManager(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, @Nonnull String defaultValue) {
 		super(data, table, keyColumn, valueColumn, defaultValue);
+		setup();
+	}
+
+	protected void setup() {
+		bind(LanguageManager.class);
 	}
 
 	/**
