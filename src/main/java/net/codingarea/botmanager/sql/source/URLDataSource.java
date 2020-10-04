@@ -1,6 +1,6 @@
 package net.codingarea.botmanager.sql.source;
 
-import net.codingarea.botmanager.utils.ConfigLoader;
+import net.codingarea.botmanager.utils.NamedValueConfig;
 
 import javax.annotation.Nonnull;
 import java.sql.Connection;
@@ -17,7 +17,7 @@ import java.util.List;
 public final class URLDataSource implements DataSource {
 
 	@Nonnull
-	public static URLDataSource ofConfig(@Nonnull ConfigLoader config) {
+	public static URLDataSource ofConfig(@Nonnull NamedValueConfig config) {
 		int port = config.getInt("port");
 		String host = config.getString("host");
 		String user = config.getString("user");
