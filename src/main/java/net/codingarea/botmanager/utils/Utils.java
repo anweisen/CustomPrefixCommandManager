@@ -1,5 +1,9 @@
 package net.codingarea.botmanager.utils;
 
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.api.entities.TextChannel;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.time.OffsetDateTime;
@@ -86,6 +90,29 @@ public final class Utils {
 	@CheckReturnValue
 	public static OffsetDateTime centralEuropeTime() {
 		return OffsetDateTime.now(ZoneId.of("Europe/Paris"));
+	}
+
+	@CheckReturnValue
+	public static Category findNearestParent(@Nonnull TextChannel channel) {
+
+		if (channel.getParent() != null) return channel.getParent();
+
+		if (!channel.getGuild().getCategories().isEmpty()) {
+			return channel.getGuild().getCategories().get(0);
+		} else {
+			return null;
+		}
+
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String emoteToString(@Nonnull ReactionEmote emote) {
+		try {
+			return emote.getEmote().getAsMention();
+		} catch (Exception ignored) {
+			return emote.getEmoji();
+		}
 	}
 
 }
