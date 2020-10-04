@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public final class DefaultTeamRankCache extends SQLValueCache implements PermissionChecker, Factory<Role, Guild> {
+public class DefaultTeamRankCache extends SQLValueCache implements PermissionChecker, Factory<Role, Guild> {
 
 	public DefaultTeamRankCache(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
@@ -57,12 +57,19 @@ public final class DefaultTeamRankCache extends SQLValueCache implements Permiss
 	@Nonnull
 	@Override
 	public Role get(@Nonnull Guild guild) {
-		Role role = null;
 		try {
-			role = guild.getRoleById(get(guild.getId()));
-		} catch (Exception ignored) { }
-		if (role == null) throw new NoSuchElementException();
-		return role;
+			return guild.getRoleById(get(guild.getId()));
+		} catch (Exception ignored) {
+			throw new NoSuchElementException();
+		}
+	}
+
+	public Role getRole(@Nonnull Guild guild) {
+		try {
+			return guild.getRoleById(get(guild.getId()));
+		} catch (Exception ignored) {
+			return null;
+		}
 	}
 
 }
