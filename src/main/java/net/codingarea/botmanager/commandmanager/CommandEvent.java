@@ -331,7 +331,11 @@ public class CommandEvent {
 	}
 
 	public Member getSelfMember() {
-		return getGuild().getSelfMember();
+		try {
+			return getGuild().getSelfMember();
+		} catch (Exception ignored) {
+			return null;
+		}
 	}
 
 	/**
