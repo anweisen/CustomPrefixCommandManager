@@ -181,7 +181,11 @@ public class SQLValueCache implements Bindable {
 		}
 	}
 
-	public synchronized void set(@Nonnull String key, @Nonnull String value) throws SQLException {
+	public synchronized void set(@Nonnull String key, String value) throws SQLException {
+		if (value == null) {
+			setNull(key);
+			return;
+		}
 		if (cacheValues) setCached(key, value);
 		try {
 			getFromDatabase(key); // Checks if the guild is in the database (throws IllegalStateException if not)
@@ -189,6 +193,11 @@ public class SQLValueCache implements Bindable {
 		} catch (IllegalStateException ignored) {
 			data.update("INSERT INTO " + table + " (" + keyColumn + ", " + valueColumn + ") VALUES (?, ?)", key, value);
 		}
+	}
+
+	public synchronized void setNull(@Nonnull String key) throws SQLException {
+		if (cacheValues) setCached(key, null);
+		data.update("UPDATE " + table + " SET " + valueColumn + " = NULL WHERE " + keyColumn + " = ?", key);
 	}
 
 	public void setDefaultValue(String defaultValue) {
