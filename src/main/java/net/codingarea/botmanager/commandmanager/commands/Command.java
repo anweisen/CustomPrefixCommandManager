@@ -153,4 +153,43 @@ public abstract class Command extends CommandHelper implements ICommand {
 	public final boolean isTeamCommand() {
 		return teamCommand;
 	}
+
+
+	protected final void setReactToBots(boolean reactToBots) {
+		this.reactToBots = reactToBots;
+	}
+
+	protected final void setType(@Nonnull CommandType type) {
+		this.type = type;
+		if (type == CommandType.PRIVATE || type == CommandType.GENERAL) permission = null;
+	}
+
+	protected final void setPermission(Permission permission) {
+		this.permission = permission;
+		if (permission != null) type = CommandType.GUILD;
+	}
+
+	protected final void setAlias(@Nonnull String[] alias) {
+		this.alias = alias;
+	}
+
+	protected final void setName(@Nonnull String name) {
+		this.name = name;
+	}
+
+	protected final void setProcessInNewThread(boolean processInNewThread) {
+		this.processInNewThread = processInNewThread;
+	}
+
+	protected final void setReactToMentionPrefix(boolean reactToMentionPrefix) {
+		this.reactToMentionPrefix = reactToMentionPrefix;
+	}
+
+	protected final void setReactToWebhooks(boolean reactToWebhooks) {
+		this.reactToWebhooks = reactToWebhooks;
+	}
+
+	protected final void setTeamCommand(boolean teamCommand) {
+		this.teamCommand = teamCommand;
+	}
 }
