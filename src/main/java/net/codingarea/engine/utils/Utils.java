@@ -1,0 +1,156 @@
+package net.codingarea.engine.utils;
+
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.api.entities.TextChannel;
+import sun.reflect.CallerSensitive;
+
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * @author anweisen | https://github.com/anweisen
+ * @since 1.0
+ */
+public final class Utils {
+
+	private Utils() { }
+
+	public static String getEnumName(Enum<?> enun) {
+		return getEnumName(enun.name());
+	}
+
+	public static String getEnumName(String enumName) {
+
+		if (enumName == null) return "";
+
+		StringBuilder builder = new StringBuilder();
+		String[] chars = enumName.split("");
+		chars[0] = chars[0].toUpperCase();
+		boolean nextUp = true;
+		for (String currentChar : chars) {
+			if (currentChar.equals("_")) {
+				nextUp = true;
+				builder.append(" ");
+				continue;
+			}
+			if (nextUp) {
+				builder.append(currentChar.toUpperCase());
+				nextUp = false;
+			} else {
+				builder.append(currentChar.toLowerCase());
+			}
+		}
+
+		return builder.toString()
+				.replace(" And ", " and ")
+				.replace(" The ", " the ")
+				.replace(" Or ", " or ")
+				.replace(" Of " , " of")
+				.replace(" In ", " in ")
+				.replace(" On " , " on ")
+				.replace(" Off ", " off ");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter yearTimeDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter yearDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM.yyyy");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter dayDateTime() {
+		return DateTimeFormatter.ofPattern("dd.MM");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter minuteDateTime() {
+		return DateTimeFormatter.ofPattern("HH:mm");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DateTimeFormatter secondDateTime() {
+		return DateTimeFormatter.ofPattern("HH:mm:ss");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static OffsetDateTime centralEuropeTime() {
+		return OffsetDateTime.now(ZoneId.of("Europe/Paris"));
+	}
+
+	@CheckReturnValue
+	public static Category findNearestParent(@Nonnull TextChannel channel) {
+
+		if (channel.getParent() != null) return channel.getParent();
+
+		if (!channel.getGuild().getCategories().isEmpty()) {
+			return channel.getGuild().getCategories().get(0);
+		} else {
+			return null;
+		}
+
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String emoteToString(@Nonnull ReactionEmote emote) {
+		try {
+			return emote.getEmote().getAsMention();
+		} catch (Exception ignored) {
+			return emote.getEmoji();
+		}
+	}
+
+	@Nonnull
+	@CallerSensitive
+	@CheckReturnValue
+	public static Class<?>[] callerContext() {
+		return new SecManager().callerContext();
+	}
+
+	@CallerSensitive
+	@CheckReturnValue
+	public static Class<?> caller(int index) {
+		try {
+			return callerContext()[index];
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
+	@CallerSensitive
+	@CheckReturnValue
+	public static Class<?> caller() {
+		try {
+			return caller(2);
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
+	static class SecManager extends SecurityManager {
+		public Class<?>[] callerContext() {
+			return getClassContext();
+		}
+	}
+
+	public static String exceptionToString(@Nonnull Throwable ex) {
+		StringBuilderPrintWriter writer = new StringBuilderPrintWriter();
+		ex.printStackTrace(writer);
+		return writer.toString();
+	}
+
+}
