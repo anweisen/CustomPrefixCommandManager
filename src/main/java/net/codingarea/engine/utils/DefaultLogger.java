@@ -1,6 +1,5 @@
 package net.codingarea.engine.utils;
 
-import sun.reflect.CallerSensitive;
 import sun.reflect.Reflection;
 
 import javax.annotation.Nonnull;
@@ -86,4 +85,10 @@ public class DefaultLogger extends Logger implements Bindable {
 		log(record);
 		handler.setUseRecordCaller(false);
 	}
+
+	public DefaultLogger level(@Nonnull Level level) {
+		setLevel(level);
+		return this;
+	}
+
 }
