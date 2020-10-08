@@ -12,6 +12,8 @@ import javax.annotation.Nonnull;
  */
 public abstract class Command extends CommandHelper implements ICommand {
 
+	public Command() { }
+
 	public Command(@Nonnull String name, @Nonnull String... alias) {
 		this(name, false, alias);
 	}
@@ -30,6 +32,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 	public Command(@Nonnull String name, @Nonnull Permission permission, @Nonnull String... alias) {
 		this(name, alias);
 		this.permission = permission;
+		this.type = CommandType.GUILD;
 	}
 
 	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, @Nonnull String... alias) {
@@ -84,6 +87,30 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this.type = CommandType.GUILD;
 	}
 
+	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission, boolean reactToWebhooks,
+	               boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, boolean executeOnUpdate, @Nonnull String... alias) {
+		this.name = name;
+		this.alias = alias;
+		this.processInNewThread = processInNewThread;
+		this.permission = permission;
+		this.type = CommandType.GUILD;
+		this.reactToWebhooks = reactToWebhooks;
+		this.reactToBots = reactToBots;
+		this.reactToMentionPrefix = reactToMentionPrefix;
+		this.teamCommand = teamCommand;
+		this.executeOnUpdate = executeOnUpdate;
+	}
+
+	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull CommandType type,
+	               boolean teamCommand, boolean executeOnUpdate, @Nonnull String... alias) {
+		this.name = name;
+		this.alias = alias;
+		this.processInNewThread = processInNewThread;
+		this.type = type;
+		this.teamCommand = teamCommand;
+		this.executeOnUpdate = executeOnUpdate;
+	}
+
 	private String name;
 	private String[] alias;
 
@@ -94,9 +121,10 @@ public abstract class Command extends CommandHelper implements ICommand {
 	private boolean reactToWebhooks = false;
 	private boolean reactToBots = false;
 	private boolean reactToMentionPrefix = true;
-	private boolean teamCommand;
+	private boolean teamCommand = false;
+	private boolean executeOnUpdate = true;
 
-	public abstract void onCommand(@Nonnull final CommandEvent event) throws Throwable;
+	public abstract void onCommand(@Nonnull final CommandEvent event) throws Exception;
 
 	@Nonnull
 	@Override
@@ -143,10 +171,14 @@ public abstract class Command extends CommandHelper implements ICommand {
 	}
 
 	@Override
+	public final boolean executeOnUpdate() {
+		return executeOnUpdate;
+	}
+
+	@Override
 	public final boolean isTeamCommand() {
 		return teamCommand;
 	}
-
 
 	protected final void setReactToBots(boolean reactToBots) {
 		this.reactToBots = reactToBots;
@@ -185,4 +217,9 @@ public abstract class Command extends CommandHelper implements ICommand {
 	protected final void setTeamCommand(boolean teamCommand) {
 		this.teamCommand = teamCommand;
 	}
+
+	public final void setExecuteOnUpdate(boolean executeOnUpdate) {
+		this.executeOnUpdate = executeOnUpdate;
+	}
+
 }
