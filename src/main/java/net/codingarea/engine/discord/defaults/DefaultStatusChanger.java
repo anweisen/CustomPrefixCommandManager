@@ -1,9 +1,7 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.utils.Bindable;
-import net.codingarea.engine.utils.Factory;
-import net.codingarea.engine.utils.NumberFormatter;
-import net.codingarea.engine.utils.ScheduleTimer;
+import net.codingarea.engine.utils.*;
+import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -11,6 +9,7 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -37,6 +36,18 @@ public class DefaultStatusChanger implements Bindable {
 
 			return status.toArray(new String[0]);
 
+		};
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Factory<String[], ShardManager> createByReplacements(@Nonnull String prefix, @Nonnull String[] suffix, @Nonnull Replacement... replacements) {
+		return shardManager -> {
+			String[] status = new String[suffix.length];
+			for (int i = 0; i < status.length; i++) {
+				status[i] = Replacement.replaceAll((prefix + suffix[i]), replacements);
+			}
+			return status;
 		};
 	}
 
@@ -102,15 +113,19 @@ public class DefaultStatusChanger implements Bindable {
 		if (suffix.length == 0) {
 			this.status = createNewFactory(prefix);
 		} else {
-			this.status = manager -> {
-				List<String> strings = new ArrayList<>();
-				for (String s : suffix) {
-					strings.add((prefix + s)
-							.replace("%guilds%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getGuilds().size()))
-							.replace("%user%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getUsers().size())));
-				}
-				return strings.toArray(new String[0]);
-			};
+			this.status = createByReplacements(prefix, suffix,
+											   new Replacement("%guilds%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getGuilds().size())),
+											   new Replacement("%user%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getUsers().size())));
+		}
+	}
+
+	@CheckReturnValue
+	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull String prefix, @Nonnull String[] suffix, @Nonnull Replacement... replacements) {
+		this.shardManager = shardManager;
+		if (suffix.length == 0) {
+			this.status = createNewFactory(prefix);
+		} else {
+			this.status = createByReplacements(prefix, suffix, replacements);
 		}
 	}
 
