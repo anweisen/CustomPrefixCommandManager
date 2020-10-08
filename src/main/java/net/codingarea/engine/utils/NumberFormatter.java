@@ -35,15 +35,18 @@ public interface NumberFormatter {
 				int minutes = seconds / 60;
 				int hours = minutes / 60;
 				int days = hours / 24;
+				int years = days / 365;
 
 				seconds %= 60;
 				minutes %= 60;
 				hours %= 24;
+				days %= 365;
 
-				return (days > 0 ? days + "d " : "")
+				return (years > 0 ? years + "y " : "")
+					 + (days > 0 ? days + "d " : "")
 					 + (hours > 0 ? hours + "h " : "")
 					 + (minutes > 0 ? minutes + "m " : "")
-					 + (days == 0 || (hours == 0 && minutes == 0) ? seconds + "s" : "");
+					 + (years == 0 && days == 0 || (hours == 0 && minutes == 0) ? seconds + "s" : "");
 
 			},
 
@@ -56,12 +59,16 @@ public interface NumberFormatter {
 				int minutes = seconds / 60;
 				int hours = minutes / 60;
 				int days = hours / 24;
+				int years = days / 365;
+
 				minutes %= 60;
 				hours %= 24;
+				days %= 365;
 
-				return (days > 0 ? days + "d " : "")
+				return (years > 0 ? years + "y " : "")
+					 + (days > 0 ? days + "d " : "")
 					 + (hours > 0 ? hours + "h " : "")
-				     + (minutes > 0 || (days == 0 && hours == 0) ? minutes + "m " : "");
+				     + (minutes > 0 || (years == 0 && days == 0 && hours == 0) ? minutes + "m " : "");
 
 			},
 
@@ -134,7 +141,7 @@ public interface NumberFormatter {
 			},
 
 			/**
-			 * inputs in bytes
+			 * input in bytes
 			 * gigabyte, terrabyte
 			 */
 			BIG_DATA_SIZE = value -> {
