@@ -7,9 +7,13 @@ import sun.reflect.CallerSensitive;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -151,6 +155,42 @@ public final class Utils {
 		StringBuilderPrintWriter writer = new StringBuilderPrintWriter();
 		ex.printStackTrace(writer);
 		return writer.toString();
+	}
+
+	public static List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<? extends Annotation> annotation) {
+		List<Method> methods = new ArrayList<>();
+		while (clazz != Object.class) {
+			for (Method method : clazz.getDeclaredMethods()) {
+				if (method.isAnnotationPresent(annotation)) {
+					methods.add(method);
+				}
+			}
+			clazz = clazz.getSuperclass();
+		}
+		return methods;
+	}
+
+	public static boolean subClassOf(Class<?> expected, Class<?> given) {
+
+		if (given == null || expected == null) return false;
+
+		while (given != Object.class) {
+
+			if (given == expected) return true;
+
+			if (given.getInterfaces() != null) {
+				for (Class<?> currentInterface : given.getInterfaces()) {
+					if (subClassOf(expected, currentInterface)) return true;
+				}
+			}
+
+			given = given.getSuperclass();
+			if (given == null) return false;
+
+		}
+
+		return false;
+
 	}
 
 }
