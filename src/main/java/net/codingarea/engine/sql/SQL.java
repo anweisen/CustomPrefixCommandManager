@@ -88,7 +88,9 @@ public abstract class SQL implements Bindable {
 	/**
 	 * Terminates the existing connection, using {@link #disconnect()}
 	 * Then it creates a new connection using {@link DataSource#createConnection()}
-	 * @throws SQLException If a {@link SQLException} is thrown while disconnection or creating a new connection to the sql server
+	 *
+	 * @throws SQLException
+	 *         If a {@link SQLException} is thrown while disconnection or creating a new connection to the sql server
 	 */
 	public void connect() throws SQLException {
 		if (connectionIsOpened()) {
@@ -100,7 +102,9 @@ public abstract class SQL implements Bindable {
 
 	/**
 	 * Closes the the connection ({@link #getConnection()}) to the sql server using {@link Connection#close()}
-	 * @throws SQLException If a {@link SQLException} is thrown while closing the connection
+	 *
+	 * @throws SQLException
+	 *         If a {@link SQLException} is thrown while closing the connection
 	 */
 	public void disconnect() throws SQLException {
 		connection.close();
@@ -117,7 +121,9 @@ public abstract class SQL implements Bindable {
 
 	/**
 	 * Connects to the sql server ({@link #connect()}) if the connection is no longer opened (not {@link #connectionIsOpened()})
-	 * @throws SQLException If a {@link SQLException} is thrown while connecting to the server
+	 *
+	 * @throws SQLException
+	 *         If a {@link SQLException} is thrown while connecting to the server
 	 */
 	public void verifyConnection() throws SQLException {
 		if (!connectionIsOpened()) {
@@ -142,18 +148,20 @@ public abstract class SQL implements Bindable {
 
 	/**
 	 * Executes a update to the database using {@link Statement#executeUpdate(String)}.
-	 * Be aware of SQLInjection
+	 * Be aware of SQLInjection.
+	 *
 	 * @see #update(String, Object...)
 	 * @param sql The command which should be executed
 	 * @throws SQLException If a {@link SQLException} is thrown while creating a {@link Statement} (using {@link #createStatement()}),
 	 *                      executing the update (using {@link Statement#executeUpdate(String)})
 	 *                      or closing the statement (using {@link Statement#close()})
 	 */
-	public void executeUpdate(@Nonnull String sql) throws SQLException {
+	public int executeUpdate(@Nonnull String sql) throws SQLException {
 		verifyConnection();
 		Statement statement = createStatement();
-		statement.executeUpdate(sql);
+		int result = statement.executeUpdate(sql);
 		statement.close();
+		return result;
 	}
 
 	@Nonnull
@@ -165,12 +173,16 @@ public abstract class SQL implements Bindable {
 
 	/**
 	 * Creates a {@link PreparedStatement} using {@link #prepare(String)} and sets the params using {@link #fillParams(PreparedStatement, Object...)}
+	 *
 	 * @param sql The SQLCommand
 	 * @param params The params which replace the ?s in the command.
 	 * @return The {@link PreparedStatement} just created
-	 * @throws SQLException If a {@link SQLException} is thrown while preparing the {@link PreparedStatement} ({@link #prepare(String)})
-	 *                      or while filling the params {@link #fillParams(PreparedStatement, Object...)}
+	 * @throws SQLException
+	 *         If a {@link SQLException} is thrown while preparing the {@link PreparedStatement} ({@link #prepare(String)})
+	 *         or while filling the params ({@link #fillParams(PreparedStatement, Object...)})
 	 */
+	@Nonnull
+	@CheckReturnValue
 	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql);
 		fillParams(statement, params);
