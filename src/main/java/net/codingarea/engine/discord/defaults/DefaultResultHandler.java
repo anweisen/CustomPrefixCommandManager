@@ -5,7 +5,11 @@ import net.codingarea.engine.discord.commandmanager.CommandResult;
 import net.codingarea.engine.discord.commandmanager.ResultHandler;
 import net.codingarea.engine.utils.NumberFormatter;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 
@@ -17,7 +21,8 @@ import javax.annotation.Nonnull;
 public class DefaultResultHandler implements ResultHandler {
 
 	@Override
-	public void handle(@Nonnull MessageReceivedEvent event, @Nonnull CommandResult result, Object arg) {
+	public void handle(@Nullable GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user,
+	                   @Nullable Member member, @Nonnull CommandResult result, Object arg) {
 
 		String answer = result.getAnswer();
 		if (answer == null) return;
@@ -44,7 +49,7 @@ public class DefaultResultHandler implements ResultHandler {
 				}
 				break;
 			case NO_PERMISSIONS:
-				if (arg instanceof Permission && !event.getMember().hasPermission((Permission) arg)) {
+				if (arg instanceof Permission && !member.hasPermission((Permission) arg)) {
 					answer = answer.replace("%permission%", ((Permission) arg).getName());
 				} else {
 					answer = answer.replace("%permission%", "TeamRank");
@@ -60,11 +65,11 @@ public class DefaultResultHandler implements ResultHandler {
 					}
 				}
 				answer = answer.replace("%exception%", ex != null ? ex.getClass().getSimpleName() : "null")
-							   .replace("%messages%", ex != null && ex.getMessage() != null ? ex.getMessage() : "null");
+						.replace("%messages%", ex != null && ex.getMessage() != null ? ex.getMessage() : "null");
 				break;
 		}
 
-		event.getChannel().sendMessage(answer).queue();
+		channel.sendMessage(answer).queue();
 
 	}
 }
