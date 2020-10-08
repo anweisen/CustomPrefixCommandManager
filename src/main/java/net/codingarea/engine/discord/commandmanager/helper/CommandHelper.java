@@ -62,7 +62,7 @@ public abstract class CommandHelper extends LogHelper {
 
 	@CheckReturnValue
 	public static TextChannel findTextChannel(CommandEvent event, String search) {
-		if (CommandEvent.containsMention(search.trim())) {
+		if (containsMention(search.trim())) {
 			try {
 				String id = search.substring(3).substring(0, 18);
 				return event.getGuild().getTextChannelById(id);
@@ -105,7 +105,7 @@ public abstract class CommandHelper extends LogHelper {
 
 	@CheckReturnValue
 	public static Member findMember(CommandEvent event, String search) {
-		if (CommandEvent.containsMention(search.trim())) {
+		if (containsMention(search.trim())) {
 			try {
 				String id = search.substring(3).substring(0, 18);
 				return event.getGuild().getMemberById(id);
@@ -188,7 +188,7 @@ public abstract class CommandHelper extends LogHelper {
 	@Nonnull
 	@CheckReturnValue
 	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
-		return getMessage(event, "syntax", "Please use **%syntax%**",
+		return getMessage(event, "syntax", "Please use `%syntax%`",
 						  new Replacement("%syntax%", event.syntax(syntax)));
 	}
 
@@ -199,7 +199,48 @@ public abstract class CommandHelper extends LogHelper {
 	@Nonnull
 	@CheckReturnValue
 	public static String removeMarkdown(@Nonnull String string) {
-		return CommandEvent.removeMarkdown(string);
+		return string.replace("`", "\\`")
+				.replace("_", "\\_")
+				.replace("*", "\\*");
+	}
+
+	/**
+	 * @return returns if the given text mentions a {@link Member}
+	 * @see IMentionable
+	 * @since 1.2
+	 */
+	@CheckReturnValue
+	public static boolean containsMention(@Nonnull String text) {
+
+		// n is a placeholder for any number
+		char[] goal = "<@!nnnnnnnnnnnnnnnnnn>".toCharArray();
+		int current = 0;
+		for (char currentChar : text.toCharArray()) {
+
+			boolean isInMention = false;
+			char expected = goal[current];
+
+			if (currentChar == expected) {
+				isInMention = true;
+			} else if (expected == 'n') {
+				try {
+					Integer.parseInt(String.valueOf(current));
+					isInMention = true;
+				} catch (NumberFormatException ignored) { }
+			}
+
+			if (isInMention) {
+				current++;
+			} else {
+				current = 0;
+			}
+
+			if (current == goal.length) return true;
+
+		}
+
+		return false;
+
 	}
 
 }
