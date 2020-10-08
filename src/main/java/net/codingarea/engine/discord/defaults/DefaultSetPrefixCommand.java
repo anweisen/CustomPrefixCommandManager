@@ -1,6 +1,7 @@
 package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.events.ReceivedCommandEvent;
 import net.codingarea.engine.discord.commandmanager.Command;
 import net.codingarea.engine.utils.Replacement;
 import net.dv8tion.jda.api.Permission;
@@ -25,7 +26,7 @@ public class DefaultSetPrefixCommand extends Command {
 	}
 
 	@Override
-	public void onCommand(@Nonnull final CommandEvent event) throws Throwable {
+	public void onCommand(@Nonnull final CommandEvent event) throws Exception {
 
 		String prefix = event.getArgsAsString().replace("`", "");
 		if (prefix.isEmpty()) {

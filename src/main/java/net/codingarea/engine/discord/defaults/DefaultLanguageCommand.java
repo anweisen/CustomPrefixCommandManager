@@ -1,6 +1,7 @@
 package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.events.ReceivedCommandEvent;
 import net.codingarea.engine.discord.commandmanager.Command;
 import net.codingarea.engine.exceptions.LanguageNotFoundException;
 import net.codingarea.engine.lang.Language;
@@ -28,7 +29,7 @@ public class DefaultLanguageCommand extends Command {
 	}
 
 	@Override
-	public void onCommand(@Nonnull final CommandEvent event) throws Throwable {
+	public void onCommand(@Nonnull final CommandEvent event) throws Exception {
 
 		if (getLanguageManager() == null) {
 			throw new IllegalStateException("LanguageManager was not set via the StaticBinder#bindToClass!");
