@@ -108,8 +108,8 @@ public final class ConstSQL {
 		return instance.executeQuery(sql);
 	}
 
-	public static void executeUpdate(@Nonnull String sql) throws SQLException {
-		instance.executeUpdate(sql);
+	public static int executeUpdate(@Nonnull String sql) throws SQLException {
+		return instance.executeUpdate(sql);
 	}
 
 	@Nonnull
@@ -118,6 +118,8 @@ public final class ConstSQL {
 		return instance.prepare(sql);
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public static PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		return instance.prepare(sql, params);
 	}
@@ -130,10 +132,12 @@ public final class ConstSQL {
 		return instance.update(sql, params);
 	}
 
+	@CheckReturnValue
 	public static boolean isSet(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		return instance.isSet(sql, params);
 	}
 
+	@CheckReturnValue
 	public static boolean paramIsSet(@Nonnull String sql, @Nonnull String param, @Nonnull Object... params) throws SQLException {
 		return instance.paramIsSet(sql, param, params);
 	}
