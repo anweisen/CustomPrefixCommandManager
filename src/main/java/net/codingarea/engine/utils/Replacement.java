@@ -21,9 +21,9 @@ public final class Replacement {
 		this(origin, () -> String.valueOf(replacement));
 	}
 
-	public Replacement(@Nonnull String origin, @Nonnull Supplier<String> replacement) {
+	public Replacement(@Nonnull String origin, @Nonnull Supplier<?> replacement) {
 		this.origin = origin;
-		this.replacement = replacement;
+		this.replacement = () -> String.valueOf(replacement.get());
 	}
 
 	@Nonnull
