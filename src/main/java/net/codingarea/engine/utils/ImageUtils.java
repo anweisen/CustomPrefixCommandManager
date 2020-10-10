@@ -25,19 +25,9 @@ public final class ImageUtils {
 	private ImageUtils() { }
 
 	public static void post(@Nonnull RenderedImage image, @Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String fileType, boolean delete) throws IOException {
-
-		fileName += "." + fileType;
-
-		File folder = new File("./temp");
-		if (!folder.exists()) folder.mkdir();
-		File file = new File(folder, "image-" + System.currentTimeMillis() + "-" + channel.getId());
-
+		File file = FileUtils.createTempFile(channel, fileType);
 		ImageIO.write(image, fileType, file);
-
-		channel.sendFile(file, fileName).queue(message -> {
-			if (delete) file.delete();
-		}, MessageException::create);
-
+		FileUtils.send(channel, fileName, fileType, file, delete);
 	}
 
 	/**
