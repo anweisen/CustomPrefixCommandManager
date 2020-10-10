@@ -44,6 +44,7 @@ public final class MapFactory {
 				String[] elements = arg.split(REGEX_2);
 				K keyElement = key.get(elements[0]);
 				V valueElement = value.get(elements[1]);
+				if (keyElement == null || valueElement == null) throw new NullPointerException();
 				map.put(keyElement, valueElement);
 			} catch (Exception ex) {
 				LogHelper.log(LogLevel.WARNING, MapFactory.class, "Cannot generate key/value: " + ex.getMessage());
