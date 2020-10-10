@@ -1,6 +1,6 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.discord.commandmanager.PermissionChecker;
+import net.codingarea.engine.discord.commandmanager.CommandAccessChecker;
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.cache.SQLValueCache;
@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public class DefaultTeamRankCache extends SQLValueCache implements PermissionChecker, Factory<Role, Guild> {
+public class DefaultTeamRankCache extends SQLValueCache implements CommandAccessChecker, Factory<Role, Guild> {
 
 	public DefaultTeamRankCache(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
