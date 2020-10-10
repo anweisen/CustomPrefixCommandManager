@@ -61,71 +61,122 @@ public abstract class CommandHelper extends LogHelper {
 	}
 
 	@CheckReturnValue
-	public static TextChannel findTextChannel(CommandEvent event, String search) {
-		if (containsMention(search.trim())) {
+	public static Role findRole(@Nonnull CommandEvent event, String search) {
+		return findRole(event.getGuild(), search);
+	}
+
+	@CheckReturnValue
+	public static Role findRole(@Nonnull Guild guild, String search) {
+		search = search.trim();
+		if (containsMention(search)) {
 			try {
 				String id = search.substring(3).substring(0, 18);
-				return event.getGuild().getTextChannelById(id);
+				return guild.getRoleById(id);
 			} catch (Exception ignored) { }
 			try {
 				String id = search.substring(2).substring(0, 18);
-				return event.getGuild().getTextChannelById(id);
+				return guild.getRoleById(id);
 			} catch (Exception ignored) { }
 		}
 		try {
-			return event.getGuild().getTextChannelById(search);
+			return guild.getRoleById(search);
 		} catch (Exception ignored) { }
 		try {
-			return event.getGuild().getTextChannelsByName(search, true).get(0);
+			return guild.getRolesByName(search, true).get(0);
 		} catch (Exception ignored) { }
 		return null;
 	}
 
 	@CheckReturnValue
-	public static VoiceChannel findVoiceChannel(CommandEvent event, String search) {
-		try {
-			return event.getGuild().getVoiceChannelById(search);
-		} catch (Exception ignored) { }
-		try {
-			return event.getGuild().getVoiceChannelsByName(search, true).get(0);
-		} catch (Exception ignored) { }
-		return null;
+	public static TextChannel findTextChannel(@Nonnull CommandEvent event, String search) {
+		return findTextChannel(event.getGuild(), search);
 	}
 
 	@CheckReturnValue
-	public static Category findCategory(CommandEvent event, String search) {
-		try {
-			return event.getGuild().getCategoryById(search);
-		} catch (Exception ignored) { }
-		try {
-			return event.getGuild().getCategoriesByName(search, true).get(0);
-		} catch (Exception ignored) { }
-		return null;
-	}
-
-	@CheckReturnValue
-	public static Member findMember(CommandEvent event, String search) {
-		if (containsMention(search.trim())) {
+	public static TextChannel findTextChannel(@Nonnull Guild guild, String search) {
+		search = search.trim();
+		if (containsMention(search)) {
 			try {
 				String id = search.substring(3).substring(0, 18);
-				return event.getGuild().getMemberById(id);
+				return guild.getTextChannelById(id);
 			} catch (Exception ignored) { }
 			try {
 				String id = search.substring(2).substring(0, 18);
-				return event.getGuild().getMemberById(id);
+				return guild.getTextChannelById(id);
 			} catch (Exception ignored) { }
 		}
 		try {
-			return event.getGuild().getMemberById(search);
+			return guild.getTextChannelById(search);
 		} catch (Exception ignored) { }
 		try {
-			return event.getGuild().getMemberByTag(search);
+			return guild.getTextChannelsByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@CheckReturnValue
+	public static VoiceChannel findVoiceChannel(@Nonnull CommandEvent event, String search) {
+		return findVoiceChannel(event.getGuild(), search);
+	}
+
+	@CheckReturnValue
+	public static VoiceChannel findVoiceChannel(@Nonnull Guild guild, String search) {
+		search = search.trim();
+		try {
+			return guild.getVoiceChannelById(search);
 		} catch (Exception ignored) { }
 		try {
-			return event.getGuild().getMembersByName(search, true).get(0);
+			return guild.getVoiceChannelsByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@CheckReturnValue
+	public static Category findCategory(@Nonnull CommandEvent event, String search) {
+		return findCategory(event.getGuild(), search);
+	}
+
+	@CheckReturnValue
+	public static Category findCategory(@Nonnull Guild guild, String search) {
+		search = search.trim();
+		try {
+			return guild.getCategoryById(search);
 		} catch (Exception ignored) { }
 		try {
-			return event.getGuild().getMembersByEffectiveName(search, true).get(0);
+			return guild.getCategoriesByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@CheckReturnValue
+	public static Member findMember(@Nonnull CommandEvent event, String search) {
+		return findMember(event.getGuild(), search);
+	}
+
+	@CheckReturnValue
+	public static Member findMember(@Nonnull Guild guild, String search) {
+		search = search.trim();
+		if (containsMention(search)) {
+			try {
+				String id = search.substring(3).substring(0, 18);
+				return guild.getMemberById(id);
+			} catch (Exception ignored) { }
+			try {
+				String id = search.substring(2).substring(0, 18);
+				return guild.getMemberById(id);
+			} catch (Exception ignored) { }
+		}
+		try {
+			return guild.getMemberById(search);
+		} catch (Exception ignored) { }
+		try {
+			return guild.getMemberByTag(search);
+		} catch (Exception ignored) { }
+		try {
+			return guild.getMembersByName(search, true).get(0);
+		} catch (Exception ignored) { }
+		try {
+			return guild.getMembersByEffectiveName(search, true).get(0);
 		} catch (Exception ignored) { }
 		return null;
 	}
