@@ -1,5 +1,6 @@
 package net.codingarea.engine.utils;
 
+import net.codingarea.engine.discord.commandmanager.CommandResult;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -93,6 +94,12 @@ public final class Utils {
 	@CheckReturnValue
 	public static OffsetDateTime centralEuropeTime() {
 		return OffsetDateTime.now(ZoneId.of("Europe/Paris"));
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static ZoneId centralEuropeZoneId() {
+		return ZoneId.of("Europe/Paris");
 	}
 
 	@CheckReturnValue
@@ -191,6 +198,39 @@ public final class Utils {
 
 		return false;
 
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String arrayToString(@Nonnull String[] array) {
+		return arrayToString(array, 0, array.length);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String arrayToString(@Nonnull String[] array, int start) {
+		return arrayToString(array, start, array.length);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String arrayToString(@Nonnull String[] array, int start, int end) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = start; i < end; i++) {
+			builder.append(array[i] + " ");
+		}
+		return builder.toString().trim();
+	}
+
+	@CheckReturnValue
+	public static <T extends Enum<?>> T findEnum(@Nonnull T[] enums, @Nonnull String search) {
+		for (T current : enums) {
+			if (current.name().equalsIgnoreCase(search))
+				return current;
+			if (current instanceof INamed && ((INamed)current).getName().equalsIgnoreCase(search))
+				return current;
+		}
+		return null;
 	}
 
 }
