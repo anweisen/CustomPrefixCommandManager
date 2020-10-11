@@ -46,7 +46,7 @@ public interface NumberFormatter {
 					 + (days > 0 ? days + "d " : "")
 					 + (hours > 0 ? hours + "h " : "")
 					 + (minutes > 0 ? minutes + "m " : "")
-					 + (years == 0 && days == 0 || (hours == 0 && minutes == 0) ? seconds + "s" : "");
+					 + (seconds > 0 || (years == 0 && days == 0 && hours == 0 && minutes == 0) ? seconds + "s" : "");
 
 			},
 
@@ -65,10 +65,10 @@ public interface NumberFormatter {
 				hours %= 24;
 				days %= 365;
 
-				return (years > 0 ? years + "y " : "")
-					 + (days > 0 ? days + "d " : "")
-					 + (hours > 0 ? hours + "h " : "")
-				     + (minutes > 0 || (years == 0 && days == 0 && hours == 0) ? minutes + "m " : "");
+				return ((years > 0 ? years + "y " : "")
+				  	  + (days > 0 ? days + "d " : "")
+					  + (hours > 0 ? hours + "h " : "")
+					  + (minutes > 0 || (years == 0 && days == 0 && hours == 0) ? minutes + "m " : "")).trim();
 
 			},
 
