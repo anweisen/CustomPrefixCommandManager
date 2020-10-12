@@ -1,5 +1,6 @@
 package net.codingarea.engine.discord.commandmanager;
 
+import net.codingarea.engine.utils.NumberConversions;
 import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.Permission;
@@ -175,17 +176,17 @@ public abstract class SubbedCommand extends Command {
 		} else if (clazz == StringBuilder.class) {
 			return new StringBuilder(input);
 		} else if (clazz == Integer.class || clazz == int.class) {
-			return Integer.parseInt(input);
+			return NumberConversions.toInt(input);
 		} else if (clazz == Long.class || clazz == long.class) {
-			return Long.parseLong(input);
+			return NumberConversions.toLong(input);
 		} else if (clazz == Byte.class || clazz == byte.class) {
-			return Byte.parseByte(input);
+			return NumberConversions.toByte(input);
 		} else if (clazz == Short.class || clazz == short.class) {
-			return Short.valueOf(input);
+			return NumberConversions.toShort(input);
 		} else if (clazz == Double.class || clazz == double.class) {
-			return Double.parseDouble(input);
+			return NumberConversions.toDouble(input);
 		} else if (clazz == Float.class || clazz == float.class) {
-			return Float.parseFloat(input);
+			return NumberConversions.toFloat(input);
 		} else if (clazz == Member.class) {
 			return findMember(event, input);
 		} else if (clazz == User.class) {
@@ -197,6 +198,8 @@ public abstract class SubbedCommand extends Command {
 			return findVoiceChannel(event, input);
 		} else if (clazz == Category.class) {
 			return findCategory(event, input);
+		} else if (clazz == Role.class) {
+			return findRole(event, input);
 		} else {
 			return null;
 		}
