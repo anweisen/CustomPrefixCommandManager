@@ -1,4 +1,4 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.function;
 
 /**
  * @author anweisen | https://github.com/anweisen

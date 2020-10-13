@@ -1,7 +1,7 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.function;
 
 import net.codingarea.engine.exceptions.ConsumeException;
-import net.codingarea.engine.utils.Factory;
+import net.codingarea.engine.utils.function.BiFactory;
 
 import javax.annotation.Nonnull;
 
@@ -9,18 +9,18 @@ import javax.annotation.Nonnull;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public interface ThrowingFactory<R, T> extends Factory<R, T> {
+public interface ThrowingBiFactory<R, A, B> extends BiFactory<R, A, B> {
 
 	@Nonnull
 	@Override
-	default R get(T t) {
+	default R get(A a, B b) {
 		try {
-			return getThrowing(t);
+			return getThrowing(a, b);
 		} catch (Throwable ex) {
 			throw new ConsumeException(ex);
 		}
 	}
 
-	R getThrowing(T t);
+	R getThrowing(A a, B b);
 
 }

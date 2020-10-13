@@ -40,7 +40,7 @@ public final class ImageUtils {
 		int lineWidth = (int) layout.getBounds().getWidth();
 
 		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		graphics.drawString(text, graphics.getClipBounds().width / 2 - lineWidth / 2, height);
+		graphics.drawString(text, graphics.getDeviceConfiguration().getBounds().width / 2 - lineWidth / 2, height);
 
 		return lineWidth;
 
@@ -91,9 +91,13 @@ public final class ImageUtils {
 		return ImageIO.read(connection.getInputStream());
 	}
 
-	public static BufferedImage loadResource(String path) throws IOException {
+	public static BufferedImage loadResource(@Nonnull String path) throws IOException {
 		InputStream stream = ImageUtils.class.getClassLoader().getResourceAsStream(path);
 		return ImageIO.read(stream);
+	}
+
+	public static BufferedImage loadFile(@Nonnull File file) throws IOException {
+		return ImageIO.read(file);
 	}
 
 	@Nonnull

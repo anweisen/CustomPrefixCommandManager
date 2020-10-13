@@ -1,4 +1,4 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.function;
 
 import javax.annotation.Nonnull;
 
