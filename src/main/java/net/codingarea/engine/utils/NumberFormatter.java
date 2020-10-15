@@ -21,10 +21,10 @@ public interface NumberFormatter {
 	}
 
 	public static final NumberFormatter
-			DEFAULT = fromPattern("0.##", "", false),
-			FLOATING_POINT = fromPattern("0.0", "", false),
+			DEFAULT = fromPattern("0.##", null, false),
+			FLOATING_POINT = fromPattern("0.0", null, false),
 			PERCENTAGE = fromPattern("0.##", "%", true),
-			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", "", false),
+			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", null, false),
 
 			/**
 			 *  days, hours, minutes, seconds
@@ -165,12 +165,35 @@ public interface NumberFormatter {
 				value /= divide;
 				return format.format(value) + ending;
 
+			},
+			ORDINAL = value -> {
+
+				String string = String.valueOf(((long) value));
+				byte number = NumberConversions.toByte(string.substring(string.length() - 1));
+				String ending = "th";
+
+				if (value != 11 && value != 12 && value != 13) {
+					switch (number) {
+						case 1:
+							ending = "st";
+							break;
+						case 2:
+							ending = "nd";
+							break;
+						case 3:
+							ending = "rd";
+							break;
+					}
+				}
+
+				return string + ending;
+
 			};
 
 	@Nonnull
 	@CheckReturnValue
-	public static NumberFormatter fromPattern(@Nonnull String pattern, @Nonnull String ending, boolean plus) {
-		return value -> new DecimalFormat(pattern).format(plus ? (value > 0 ? value : 0) : value) + ending;
+	public static NumberFormatter fromPattern(@Nonnull String pattern, String ending, boolean positive) {
+		return value -> new DecimalFormat(pattern).format(positive ? (value > 0 ? value : 0) : value) + (ending != null ? ending : "");
 	}
 
 }
