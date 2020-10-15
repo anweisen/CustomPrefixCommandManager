@@ -10,7 +10,8 @@ public final class LogLevel extends Level {
 
 	public static final LogLevel ERROR = new LogLevel("ERROR", Level.SEVERE),
 								 DEBUG = new LogLevel("DEBUG", Level.FINEST),
-								 STATUS = new LogLevel("STATUS", Level.INFO);
+								 STATUS = new LogLevel("STATUS", Level.INFO),
+	                             NONE = new LogLevel("NONE", Integer.MAX_VALUE);
 
 	private LogLevel(String name, int value) {
 		super(name, value);
