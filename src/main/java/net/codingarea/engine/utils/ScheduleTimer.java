@@ -16,7 +16,7 @@ public final class ScheduleTimer {
 	}
 
 	public ScheduleTimer(@Nonnull Runnable sync, int rate) {
-		if (rate <= 0 || rate > 60) throw new IllegalArgumentException();
+		if (rate <= 0 || rate >= 60) throw new IllegalArgumentException();
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
