@@ -63,6 +63,14 @@ public abstract class SQL implements Bindable {
 		return instance;
 	}
 
+	public static void disconnect(SQL sql) {
+		if (sql != null) {
+			try {
+				sql.disconnect();
+			} catch (Throwable ignored) { }
+		}
+	}
+
 	protected final DataSource dataSource;
 	protected Connection connection;
 	protected Logger logger = new DefaultLogger(this);
