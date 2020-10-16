@@ -56,10 +56,17 @@ public final class Embeds {
 
 	@Nonnull
 	@CheckReturnValue
-	public static String title(@Nonnull Guild guild, String suffix) {
+	public static String title(String icon, String content, String suffix) {
+		if (content == null) content = "";
 		if (suffix == null) suffix = "";
 		if (!suffix.isEmpty()) suffix = " • " + suffix;
-		return (guild.getIconUrl() != null ? "» " : "") + guild.getName() + suffix;
+		return (icon != null ? "» " : "") + content + suffix;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String title(@Nonnull Guild guild, String suffix) {
+		return title(guild.getIconUrl(), guild.getName(), suffix);
 	}
 
 	@Nonnull
@@ -71,9 +78,7 @@ public final class Embeds {
 	@Nonnull
 	@CheckReturnValue
 	public static String title(@Nonnull User user, String suffix) {
-		if (suffix == null) suffix = "";
-		if (!suffix.isEmpty()) suffix = " • " + suffix;
-		return "» " + user.getName() + suffix;
+		return title(user.getEffectiveAvatarUrl(), user.getName(), suffix);
 	}
 
 }
