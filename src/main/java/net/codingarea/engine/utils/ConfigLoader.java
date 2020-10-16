@@ -50,14 +50,18 @@ public class ConfigLoader extends NamedValueConfig implements Bindable {
 	}
 
 	public ConfigLoader(@Nonnull String path, boolean exception, @Nonnull NamedValue... defaults) throws IOException {
+		this(new File(path), exception, defaults);
+	}
+
+
+	public ConfigLoader(@Nonnull File file, @Nonnull String... values) throws IOException {
+		this(file, false, NamedValue.ofStrings(values));
+	}
+
+	public ConfigLoader(@Nonnull File file, boolean exception, @Nonnull NamedValue... defaults) throws IOException {
 
 		this.values.addAll(Arrays.asList(defaults));
-
-		if (!path.contains(".")) {
-			path += ".properties";
-		}
-
-		file = new File(path);
+		this.file = file;
 
 		// If the file doesn't already exists, we'll create a new one and set the default values to it
 		if (!file.exists()) {
