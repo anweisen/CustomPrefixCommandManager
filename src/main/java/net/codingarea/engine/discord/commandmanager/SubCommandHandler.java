@@ -16,63 +16,63 @@ import java.util.List;
  * @author anweisen | https://github.com/anweisen
  * @since 2.6
  */
-public abstract class SubbedCommand extends Command {
+public abstract class SubCommandHandler extends Command {
 
-	public SubbedCommand(@Nonnull String name, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, @Nonnull String... alias) {
 		super(name, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, boolean processInNewThread, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull String... alias) {
 		super(name, processInNewThread, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, @Nonnull CommandType commandType, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, @Nonnull CommandType commandType, @Nonnull String... alias) {
 		super(name, commandType, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, @Nonnull Permission permission, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, @Nonnull Permission permission, @Nonnull String... alias) {
 		super(name, permission, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, @Nonnull String... alias) {
 		super(name, commandType, processInNewThread, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull String... alias) {
 		super(name, processInNewThread, reactToMentionPrefix, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread,
-	                     boolean reactToMentionPrefix, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread,
+	                         boolean reactToMentionPrefix, @Nonnull String... alias) {
 		super(name, commandType, processInNewThread, reactToMentionPrefix, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull Permission permission,
-	                     @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull Permission permission,
+	                         @Nonnull String... alias) {
 		super(name, processInNewThread, reactToMentionPrefix, permission, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, boolean processInNewThread, Permission permission, boolean reactToWebhooks,
-	                     boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, Permission permission, boolean reactToWebhooks,
+	                         boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, @Nonnull String... alias) {
 		super(name, processInNewThread, permission, reactToWebhooks, reactToBots, reactToMentionPrefix, teamCommand, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
 		super(name, permission, teamCommand, alias);
 		registerSubCommands();
 	}
 
-	public SubbedCommand(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission,
-	                     boolean teamCommand, @Nonnull String... alias) {
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission,
+	                         boolean teamCommand, @Nonnull String... alias) {
 		super(name, processInNewThread, permission, teamCommand, alias);
 		registerSubCommands();
 	}

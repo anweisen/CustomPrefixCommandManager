@@ -16,9 +16,9 @@ public final class SubCommandInstance {
 	private final String[] alias;
 	private final Class<?>[] args;
 	private final Method method;
-	private final SubbedCommand root;
+	private final SubCommandHandler root;
 
-	public SubCommandInstance(@Nonnull Method method, @Nonnull SubbedCommand root) {
+	public SubCommandInstance(@Nonnull Method method, @Nonnull SubCommandHandler root) {
 
 		this.root = root;
 
@@ -81,7 +81,7 @@ public final class SubCommandInstance {
 		return args;
 	}
 
-	public SubbedCommand getRoot() {
+	public SubCommandHandler getRoot() {
 		return root;
 	}
 

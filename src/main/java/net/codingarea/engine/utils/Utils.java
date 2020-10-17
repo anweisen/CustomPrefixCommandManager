@@ -1,6 +1,5 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.discord.commandmanager.CommandResult;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -224,13 +223,67 @@ public final class Utils {
 
 	@CheckReturnValue
 	public static <T extends Enum<?>> T findEnum(@Nonnull T[] enums, @Nonnull String search) {
+
 		for (T current : enums) {
 			if (current.name().equalsIgnoreCase(search))
 				return current;
 			if (current instanceof INamed && ((INamed)current).getName().equalsIgnoreCase(search))
 				return current;
 		}
+
+		int ordinal = NumberConversions.toInt(search);
+		if (ordinal > 0 && ordinal <= enums.length)
+			return enums[ordinal - 1];
+
 		return null;
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T> T[] array(T... content) {
+		return content;
+	}
+
+	@CheckReturnValue
+	public static long parseTime(@Nonnull String string) {
+		long current = 0;
+		long seconds = 0;
+		for (String c : string.split("")) {
+			try {
+
+				int i = Integer.parseInt(c);
+				current *= 10;
+				current += i;
+
+			} catch (Exception ignored) {
+
+				int multiplier = 1;
+				switch (c.toLowerCase()) {
+					case "m":
+						multiplier = 60;
+						break;
+					case "h":
+						multiplier = 60*60;
+						break;
+					case "d":
+						multiplier = 24*60*60;
+						break;
+					case "w":
+						multiplier = 7*24*60*60;
+						break;
+					case "y":
+						multiplier = 365*24*60*60;
+						break;
+				}
+
+				seconds += current * multiplier;
+				current = 0;
+
+			}
+		}
+		seconds += current;
+		return seconds;
 	}
 
 }

@@ -6,10 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @see Listener
- *
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
+ * @see Listener
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

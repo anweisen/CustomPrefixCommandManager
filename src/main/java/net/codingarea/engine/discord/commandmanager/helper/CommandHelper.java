@@ -27,37 +27,7 @@ public abstract class CommandHelper extends LogHelper {
 
 	@CheckReturnValue
 	public static long parseTime(String string) {
-		long current = 0;
-		long seconds = 0;
-		for (String c : string.split("")) {
-			try {
-
-				int i = Integer.parseInt(c);
-				current *= 10;
-				current += i;
-
-			} catch (Exception ignored) {
-
-				int multiplier = 1;
-				switch (c.toLowerCase()) {
-					case "m":
-						multiplier = 60;
-						break;
-					case "h":
-						multiplier = 60*60;
-						break;
-					case "d":
-						multiplier = 24*60*60;
-						break;
-				}
-
-				seconds += current * multiplier;
-				current = 0;
-
-			}
-		}
-		seconds += current;
-		return seconds;
+		return Utils.parseTime(string);
 	}
 
 	@CheckReturnValue

@@ -3,7 +3,7 @@ package net.codingarea.engine.lang;
 import net.codingarea.engine.exceptions.LanguageNotFoundException;
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.cache.SQLValueCache;
-import net.codingarea.engine.utils.BiFactory;
+import net.codingarea.engine.utils.function.BiFactory;
 import net.dv8tion.jda.api.entities.Guild;
 
 import javax.annotation.CheckReturnValue;

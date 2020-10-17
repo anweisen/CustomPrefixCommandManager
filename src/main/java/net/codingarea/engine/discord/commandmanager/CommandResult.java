@@ -72,6 +72,11 @@ public enum CommandResult {
 	BOT_MESSAGE_NO_REACT,
 
 	/**
+	 * Used when the bot it self triggers the CommandEvent
+	 */
+	SELF_MESSAGE_NO_REACT,
+
+	/**
 	 * Used when the command event was triggered without using a valid prefix
 	 *
 	 * @see CommandHandler#handleCommand(String, MessageReceivedEvent)

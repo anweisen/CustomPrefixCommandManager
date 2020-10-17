@@ -1,6 +1,7 @@
 package net.codingarea.engine.discord.commandmanager;
 
 /**
+ * @see CommandHandler
  * @author anweisen | https://github.com/anweisen
  * @since 2.5
  */

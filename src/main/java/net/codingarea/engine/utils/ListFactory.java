@@ -1,5 +1,7 @@
 package net.codingarea.engine.utils;
 
+import net.codingarea.engine.utils.function.Factory;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

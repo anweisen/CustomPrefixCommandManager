@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
  * @see ICommand
  *
  * @author anweisen | https://github.com/anweisen
- * @since 1.0
+ * @since 2.6
  */
 public class ReceivedCommandEvent extends GenericCommandEvent {
 

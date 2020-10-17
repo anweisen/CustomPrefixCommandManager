@@ -1,36 +1,44 @@
-import net.codingarea.engine.discord.commandmanager.Command;
 import net.codingarea.engine.discord.commandmanager.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.CommandHandler;
+import net.codingarea.engine.discord.commandmanager.SubCommand;
+import net.codingarea.engine.discord.commandmanager.SubCommandHandler;
 import net.codingarea.engine.discord.defaults.DefaultBuilder;
+import net.codingarea.engine.discord.defaults.DefaultCommandListener;
 import net.codingarea.engine.discord.defaults.DefaultConfigLoader;
-import net.codingarea.engine.discord.defaults.DefaultMessageListener;
-
-import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.entities.Member;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 
 		CommandHandler handler = new CommandHandler().registerCommand(new Com());
-		DefaultConfigLoader config = new DefaultConfigLoader();
-		DefaultBuilder.createHeavyShardManager(config.getToken())
-					  .addEventListeners(new DefaultMessageListener(handler, "!"))
+		DefaultBuilder.createHeavyJDA(new DefaultConfigLoader().getToken())
+					  .addEventListeners(new DefaultCommandListener(handler, "-"))
 					  .build();
 
 	}
 
-	static class Com extends Command {
+	public static class Com extends SubCommandHandler {
 
-		Com() {
-			super("find");
+		public Com() {
+			super("help");
 		}
 
-		@Override
-		public void onCommand(@Nonnull final CommandEvent event) throws Throwable {
-
-			event.queueReply(findMember(event, event.getArgsAsString()) + " | " + event.getArgsAsString());
-
+		@SubCommand(name = "1")
+		public void subCommand(CommandEvent event, String string, int asd) {
+			event.queueReply("this is sub command 1 :) " + string + asd);
 		}
+
+		@SubCommand(name = "2", alias = {"3"})
+		public void subCommand2(CommandEvent event) {
+			event.queueReply("hey, wie gehts");
+		}
+
+		@SubCommand(name = "ban")
+		public void saehozf(CommandEvent event, Member member) {
+			event.queueReply(member.getAsMention() + "is weg alda");
+		}
+
 	}
 
 }

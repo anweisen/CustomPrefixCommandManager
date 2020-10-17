@@ -1,5 +1,6 @@
 package net.codingarea.engine.utils;
 
+import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
@@ -126,6 +127,12 @@ public final class DefaultFactory {
 	@CheckReturnValue
 	public static Factory<String, Class<?>> classToName() {
 		return Class::getName;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static <T extends INamed> Factory<String, T> namedToName() {
+		return INamed::getName;
 	}
 
 }

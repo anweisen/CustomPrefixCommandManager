@@ -1,17 +1,13 @@
 package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.utils.*;
-import net.dv8tion.jda.annotations.ReplaceWith;
+import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import java.lang.annotation.Retention;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,18 +21,10 @@ public class DefaultStatusChanger implements Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String[], ShardManager> createNewFactory(@Nonnull String prefix) {
-		return manager -> {
-
-			List<String> status = new ArrayList<>();
-			status.add(prefix + NumberFormatter.MIDDLE_NUMBER.format(manager.getGuilds().size()) + " Server");
-			if (manager.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-				status.add(prefix + NumberFormatter.MIDDLE_NUMBER.format(manager.getUsers().size()) + " User");
-			}
-
-			return status.toArray(new String[0]);
-
-		};
+	public static Factory<String[], ShardManager> createNewFactory(@Nonnull String prefix, @Nonnull ShardManager shardManager) {
+		return createByReplacements(prefix, new String[]{"%user% User", "%guilds% Server"},
+				new Replacement("%user%", () -> NumberFormatter.MIDDLE_NUMBER.format(shardManager.getUsers().size())),
+				new Replacement("%guilds%", () -> NumberFormatter.MIDDLE_NUMBER.format(shardManager.getGuilds().size())));
 	}
 
 	@Nonnull
@@ -85,7 +73,7 @@ public class DefaultStatusChanger implements Bindable {
 	@CheckReturnValue
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager) {
 		this.shardManager = shardManager;
-		this.status = createNewFactory("");
+		this.status = createNewFactory("", shardManager);
 	}
 
 	@CheckReturnValue
@@ -111,7 +99,7 @@ public class DefaultStatusChanger implements Bindable {
 		this.shardManager = shardManager;
 		this.type = type;
 		if (suffix.length == 0) {
-			this.status = createNewFactory(prefix);
+			this.status = createNewFactory(prefix, shardManager);
 		} else {
 			this.status = createByReplacements(prefix, suffix,
 											   new Replacement("%guilds%", NumberFormatter.MIDDLE_NUMBER.format(shardManager.getGuilds().size())),
@@ -123,7 +111,7 @@ public class DefaultStatusChanger implements Bindable {
 	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull String prefix, @Nonnull String[] suffix, @Nonnull Replacement... replacements) {
 		this.shardManager = shardManager;
 		if (suffix.length == 0) {
-			this.status = createNewFactory(prefix);
+			this.status = createNewFactory(prefix, shardManager);
 		} else {
 			this.status = createByReplacements(prefix, suffix, replacements);
 		}

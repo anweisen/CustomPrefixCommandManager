@@ -153,6 +153,11 @@ public class CommandHandler implements Bindable {
 	 */
 	protected void handleCommand(@Nonnull String prefix, @Nonnull GenericMessageEvent event, Member member, @Nonnull Message message) {
 
+		if (message.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) {
+			resultHandler.handle(event, CommandResult.SELF_MESSAGE_NO_REACT, null);
+			return;
+		}
+
 		ResultHandler resultHandler = this.resultHandler;
 		if (resultHandler == null) resultHandler = (a, b, c, d, e, f) -> {};
 

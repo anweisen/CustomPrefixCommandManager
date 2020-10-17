@@ -18,7 +18,7 @@ public final class DefaultBuilder {
 	private DefaultBuilder() { }
 
 	/**
-	 * @return Creates a {@link JDABuilder} with every {@link GatewayIntent}
+	 * @return Creates a {@link JDABuilder} using every {@link GatewayIntent}
 	 * @see JDABuilder
 	 */
 	@Nonnull
@@ -40,7 +40,7 @@ public final class DefaultBuilder {
 	}
 
 	/**
-	 * @return Creates a {@link DefaultShardManagerBuilder} with every {@link GatewayIntent}
+	 * @return Creates a {@link DefaultShardManagerBuilder} using every {@link GatewayIntent}
 	 * @see DefaultShardManagerBuilder
 	 */
 	@Nonnull

@@ -3,7 +3,7 @@ package net.codingarea.engine.discord.defaults;
 import net.codingarea.engine.discord.commandmanager.CommandHandler;
 import net.codingarea.engine.discord.listener.DiscordEvent;
 import net.codingarea.engine.discord.listener.Listener;
-import net.codingarea.engine.utils.Factory;
+import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;

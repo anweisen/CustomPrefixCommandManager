@@ -2,7 +2,7 @@ package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.cache.SQLValueCache;
-import net.codingarea.engine.utils.Factory;
+import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.entities.Guild;
 
 import javax.annotation.CheckReturnValue;

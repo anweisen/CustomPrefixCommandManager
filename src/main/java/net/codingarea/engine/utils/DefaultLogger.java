@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.function.Supplier;
+import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -17,9 +18,12 @@ import java.util.logging.Logger;
 public class DefaultLogger extends Logger implements Bindable {
 
 	public static final DefaultLogger DEFAULT = new DefaultLogger("default");
+	public static final DefaultLogger EMPTY = new DefaultLogger("empty");
 
 	static {
 		DEFAULT.setLevel(Level.ALL);
+		EMPTY.setLevel(LogLevel.NONE);
+		EMPTY.setFilter(record -> false);
 	}
 
 	private final DefaultLogHandler handler;

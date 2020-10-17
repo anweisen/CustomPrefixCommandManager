@@ -49,10 +49,9 @@ public final class IOUtils {
 	public static long copyLarge(Reader input, Writer output, char[] buffer) throws IOException {
 		long count;
 		int n;
-		for(count = 0L; -1 != (n = input.read(buffer)); count += n) {
+		for (count = 0L; -1 != (n = input.read(buffer)); count += n) {
 			output.write(buffer, 0, n);
 		}
-
 		return count;
 	}
 

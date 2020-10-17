@@ -1,16 +1,16 @@
 package net.codingarea.engine.discord.commandmanager.events;
 
-import net.codingarea.engine.discord.commandmanager.CommandEvent;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.codingarea.engine.discord.commandmanager.CommandHandler;
+import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 
 /**
+ * @see CommandHandler
+ * @see ICommand
+ *
  * @author anweisen | https://github.com/anweisen
  * @since 2.6
  */

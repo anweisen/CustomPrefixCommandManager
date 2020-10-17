@@ -3,7 +3,7 @@ package net.codingarea.engine.discord.commandmanager;
 import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.codingarea.engine.exceptions.MessageException;
 import net.codingarea.engine.utils.Colors;
-import net.codingarea.engine.utils.ThrowingConsumer;
+import net.codingarea.engine.utils.function.ThrowingConsumer;
 import net.codingarea.engine.utils.UtilMethod;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
