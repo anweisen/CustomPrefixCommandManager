@@ -165,38 +165,12 @@ public final class Utils {
 
 	public static List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<? extends Annotation> annotation) {
 		List<Method> methods = new ArrayList<>();
-		while (clazz != Object.class) {
-			for (Method method : clazz.getDeclaredMethods()) {
-				if (method.isAnnotationPresent(annotation)) {
-					methods.add(method);
-				}
+		for (Method method : clazz.getMethods()) {
+			if (method.isAnnotationPresent(annotation)) {
+				methods.add(method);
 			}
-			clazz = clazz.getSuperclass();
 		}
 		return methods;
-	}
-
-	public static boolean subClassOf(Class<?> expected, Class<?> given) {
-
-		if (given == null || expected == null) return false;
-
-		while (given != Object.class) {
-
-			if (given == expected) return true;
-
-			if (given.getInterfaces() != null) {
-				for (Class<?> currentInterface : given.getInterfaces()) {
-					if (subClassOf(expected, currentInterface)) return true;
-				}
-			}
-
-			given = given.getSuperclass();
-			if (given == null) return false;
-
-		}
-
-		return false;
-
 	}
 
 	@Nonnull
