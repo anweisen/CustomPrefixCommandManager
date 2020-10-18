@@ -9,11 +9,16 @@ import java.lang.reflect.Method;
  */
 public class IllegalSubCommandException extends IllegalStateException {
 
+	public IllegalSubCommandException(String message, @Nonnull Method method) {
+		super(message + ": " + method.toString());
+	}
+
 	public IllegalSubCommandException(@Nonnull Method method) {
 		super(method.toString());
 	}
 
-	protected IllegalSubCommandException(String cause) {
+	public IllegalSubCommandException(String cause) {
 		super(cause);
 	}
+
 }
