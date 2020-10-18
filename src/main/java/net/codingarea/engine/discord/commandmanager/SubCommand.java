@@ -13,7 +13,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SubCommand {
 
-	String name();
-	String[] alias() default {};
+	String[] name() default {};
 
 }
