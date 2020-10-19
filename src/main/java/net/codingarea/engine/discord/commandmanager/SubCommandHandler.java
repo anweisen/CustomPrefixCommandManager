@@ -1,5 +1,6 @@
 package net.codingarea.engine.discord.commandmanager;
 
+import net.codingarea.engine.exceptions.SubCommandNameAlreadyTakenException;
 import net.codingarea.engine.utils.NumberConversions;
 import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.Utils;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.entities.*;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +79,23 @@ public abstract class SubCommandHandler extends Command {
 		registerSubCommands();
 	}
 
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission, boolean reactToWebhooks,
+	                         boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, boolean executeOnUpdate, @Nonnull String... alias) {
+		super(name, processInNewThread, permission, reactToWebhooks, reactToBots, reactToMentionPrefix, teamCommand, executeOnUpdate, alias);
+		registerSubCommands();
+	}
+
+	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull CommandType type, boolean teamCommand,
+	                         boolean executeOnUpdate, @Nonnull String... alias) {
+		super(name, processInNewThread, type, teamCommand, executeOnUpdate, alias);
+		registerSubCommands();
+	}
+
+	public SubCommandHandler() {
+		super();
+		registerSubCommands();
+	}
+
 	private final List<SubCommandInstance> commands = new ArrayList<>();
 
 	private void registerSubCommands() {
@@ -85,17 +104,24 @@ public abstract class SubCommandHandler extends Command {
 
 	private void registerSubCommand(@Nonnull Method method) {
 		SubCommandInstance command = new SubCommandInstance(method, this);
+
+		// Make sure there is no subcommand with a name this command has too
+		for (SubCommandInstance registered : commands) {
+			for (String name : registered.getNames()) {
+				for (String name2 : command.getNames()) {
+					if (name.equalsIgnoreCase(name2))
+						throw new SubCommandNameAlreadyTakenException(name);
+				}
+			}
+		}
+
 		commands.add(command);
 	}
 
-	private SubCommandInstance findCommand(@Nonnull String name) {
+	protected final SubCommandInstance findCommand(@Nonnull String name) {
 
 		for (SubCommandInstance command : commands) {
-
-			if (command.getName().equalsIgnoreCase(name))
-				return command;
-
-			for (String alias : command.getAlias()) {
+			for (String alias : command.getNames()) {
 				if (alias.equalsIgnoreCase(name))
 					return command;
 			}
@@ -129,13 +155,14 @@ public abstract class SubCommandHandler extends Command {
 		Object[] args = new Object[command.getArgs().length];
 		for (int i = 0; i < command.getArgs().length; i++) {
 
-			Object argument = parseArgument(command.getArgs()[i], event.getArg(i + 1), event);
-			if (argument == null) {
+			try {
+				Object argument = parseArgument(command.getArgs()[i], event.getArg(i + 1), event);
+				if (argument == null) throw new NullPointerException();
+				args[i] = argument;
+			} catch (Exception ignored) {
 				onInvalidSubCommandArgument(event, command, command.getArgs()[i], event.getArg(i + 1), i + 1);
 				return;
 			}
-
-			args[i] = argument;
 
 		}
 
@@ -163,46 +190,54 @@ public abstract class SubCommandHandler extends Command {
 	protected void onInvalidSubCommandArgument(@Nonnull CommandEvent event, @Nonnull SubCommandInstance command,
 	                                           @Nonnull Class<?> expected, @Nonnull String given, int argumentIndex) throws Exception {
 		event.queueReply(getMessage(event, "invalid-sub-command-argument",
-									"Invalid argument **%index%**: Expected `%expected%`, got `%given%`",
+									"Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
 									new Replacement("%index%", argumentIndex),
 									new Replacement("%given%", given),
 									new Replacement("%expected%", expected.getSimpleName())));
 	}
 
 	@CheckReturnValue
-	protected <T> Object parseArgument(@Nonnull Class<T> clazz, @Nonnull String input, @Nonnull CommandEvent event) {
-		if (clazz == Object.class || clazz == String.class || clazz == CharSequence.class) {
+	protected Object parseArgument(@Nonnull Class<?> argument, @Nonnull String input, @Nonnull CommandEvent event) throws Exception {
+		if (argument == Object.class || argument == String.class || argument == CharSequence.class) {
 			return input;
-		} else if (clazz == StringBuilder.class) {
+		} else if (argument == char[].class) {
+			return input.toCharArray();
+		} else if (argument == StringBuilder.class) {
 			return new StringBuilder(input);
-		} else if (clazz == Integer.class || clazz == int.class) {
-			return NumberConversions.toInt(input);
-		} else if (clazz == Long.class || clazz == long.class) {
-			return NumberConversions.toLong(input);
-		} else if (clazz == Byte.class || clazz == byte.class) {
-			return NumberConversions.toByte(input);
-		} else if (clazz == Short.class || clazz == short.class) {
-			return NumberConversions.toShort(input);
-		} else if (clazz == Double.class || clazz == double.class) {
-			return NumberConversions.toDouble(input);
-		} else if (clazz == Float.class || clazz == float.class) {
-			return NumberConversions.toFloat(input);
-		} else if (clazz == Member.class) {
+		} else if (argument == Integer.class || argument == int.class) {
+			return Integer.parseInt(input);
+		} else if (argument == Long.class || argument == long.class) {
+			return Long.parseLong(input);
+		} else if (argument == Byte.class || argument == byte.class) {
+			return Byte.parseByte(input);
+		} else if (argument == Short.class || argument == short.class) {
+			return Short.parseShort(input);
+		} else if (argument == Double.class || argument == double.class) {
+			return Double.parseDouble(input);
+		} else if (argument == Float.class || argument == float.class) {
+			return Float.parseFloat(input);
+		} else if (argument == OffsetDateTime.class) {
+			return OffsetDateTime.parse(input);
+		} else if (argument == Member.class) {
 			return findMember(event, input);
-		} else if (clazz == User.class) {
+		} else if (argument == User.class) {
 			Member member = findMember(event, input);
 			return member == null ? null : member.getUser();
-		} else if (clazz == TextChannel.class) {
+		} else if (argument == TextChannel.class) {
 			return findTextChannel(event, input);
-		} else if (clazz == VoiceChannel.class) {
+		} else if (argument == VoiceChannel.class) {
 			return findVoiceChannel(event, input);
-		} else if (clazz == Category.class) {
+		} else if (argument == Category.class) {
 			return findCategory(event, input);
-		} else if (clazz == Role.class) {
+		} else if (argument == Role.class) {
 			return findRole(event, input);
 		} else {
 			return null;
 		}
+	}
+
+	public final SubCommandInstance[] getSubCommands() {
+		return commands.toArray(new SubCommandInstance[0]);
 	}
 
 }
