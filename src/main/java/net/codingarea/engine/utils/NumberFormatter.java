@@ -93,10 +93,14 @@ public interface NumberFormatter {
 				} else if (value < 1000000000) {
 					divide = 1000000;
 					ending = "m";
-				// Billion
-				} else {
+				// Billion (Milliarde)
+				} else if (value < 1000000000000D) {
 					divide = 1000000000;
 					ending = "b";
+				// Trillion (Billion)
+				} else {
+					divide = 1000000000000D;
+					ending = "t";
 				}
 
 				value /= divide;
@@ -142,7 +146,7 @@ public interface NumberFormatter {
 
 			/**
 			 * input in bytes
-			 * gigabyte, terrabyte
+			 * gigabyte, terrabyte, petabyte
 			 */
 			BIG_DATA_SIZE = value -> {
 
@@ -157,9 +161,13 @@ public interface NumberFormatter {
 					divide = 1000000000L;
 					ending = "GB";
 				// TerraByte
-				} else {
+				} else if (value < 1000000000000000L) {
 					divide = 1000000000000L;
 					ending = "TB";
+				// PetaByte
+				} else {
+					divide = 1000000000000000L;
+					ending = "PB";
 				}
 
 				value /= divide;
