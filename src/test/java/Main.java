@@ -24,12 +24,12 @@ public class Main {
 			super("help");
 		}
 
-		@SubCommand(name = "1")
+		@SubCommand
 		public void subCommand(CommandEvent event, String string, int asd) {
 			event.queueReply("this is sub command 1 :) " + string + asd);
 		}
 
-		@SubCommand(name = "2", alias = {"3"})
+		@SubCommand(name = {"2", "3"})
 		public void subCommand2(CommandEvent event) {
 			event.queueReply("hey, wie gehts");
 		}
