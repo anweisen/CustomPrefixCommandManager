@@ -1,5 +1,6 @@
 package net.codingarea.engine.utils;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.Map.Entry;
@@ -14,43 +15,39 @@ public final class StaticBinder {
 
 	private static final HashMap<String, Object> values = new HashMap<>();
 
-	public static <T> T getNullAble(@Nonnull String key) {
-		try {
-			return get(key);
-		} catch (Exception ignored) {
-			return null;
-		}
-	}
-
-	public static <T> T getNullAble(@Nonnull Class<T> clazz) {
-		try {
-			return get(clazz);
-		} catch (Exception ignored) {
-			return null;
-		}
+	@Nonnull
+	@CheckReturnValue
+	public static <T> T getNonnull(@Nonnull String key) {
+		return get(key);
 	}
 
 	@Nonnull
+	@CheckReturnValue
+	public static <T> T getNonnull(@Nonnull Class<T> clazz) {
+		return get(clazz);
+	}
+
+	@CheckReturnValue
 	public static <T> T get(@Nonnull String key) {
 		return (T) values.get(key);
 	}
 
-	@Nonnull
+	@CheckReturnValue
 	public static <T> T get(long key) {
 		return get(String.valueOf(key));
 	}
 
-	@Nonnull
+	@CheckReturnValue
 	public static <T> T get(double key) {
 		return get(String.valueOf(key));
 	}
 
-	@Nonnull
+	@CheckReturnValue
 	public static <T> T get(char key) {
 		return get(String.valueOf(key));
 	}
 
-	@Nonnull
+	@CheckReturnValue
 	public static <T> T get(@Nonnull Class<T> key) {
 		return get(key.getName());
 	}
