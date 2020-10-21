@@ -68,12 +68,6 @@ public abstract class NamedValueConfig implements Iterable<NamedValue> {
 		return properties;
 	}
 
-	@Nonnull
-	public NamedValue add(@Nonnull NamedValue value) {
-		values.add(value);
-		return value;
-	}
-
 	public String getString(@Nonnull String key) {
 		try {
 			return get(key).getValue();
