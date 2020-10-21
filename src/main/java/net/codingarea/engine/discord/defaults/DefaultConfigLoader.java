@@ -73,7 +73,7 @@ public class DefaultConfigLoader extends ConfigLoader {
 	}
 
 	public DefaultConfigLoader(String path) throws IOException {
-		super(path.contains(".") ? path : path + ".properties", DefaultNamedValue.all());
+		super(path, DefaultNamedValue.all());
 	}
 
 	public String getToken() {
