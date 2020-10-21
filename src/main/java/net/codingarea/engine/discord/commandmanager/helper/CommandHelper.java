@@ -17,12 +17,8 @@ import javax.annotation.Nonnull;
  */
 public abstract class CommandHelper extends LogHelper {
 
-	public static <T> T getInstance(Class<T> clazz) {
-		return StaticBinder.getNullAble(clazz);
-	}
-
 	public static LanguageManager getLanguageManager() {
-		return getInstance(LanguageManager.class);
+		return StaticBinder.get(LanguageManager.class);
 	}
 
 	@CheckReturnValue
