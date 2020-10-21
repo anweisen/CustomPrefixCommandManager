@@ -50,9 +50,8 @@ public class ConfigLoader extends NamedValueConfig implements Bindable {
 	}
 
 	public ConfigLoader(@Nonnull String path, boolean exception, @Nonnull NamedValue... defaults) throws IOException {
-		this(new File(path), exception, defaults);
+		this(new File(path.contains(".") ? path : path + ".properties"), exception, defaults);
 	}
-
 
 	public ConfigLoader(@Nonnull File file, @Nonnull String... values) throws IOException {
 		this(file, false, NamedValue.ofStrings(values));
