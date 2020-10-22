@@ -221,7 +221,7 @@ public class CommandHandler implements Bindable {
 		if (cooldownManager != null)
 			cooldownManager.addToCoolDown(member);
 
-		process(command, GenericCommandEvent.ofEvent(event, prefix, getCommandName(command, commandName)), resultHandler);
+		process(command, GenericCommandEvent.ofEvent(event, prefix, getCommandName(command, commandName), command), resultHandler);
 
 	}
 

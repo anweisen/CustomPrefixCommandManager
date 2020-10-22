@@ -1,6 +1,8 @@
 package net.codingarea.engine.discord.commandmanager.events;
 
+import com.sun.org.apache.bcel.internal.generic.ICONST;
 import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
@@ -19,11 +21,12 @@ public abstract class GenericCommandEvent implements CommandEvent {
 
 	@Nonnull
 	@CheckReturnValue
-	public static CommandEvent ofEvent(@Nonnull GenericMessageEvent event, @Nonnull String prefix, @Nonnull String command) {
+	public static CommandEvent ofEvent(@Nonnull GenericMessageEvent event, @Nonnull String prefix,
+	                                   @Nonnull String commandName, @Nonnull ICommand command) {
 		if (event instanceof MessageUpdateEvent) {
-			return new UpdatedCommandEvent((MessageUpdateEvent) event, prefix, command);
+			return new UpdatedCommandEvent((MessageUpdateEvent) event, prefix, commandName, command);
 		} else if (event instanceof MessageReceivedEvent) {
-			return new ReceivedCommandEvent((MessageReceivedEvent) event, prefix, command);
+			return new ReceivedCommandEvent((MessageReceivedEvent) event, prefix, commandName, command);
 		} else {
 			throw new IllegalArgumentException(event.getClass().getName() + " is not supported!");
 		}
@@ -34,13 +37,22 @@ public abstract class GenericCommandEvent implements CommandEvent {
 	protected final String prefix;
 	protected final String commandName;
 	protected final Message message;
+	protected final ICommand command;
 
-	public GenericCommandEvent(@Nonnull GenericMessageEvent event, @Nonnull Message message, @Nonnull String prefix, @Nonnull String commandName) {
+	public GenericCommandEvent(@Nonnull GenericMessageEvent event, @Nonnull Message message, @Nonnull String prefix,
+	                           @Nonnull String commandName, @Nonnull ICommand command) {
 		this.event = event;
 		this.prefix = prefix;
 		this.commandName = commandName;
+		this.command = command;
 		this.message = message;
 		this.args = CommandEvent.parseArgs(message, prefix, commandName);
+	}
+
+	@Nonnull
+	@Override
+	public ICommand getCommand() {
+		return command;
 	}
 
 	@Nonnull

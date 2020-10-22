@@ -34,6 +34,10 @@ public interface CommandEvent {
 
 	@Nonnull
 	@CheckReturnValue
+	ICommand getCommand();
+
+	@Nonnull
+	@CheckReturnValue
 	String getCommandName();
 
 	@Nonnull

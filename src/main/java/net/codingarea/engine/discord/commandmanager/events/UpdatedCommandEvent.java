@@ -18,8 +18,8 @@ public class UpdatedCommandEvent extends GenericCommandEvent {
 
 	protected final MessageUpdateEvent event;
 
-	public UpdatedCommandEvent(@Nonnull MessageUpdateEvent event, @Nonnull String prefix, @Nonnull String commandName) {
-		super(event, event.getMessage(), prefix, commandName);
+	public UpdatedCommandEvent(@Nonnull MessageUpdateEvent event, @Nonnull String prefix, @Nonnull String commandName, @Nonnull ICommand command) {
+		super(event, event.getMessage(), prefix, commandName, command);
 		this.event = event;
 	}
 

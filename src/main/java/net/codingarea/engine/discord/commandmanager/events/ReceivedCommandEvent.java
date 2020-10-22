@@ -18,8 +18,8 @@ public class ReceivedCommandEvent extends GenericCommandEvent {
 
 	protected final MessageReceivedEvent event;
 
-	public ReceivedCommandEvent(@Nonnull MessageReceivedEvent event, @Nonnull String prefix, @Nonnull String commandName) {
-		super(event, event.getMessage(), prefix, commandName);
+	public ReceivedCommandEvent(@Nonnull MessageReceivedEvent event, @Nonnull String prefix, @Nonnull String commandName, @Nonnull ICommand command) {
+		super(event, event.getMessage(), prefix, commandName, command);
 		this.event = event;
 	}
 
