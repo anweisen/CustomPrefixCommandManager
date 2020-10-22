@@ -1,5 +1,6 @@
 package net.codingarea.engine.utils;
 
+import net.codingarea.engine.utils.function.ThrowingConsumer;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -14,6 +15,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -210,6 +212,7 @@ public final class Utils {
 			return enums[ordinal - 1];
 
 		return null;
+
 	}
 
 	@Nonnull
@@ -258,6 +261,24 @@ public final class Utils {
 		}
 		seconds += current;
 		return seconds;
+	}
+
+	public static void repeat(int times, Runnable action) {
+		for (int i = 0; i < times; i++) {
+			action.run();
+		}
+	}
+
+	public static <T> void repeat(int times, T t, Consumer<? super T> action) {
+		for (int i = 0; i < times; i++) {
+			action.accept(t);
+		}
+	}
+
+	public static <T> void repeat(int times, T t, ThrowingConsumer<? super T> action) throws Exception {
+		for (int i = 0; i < times; i++) {
+			action.acceptThrowing(t);
+		}
 	}
 
 }
