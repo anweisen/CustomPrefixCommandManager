@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
  */
 public interface ResultHandler {
 
-	void handle(@Nullable GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user, @Nullable Member member, @Nonnull CommandResult result, Object arg);
+	void handle(@Nonnull GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user, @Nullable Member member, @Nonnull CommandResult result, Object arg);
 
 	default void handle(@Nonnull GenericMessageEvent event, @Nonnull CommandResult result, Object arg) {
 		if (event instanceof MessageReceivedEvent) {

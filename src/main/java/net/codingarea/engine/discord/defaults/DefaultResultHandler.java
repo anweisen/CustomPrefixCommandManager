@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 public class DefaultResultHandler implements ResultHandler {
 
 	@Override
-	public void handle(@Nullable GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user,
+	public void handle(@Nonnull GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user,
 	                   @Nullable Member member, @Nonnull CommandResult result, Object arg) {
 
 		String answer = result.getAnswer();
@@ -33,6 +33,10 @@ public class DefaultResultHandler implements ResultHandler {
 			case BOT_MESSAGE_NO_REACT:
 			case SUCCESS:
 			case PREFIX_NOT_USED:
+			case MESSAGE_EDIT_NO_REACT:
+			case SELF_MESSAGE_NO_REACT:
+			case INVALID_CHANNEL_GUILD_COMMAND:
+			case INVALID_CHANNEL_PRIVATE_COMMAND:
 			default:
 				break;
 
@@ -67,6 +71,7 @@ public class DefaultResultHandler implements ResultHandler {
 				answer = answer.replace("%exception%", ex != null ? ex.getClass().getSimpleName() : "null")
 						.replace("%messages%", ex != null && ex.getMessage() != null ? ex.getMessage() : "null");
 				break;
+
 		}
 
 		channel.sendMessage(answer).queue();
