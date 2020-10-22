@@ -3,6 +3,8 @@ package net.codingarea.engine.utils;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.function.Consumer;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -22,9 +24,13 @@ public interface NumberFormatter {
 
 	public static final NumberFormatter
 			DEFAULT = fromPattern("0.##", null, false),
+			SPACE_SPLIT = fromPattern("###,##0.###############", null, false,
+									  init -> updateSymbols(init, symbols -> symbols.setGroupingSeparator(' '))),
 			FLOATING_POINT = fromPattern("0.0", null, false),
+			BIG_FLOATING_POINT = fromPattern("###,##0.00000", null, false),
 			PERCENTAGE = fromPattern("0.##", "%", true),
-			MIDDLE_NUMBER = fromPattern("###,###,###,###,###,###,###,###,###,###,###,##0.#", null, false),
+			FLOATING_PERCENTAGE = fromPattern("0.00", "%", true),
+			MIDDLE_NUMBER = fromPattern("###,###,##0.#", null, false),
 
 			/**
 			 *  days, hours, minutes, seconds
@@ -77,7 +83,7 @@ public interface NumberFormatter {
 			 */
 			BIG_NUMBER = value -> {
 
-				DecimalFormat format = new DecimalFormat("0.##");
+				DecimalFormat format = new DecimalFormat("0.##", new DecimalFormatSymbols());
 				double divide;
 				String ending = "";
 
@@ -196,12 +202,33 @@ public interface NumberFormatter {
 
 				return string + ending;
 
-			};
+			},
+			GERMAN_ORDINAL = fromPattern("0", ".", false);
 
 	@Nonnull
 	@CheckReturnValue
 	public static NumberFormatter fromPattern(@Nonnull String pattern, String ending, boolean positive) {
-		return value -> new DecimalFormat(pattern).format(positive ? (value > 0 ? value : 0) : value) + (ending != null ? ending : "");
+		return fromPattern(pattern, ending, positive, null);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static NumberFormatter fromPattern(@Nonnull String pattern, String ending, boolean positive, Consumer<? super DecimalFormat> init) {
+		DecimalFormat format = new DecimalFormat(pattern);
+		if (init != null) init.accept(format);
+		return value -> Double.isNaN(value) ? "NaN" : format.format(positive ? (value > 0 ? value : 0) : value) + (ending != null ? ending : "");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static DecimalFormatSymbols updateSymbols(@Nonnull DecimalFormatSymbols symbols, @Nonnull Consumer<? super DecimalFormatSymbols> action) {
+		action.accept(symbols);
+		return symbols;
+	}
+
+	@CheckReturnValue
+	public static void updateSymbols(@Nonnull DecimalFormat format, @Nonnull Consumer<? super DecimalFormatSymbols> action) {
+		format.setDecimalFormatSymbols(updateSymbols(format.getDecimalFormatSymbols(), action));
 	}
 
 }
