@@ -17,6 +17,6 @@ public interface ThrowingSupplier<T> extends Supplier<T> {
 		}
 	}
 
-	T getThrowing() throws Throwable;
+	T getThrowing() throws Exception;
 
 }

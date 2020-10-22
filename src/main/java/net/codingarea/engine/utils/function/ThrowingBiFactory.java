@@ -21,6 +21,6 @@ public interface ThrowingBiFactory<R, A, B> extends BiFactory<R, A, B> {
 		}
 	}
 
-	R getThrowing(A a, B b);
+	R getThrowing(A a, B b) throws Exception;
 
 }

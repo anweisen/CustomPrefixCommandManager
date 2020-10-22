@@ -19,6 +19,6 @@ public interface ThrowingBiConsumer<A, B> extends BiConsumer<A, B> {
 		}
 	}
 
-	void acceptThrowing(A a, B b) throws Throwable;
+	void acceptThrowing(A a, B b) throws Exception;
 
 }

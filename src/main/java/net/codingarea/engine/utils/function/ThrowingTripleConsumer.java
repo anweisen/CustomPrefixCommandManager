@@ -17,6 +17,6 @@ public interface ThrowingTripleConsumer<A, B, C> extends TripleConsumer<A, B, C>
 		}
 	}
 
-	void acceptThrowing(A a, B b, C c);
+	void acceptThrowing(A a, B b, C c) throws Exception;
 
 }

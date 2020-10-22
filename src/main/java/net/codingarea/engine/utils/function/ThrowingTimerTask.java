@@ -19,6 +19,6 @@ public abstract class ThrowingTimerTask extends TimerTask {
 		}
 	}
 
-	public abstract void runThrowing() throws Throwable;
+	public abstract void runThrowing() throws Exception;
 
 }

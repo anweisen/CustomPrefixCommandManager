@@ -8,7 +8,7 @@ import net.codingarea.engine.exceptions.ConsumeException;
  */
 public interface ThrowingRunnable extends Runnable {
 
-	void runThrowing() throws Throwable;
+	void runThrowing() throws Exception;
 
 	default void run() {
 		try {
