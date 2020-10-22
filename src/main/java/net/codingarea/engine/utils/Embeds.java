@@ -18,6 +18,30 @@ public final class Embeds {
 
 	@Nonnull
 	@CheckReturnValue
+	public static EmbedBuilder construct(@Nonnull String author, String suffix, String icon, String url) {
+		return new EmbedBuilder().setAuthor(title(icon, author, suffix), url, icon);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static EmbedBuilder construct(@Nonnull String author, String suffix, String icon) {
+		return construct(author, suffix, icon, null);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static EmbedBuilder construct(@Nonnull String author, String suffix) {
+		return construct(author, suffix, null, null);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static EmbedBuilder construct(@Nonnull String author) {
+		return construct(author, null, null, null);
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	public static EmbedBuilder construct(@Nonnull Guild guild) {
 		return construct(guild, null, null);
 	}
