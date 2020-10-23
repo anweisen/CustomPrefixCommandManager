@@ -21,17 +21,18 @@ public interface Listener extends EventListener {
 		List<Method> methods = Utils.getMethodsAnnotatedWith(this.getClass(), DiscordEvent.class);
 		for (Method currentMethod : methods) {
 
-			if (currentMethod.getParameterTypes().length == 1 &&
-				currentMethod.getParameterTypes()[0].isAssignableFrom(event.getClass())) {
+			if (currentMethod.getParameterTypes().length != 1) continue;
 
-				try {
-					currentMethod.setAccessible(true);
-					currentMethod.invoke(this, event);
-				} catch (Throwable ex) {
-					throw new ListenerException(ex);
-				}
+			Class<?> parameter = currentMethod.getParameterTypes()[0];
+			if (parameter == null || !parameter.isAssignableFrom(event.getClass())) continue;
 
+			try {
+				currentMethod.setAccessible(true);
+				currentMethod.invoke(this, event);
+			} catch (Throwable ex) {
+				throw new ListenerException(ex);
 			}
+
 		}
 
 	}
