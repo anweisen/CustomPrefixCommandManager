@@ -48,11 +48,11 @@ public interface NumberFormatter {
 				hours %= 24;
 				days %= 365;
 
-				return (years > 0 ? years + "y " : "")
-					 + (days > 0 ? days + "d " : "")
-					 + (hours > 0 ? hours + "h " : "")
-					 + (minutes > 0 ? minutes + "m " : "")
-					 + (seconds > 0 || (years == 0 && days == 0 && hours == 0 && minutes == 0) ? seconds + "s" : "");
+				return ((years > 0 ? years + "y " : "")
+					  + (days > 0 ? days + "d " : "")
+					  + (hours > 0 ? hours + "h " : "")
+					  + (minutes > 0 ? minutes + "m " : "")
+					  + (seconds > 0 || (years == 0 && days == 0 && hours == 0 && minutes == 0) ? seconds + "s" : "")).trim();
 
 			},
 
@@ -83,7 +83,7 @@ public interface NumberFormatter {
 			 */
 			BIG_NUMBER = value -> {
 
-				DecimalFormat format = new DecimalFormat("0.##", new DecimalFormatSymbols());
+				DecimalFormat format = new DecimalFormat("0.##");
 				double divide;
 				String ending = "";
 
