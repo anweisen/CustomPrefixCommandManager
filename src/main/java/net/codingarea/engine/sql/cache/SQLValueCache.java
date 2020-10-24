@@ -7,10 +7,10 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -20,7 +20,7 @@ public class SQLValueCache implements Bindable {
 
 	public static final int DEFAULT_CLEAR_RATE = 3 * 60;
 
-	protected final Map<String, String> cache = new HashMap<>();
+	protected final Map<String, String> cache = new ConcurrentHashMap<>();
 	protected boolean cacheValues;
 
 	protected String defaultValue;
@@ -182,11 +182,11 @@ public class SQLValueCache implements Bindable {
 	}
 
 	public synchronized void set(@Nonnull String key, String value) throws SQLException {
+		if (cacheValues) setCached(key, value);
 		if (value == null) {
 			setNull(key);
 			return;
 		}
-		if (cacheValues) setCached(key, value);
 		try {
 			getFromDatabase(key); // Checks if the guild is in the database (throws IllegalStateException if not)
 			data.update("UPDATE " + table + " SET " + valueColumn + " = ? WHERE " + keyColumn + " = ?", value, key);
