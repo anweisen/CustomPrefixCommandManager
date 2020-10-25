@@ -10,7 +10,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
@@ -18,7 +20,7 @@ import java.util.NoSuchElementException;
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
  */
-public class DefaultTeamRankCache extends SQLValueCache implements CommandAccessChecker, Factory<Role, Guild> {
+public class DefaultTeamRankCache extends SQLValueCache implements CommandAccessChecker {
 
 	public DefaultTeamRankCache(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
@@ -37,7 +39,7 @@ public class DefaultTeamRankCache extends SQLValueCache implements CommandAccess
 
 		Role teamRole = null;
 		try {
-			teamRole = get(member.getGuild());
+			teamRole = getRole(member.getGuild());
 		} catch (NoSuchElementException ignored) { }
 
 		if (command.isTeamCommand() && teamRole != null) {
@@ -50,20 +52,16 @@ public class DefaultTeamRankCache extends SQLValueCache implements CommandAccess
 		}
 	}
 
-	public void set(@Nonnull Role role) throws SQLException {
+	public void setRole(@Nonnull Role role) throws SQLException {
 		set(role.getGuild().getId(), role.getId());
 	}
 
-	@Nonnull
-	@Override
-	public Role get(@Nonnull Guild guild) {
-		try {
-			return guild.getRoleById(get(guild.getId()));
-		} catch (Exception ignored) {
-			throw new NoSuchElementException();
-		}
+	public void setRole(@Nonnull Guild guild, @Nullable Role role) throws SQLException {
+		set(guild.getId(), role != null ? role.getId() : null);
 	}
 
+	@Nullable
+	@CheckReturnValue
 	public Role getRole(@Nonnull Guild guild) {
 		try {
 			return guild.getRoleById(get(guild.getId()));
