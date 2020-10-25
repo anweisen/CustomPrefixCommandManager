@@ -2,15 +2,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.anweisen</groupId>
-    <artifactId>CommandManager</artifactId>
-    <version>2.5</version>
+    <artifactId>Engine</artifactId>
+    <version>2.7</version>
+    <packaging>jar</packaging>
+
+    <name>Engine</name>
+    <url>http://github.com/anweisen/JDACommandManager</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://svn.apache.org/viewvc/maven</url>
+    </scm>
 
     <build>
+
         <sourceDirectory>src/main/java</sourceDirectory>
+
         <plugins>
+
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
@@ -19,8 +39,14 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
         </plugins>
+
     </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <repositories>
 
