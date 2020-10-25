@@ -36,7 +36,7 @@ public class DefaultTeamRankCommand extends Command {
 		}
 
 		Role role = event.getMentionedRoles().get(0);
-		rankCache.set(role);
+		rankCache.setRole(role);
 
 		event.queueReply(getMessage(event, "team-rank-set", "You set the team role to `%role%`",
 						 new Replacement("%role%", role.getName())));
