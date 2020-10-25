@@ -3,6 +3,7 @@ package net.codingarea.engine.discord.commandmanager;
 import net.codingarea.engine.exceptions.IllegalSubCommandException;
 import net.codingarea.engine.exceptions.IllegalSubCommandNameException;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 public final class SubCommandInstance {
 
 	private final String[] names;
+	private final String syntax;
 	private final Class<?>[] args;
 	private final Method method;
 	private final SubCommandHandler root;
@@ -55,6 +57,17 @@ public final class SubCommandInstance {
 		this.names = names;
 		this.method = method;
 
+		String syntax = command.syntax();
+		if (syntax.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			for (Class<?> arg : args) {
+				builder.append(" <" + arg.getSimpleName().toLowerCase() + ">");
+			}
+			syntax = builder.toString().trim();
+		}
+
+		this.syntax = syntax;
+
 	}
 
 	public void invoke(@Nonnull CommandEvent event, @Nonnull Object[] args) throws Exception {
@@ -67,22 +80,38 @@ public final class SubCommandInstance {
 
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public Method getMethod() {
 		return method;
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public String[] getNames() {
 		return Arrays.copyOf(names, names.length);
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public String getName() {
 		return names[0];
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	public String getSyntax() {
+		return syntax;
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	public Class<?>[] getArgs() {
 		return Arrays.copyOf(args, args.length);
 	}
 
+	@Nonnull
+	@CheckReturnValue
 	public SubCommandHandler getRoot() {
 		return root;
 	}
