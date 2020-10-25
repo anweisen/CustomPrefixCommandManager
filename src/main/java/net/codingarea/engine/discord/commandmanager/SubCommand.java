@@ -22,4 +22,12 @@ public @interface SubCommand {
 	 */
 	String[] name() default {};
 
+	/**
+	 * The syntax which should be displayed, when wrong arguments are used
+	 * If empty, we will create one our selves
+	 *
+	 * @return The syntax
+	 */
+	String syntax() default "";
+
 }
