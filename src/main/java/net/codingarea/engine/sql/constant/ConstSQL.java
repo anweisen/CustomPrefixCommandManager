@@ -4,7 +4,7 @@ import net.codingarea.engine.sql.LiteSQL;
 import net.codingarea.engine.sql.MySQL;
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.source.DataSource;
-import net.codingarea.engine.utils.ConfigLoader;
+import net.codingarea.engine.utils.*;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -18,9 +18,10 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 
 /**
- * @see SQL
  * @author anweisen | https://github.com/anweisen
  * @since 2.5
+ *
+ * @see SQL
  */
 public final class ConstSQL {
 
@@ -35,14 +36,38 @@ public final class ConstSQL {
 		instance = SQL.anonymous(dataSource);
 	}
 
+	public static void connectWithoutException(@Nonnull DataSource dataSource) {
+		try {
+			connect(dataSource);
+		} catch (SQLException ex) {
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+		}
+	}
+
 	public static void connect(@Nonnull File file) throws IOException, SQLException {
 		closeCurrent();
 		instance = new LiteSQL(file);
 	}
 
-	public static void connect(@Nonnull ConfigLoader config) throws SQLException {
+	public static void connectWithoutException(@Nonnull File file) {
+		try {
+			connect(file);
+		} catch (SQLException | IOException ex) {
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+		}
+	}
+
+	public static void connect(@Nonnull NamedValueConfig config) throws SQLException {
 		closeCurrent();
 		instance = MySQL.defaultOfConfig(config);
+	}
+
+	public static void connectWithoutException(@Nonnull NamedValueConfig config) {
+		try {
+			connect(config);
+		} catch (SQLException ex) {
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+		}
 	}
 
 	public static void connect(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
@@ -50,9 +75,25 @@ public final class ConstSQL {
 		instance = MySQL.createDefault(host, database, user, password);
 	}
 
+	public static void connectWithoutException(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
+		try {
+			connect(host, database, user, password);
+		} catch (SQLException ex) {
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+		}
+	}
+
 	public static void connect(@Nonnull String host, int port, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
 		closeCurrent();
 		instance = MySQL.createDefault(host, port, database, user, password);
+	}
+
+	public static void connectWithoutException(@Nonnull String host, int port, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
+		try {
+			connect(host, port, database, user, password);
+		} catch (SQLException ex) {
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+		}
 	}
 
 	private static void closeCurrent() {
