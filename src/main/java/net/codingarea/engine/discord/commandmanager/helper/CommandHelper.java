@@ -7,9 +7,12 @@ import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.StaticBinder;
 import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.internal.entities.TextChannelImpl;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -26,24 +29,24 @@ public abstract class CommandHelper extends LogHelper {
 		return Utils.parseTime(string);
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static Role findRole(@Nonnull CommandEvent event, String search) {
 		return findRole(event.getGuild(), search);
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static Role findRole(@Nonnull Guild guild, String search) {
 		search = search.trim();
-		if (containsMention(search)) {
-			try {
-				String id = search.substring(3).substring(0, 18);
-				return guild.getRoleById(id);
-			} catch (Exception ignored) { }
-			try {
-				String id = search.substring(2).substring(0, 18);
-				return guild.getRoleById(id);
-			} catch (Exception ignored) { }
-		}
+		try {
+			String id = search.substring(3).substring(0, 18);
+			return guild.getRoleById(id);
+		} catch (Exception ignored) { }
+		try {
+			String id = search.substring(2).substring(0, 18);
+			return guild.getRoleById(id);
+		} catch (Exception ignored) { }
 		try {
 			return guild.getRoleById(search);
 		} catch (Exception ignored) { }
@@ -53,24 +56,24 @@ public abstract class CommandHelper extends LogHelper {
 		return null;
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static TextChannel findTextChannel(@Nonnull CommandEvent event, String search) {
 		return findTextChannel(event.getGuild(), search);
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static TextChannel findTextChannel(@Nonnull Guild guild, String search) {
 		search = search.trim();
-		if (containsMention(search)) {
-			try {
-				String id = search.substring(3).substring(0, 18);
-				return guild.getTextChannelById(id);
-			} catch (Exception ignored) { }
-			try {
-				String id = search.substring(2).substring(0, 18);
-				return guild.getTextChannelById(id);
-			} catch (Exception ignored) { }
-		}
+		try {
+			String id = search.substring(3).substring(0, 18);
+			return guild.getTextChannelById(id);
+		} catch (Exception ignored) { }
+		try {
+			String id = search.substring(2).substring(0, 18);
+			return guild.getTextChannelById(id);
+		} catch (Exception ignored) { }
 		try {
 			return guild.getTextChannelById(search);
 		} catch (Exception ignored) { }
@@ -80,11 +83,13 @@ public abstract class CommandHelper extends LogHelper {
 		return null;
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static VoiceChannel findVoiceChannel(@Nonnull CommandEvent event, String search) {
 		return findVoiceChannel(event.getGuild(), search);
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static VoiceChannel findVoiceChannel(@Nonnull Guild guild, String search) {
 		search = search.trim();
@@ -97,11 +102,13 @@ public abstract class CommandHelper extends LogHelper {
 		return null;
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static Category findCategory(@Nonnull CommandEvent event, String search) {
 		return findCategory(event.getGuild(), search);
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static Category findCategory(@Nonnull Guild guild, String search) {
 		search = search.trim();
@@ -114,24 +121,24 @@ public abstract class CommandHelper extends LogHelper {
 		return null;
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static Member findMember(@Nonnull CommandEvent event, String search) {
 		return findMember(event.getGuild(), search);
 	}
 
+	@Nullable
 	@CheckReturnValue
 	public static Member findMember(@Nonnull Guild guild, String search) {
 		search = search.trim();
-		if (containsMention(search)) {
-			try {
-				String id = search.substring(3).substring(0, 18);
-				return guild.getMemberById(id);
-			} catch (Exception ignored) { }
-			try {
-				String id = search.substring(2).substring(0, 18);
-				return guild.getMemberById(id);
-			} catch (Exception ignored) { }
-		}
+		try {
+			String id = search.substring(3).substring(0, 18);
+			return guild.getMemberById(id);
+		} catch (Exception ignored) { }
+		try {
+			String id = search.substring(2).substring(0, 18);
+			return guild.getMemberById(id);
+		} catch (Exception ignored) { }
 		try {
 			return guild.getMemberById(search);
 		} catch (Exception ignored) { }
@@ -143,6 +150,15 @@ public abstract class CommandHelper extends LogHelper {
 		} catch (Exception ignored) { }
 		try {
 			return guild.getMembersByEffectiveName(search, true).get(0);
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@Nullable
+	@CheckReturnValue
+	public static Message findMessage(@Nonnull MessageChannel channel, @Nonnull String search) {
+		try {
+			return channel.retrieveMessageById(search).complete();
 		} catch (Exception ignored) { }
 		return null;
 	}
@@ -223,8 +239,9 @@ public abstract class CommandHelper extends LogHelper {
 
 	/**
 	 * @return returns if the given text mentions a {@link Member}
-	 * @see IMentionable
 	 * @since 1.2
+	 *
+	 * @see IMentionable
 	 */
 	@CheckReturnValue
 	public static boolean containsMention(@Nonnull String text) {
