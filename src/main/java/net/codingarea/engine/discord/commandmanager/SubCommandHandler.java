@@ -1,7 +1,6 @@
 package net.codingarea.engine.discord.commandmanager;
 
-import net.codingarea.engine.exceptions.SubCommandNameAlreadyTakenException;
-import net.codingarea.engine.utils.NumberConversions;
+import net.codingarea.engine.exceptions.SimilarCommandRegisteredException;
 import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.Permission;
@@ -103,14 +102,16 @@ public abstract class SubCommandHandler extends Command {
 	}
 
 	private void registerSubCommand(@Nonnull Method method) {
+
 		SubCommandInstance command = new SubCommandInstance(method, this);
 
-		// Make sure there is no subcommand with a name this command has too
+		// Make sure no command with the same args length has the same name
 		for (SubCommandInstance registered : commands) {
+			if (registered.getArgs().length != command.getArgs().length) continue;
 			for (String name : registered.getNames()) {
 				for (String name2 : command.getNames()) {
 					if (name.equalsIgnoreCase(name2))
-						throw new SubCommandNameAlreadyTakenException(name);
+						throw new SimilarCommandRegisteredException(name, command.getArgs().length);
 				}
 			}
 		}
@@ -118,9 +119,10 @@ public abstract class SubCommandHandler extends Command {
 		commands.add(command);
 	}
 
-	protected final SubCommandInstance findCommand(@Nonnull String name) {
+	protected final SubCommandInstance findCommand(@Nonnull String name, int args, boolean ignoreArgs) {
 
 		for (SubCommandInstance command : commands) {
+			if (!ignoreArgs && command.getArgs().length != args) continue;
 			for (String alias : command.getNames()) {
 				if (alias.equalsIgnoreCase(name))
 					return command;
@@ -139,16 +141,19 @@ public abstract class SubCommandHandler extends Command {
 			return;
 		}
 
-		String commandName = event.getArg(0);
-		SubCommandInstance command = findCommand(commandName);
+		event.sendTyping();
 
-		if (command == null) {
+		String commandName = event.getArg(0);
+		SubCommandInstance name = findCommand(commandName, 0, true);
+
+		if (name == null) {
 			onSubCommandNotFound(event, commandName);
 			return;
 		}
 
-		if (event.getArgsLength() <= command.getArgs().length) {
-			onInvalidSubCommandArguments(event, command);
+		SubCommandInstance command = findCommand(commandName, event.getArgsLength() - 1, false);
+		if (command == null) {
+			onInvalidSubCommandArguments(event, name);
 			return;
 		}
 
@@ -180,11 +185,7 @@ public abstract class SubCommandHandler extends Command {
 	}
 
 	protected void onInvalidSubCommandArguments(@Nonnull CommandEvent event, @Nonnull SubCommandInstance command) throws Exception {
-		StringBuilder builder = new StringBuilder();
-		for (Class<?> arg : command.getArgs()) {
-			builder.append(" <" + arg.getSimpleName().toLowerCase() + ">");
-		}
-		event.queueReply(syntax(event, command.getName() + builder));
+		event.queueReply(syntax(event, command.getName() + " " + command.getSyntax()));
 	}
 
 	protected void onInvalidSubCommandArgument(@Nonnull CommandEvent event, @Nonnull SubCommandInstance command,
@@ -231,6 +232,8 @@ public abstract class SubCommandHandler extends Command {
 			return findCategory(event, input);
 		} else if (argument == Role.class) {
 			return findRole(event, input);
+		} else if (argument == Message.class) {
+			return findMessage(event.getChannel(), input);
 		} else {
 			return null;
 		}
