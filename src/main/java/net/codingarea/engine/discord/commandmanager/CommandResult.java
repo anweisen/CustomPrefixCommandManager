@@ -1,6 +1,8 @@
 package net.codingarea.engine.discord.commandmanager;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
@@ -97,6 +99,11 @@ public enum CommandResult {
 	 * @see ICommand#executeOnUpdate()
 	 */
 	MESSAGE_EDIT_NO_REACT,
+
+	/**
+	 * Used when the {@link MessageType} of the {@link Message}, which triggered the command, is not {@link MessageType#DEFAULT}
+	 */
+	INVALID_MESSAGE_TYPE,
 
 	/**
 	 * Used when no command was found by the name used
