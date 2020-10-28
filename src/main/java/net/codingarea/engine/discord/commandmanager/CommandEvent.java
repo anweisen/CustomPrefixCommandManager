@@ -176,6 +176,7 @@ public interface CommandEvent {
 	 *
 	 * @see #getChannel()
 	 */
+	@Nonnull
 	@CheckReturnValue
 	TextChannel getTextChannel();
 
@@ -187,6 +188,7 @@ public interface CommandEvent {
 	 *
 	 * @see #getChannel()
 	 */
+	@Nonnull
 	@CheckReturnValue
 	PrivateChannel getPrivateChannel();
 
@@ -252,6 +254,10 @@ public interface CommandEvent {
 
 	default void queueReply(@Nonnull CharSequence message, @Nonnull ThrowingConsumer<Message> sent) {
 		reply(message).queue(sent, MessageException::create);
+	}
+
+	default void queueSyntax(@Nonnull final String syntax) {
+		queueReply(CommandHelper.syntax(this, syntax));
 	}
 
 	@Nonnull
