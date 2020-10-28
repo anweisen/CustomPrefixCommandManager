@@ -41,6 +41,11 @@ public final class SubCommandInstance {
 		this.args = new Class[args.length - 1];
 		System.arraycopy(args, 1, this.args, 0, args.length - 1);
 
+		for (Class<?> arg : this.args) {
+			if (arg.isArray())
+				throw new IllegalSubCommandException("Cannot have any arrays as arguments", method);
+		}
+
 		SubCommand command = method.getAnnotation(SubCommand.class);
 		String[] names = command.name();
 
