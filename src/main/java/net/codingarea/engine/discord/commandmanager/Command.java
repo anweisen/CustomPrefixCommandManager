@@ -146,7 +146,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 
 	@Nullable
 	@Override
-	public Permission getPermissionNeeded() {
+	public final Permission getPermissionNeeded() {
 		return permission;
 	}
 
