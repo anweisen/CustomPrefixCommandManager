@@ -163,6 +163,36 @@ public abstract class CommandHelper extends LogHelper {
 		return null;
 	}
 
+	@Nullable
+	@CheckReturnValue
+	public static GuildChannel findGuildChannel(@Nonnull Guild guild, String search) {
+		search = search.trim();
+		try {
+			String id = search.substring(3).substring(0, 18);
+			return guild.getGuildChannelById(id);
+		} catch (Exception ignored) { }
+		try {
+			String id = search.substring(2).substring(0, 18);
+			return guild.getGuildChannelById(id);
+		} catch (Exception ignored) { }
+		try {
+			return guild.getGuildChannelById(search);
+		} catch (Exception ignored) { }
+		try {
+			for (GuildChannel channel : guild.getChannels()) {
+				if (channel.getName().equalsIgnoreCase(search))
+					return channel;
+			}
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	@Nullable
+	@CheckReturnValue
+	public static GuildChannel findGuildChannel(@Nonnull CommandEvent event, String search) {
+		return findGuildChannel(event.getGuild(), search);
+	}
+
 	@Nonnull
 	@CheckReturnValue
 	public static String fancyEnumName(@Nonnull Enum<?> enun) {
