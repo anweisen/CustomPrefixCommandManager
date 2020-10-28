@@ -119,11 +119,13 @@ public abstract class GenericCommandEvent implements CommandEvent {
 		return event.getChannel();
 	}
 
+	@Nonnull
 	@Override
 	public TextChannel getTextChannel() {
 		return event.getTextChannel();
 	}
 
+	@Nonnull
 	@Override
 	public PrivateChannel getPrivateChannel() {
 		return event.getPrivateChannel();
