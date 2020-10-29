@@ -1,6 +1,7 @@
 package net.codingarea.engine.utils;
 
 import net.codingarea.engine.exceptions.MessageException;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -21,10 +22,10 @@ public final class FileUtils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static File createTempFile(@Nonnull MessageChannel channel, @Nonnull String format) throws IOException {
+	public static File createTempFile(@Nonnull ISnowflake snowflake, @Nonnull String format) throws IOException {
 		File folder = new File("./temp");
 		if (!folder.exists()) folder.mkdir();
-		File file = new File(folder, System.currentTimeMillis() + "-" + channel.getId() + "." + format);
+		File file = new File(folder, System.currentTimeMillis() + "-" + snowflake.getId() + "." + format);
 		file.createNewFile();
 		return file;
 	}
