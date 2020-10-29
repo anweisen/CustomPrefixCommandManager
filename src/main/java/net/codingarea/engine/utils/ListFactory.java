@@ -24,6 +24,7 @@ public final class ListFactory {
 		for (String arg : string.split(REGEX)) {
 			try {
 				T t = factory.get(arg);
+				if (t == null) throw new NullPointerException();
 				list.add(t);
 			} catch (Exception ex) {
 				LogHelper.log(LogLevel.WARNING, ListFactory.class, "Cannot generate value: " + ex.getMessage());
