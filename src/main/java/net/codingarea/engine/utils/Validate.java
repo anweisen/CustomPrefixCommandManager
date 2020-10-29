@@ -17,6 +17,7 @@
 
 package net.codingarea.engine.utils;
 
+import net.codingarea.engine.exceptions.IllegalTypeException;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
@@ -502,6 +503,20 @@ public final class Validate {
                     + clazz.getName() + " at index: " + i);
             }
         }
+    }
+
+    public static void objectClassEquals(final Object object, final Class<?> type) {
+        Validate.notNull(object);
+        Validate.notNull(type);
+        if (object.getClass() != type)
+            throw new IllegalTypeException("Expected " + type.getName() + ", got " + object.getClass().getName());
+    }
+
+    public static void classEquals(final Class<?> expected, final Class<?> clazz) {
+        Validate.notNull(expected);
+        Validate.notNull(clazz);
+        if (clazz != expected)
+            throw new IllegalTypeException("Expected " + expected.getName() + ", got " + clazz.getName());
     }
 
 }
