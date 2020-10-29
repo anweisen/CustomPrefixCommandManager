@@ -1,6 +1,7 @@
 package net.codingarea.engine.sql.cache;
 
 import net.codingarea.engine.sql.SQL;
+import net.codingarea.engine.sql.helper.SQLHelper;
 import net.codingarea.engine.utils.Bindable;
 
 import javax.annotation.CheckReturnValue;
@@ -87,7 +88,9 @@ public class SQLValueCache implements Bindable {
 	}
 
 	/**
-	 * @throws IllegalStateException If not {@link #shouldCacheValues()}
+	 * @throws IllegalStateException
+	 *         If not {@link #shouldCacheValues()}
+	 *
 	 * @see #set(String, String)
 	 */
 	public synchronized void setCached(@Nonnull String key, String value) {
@@ -100,8 +103,10 @@ public class SQLValueCache implements Bindable {
 	}
 
 	/**
-	 * @param key The key the value is assigned to. <code>null</code> when there is no value
-	 * @throws IllegalStateException If not {@link #shouldCacheValues()}
+	 * @param key The key the value is assigned to. {@code null} when there is no value
+	 *
+	 * @throws IllegalStateException
+	 *         If not {@link #shouldCacheValues()}
 	 */
 	public String getCached(@Nonnull String key) {
 		if (!cacheValues) throw new IllegalStateException("Cannot read cached values if disabled");
@@ -109,8 +114,10 @@ public class SQLValueCache implements Bindable {
 	}
 
 	/**
-	 * @throws SQLException If a database error occurs
-	 * @throws IllegalStateException If the database does not contain the given key
+	 * @throws SQLException
+	 *         If a database error occurs
+	 * @throws IllegalStateException
+	 *         If the database does not contain the given key
 	 */
 	public String getFromDatabase(String key) throws SQLException {
 		ResultSet result = data.query("SELECT " + valueColumn + " FROM " + table + " WHERE " + keyColumn + " = ?", key);
@@ -123,6 +130,7 @@ public class SQLValueCache implements Bindable {
 	/**
 	 * Reads the prefix from the database by the given. If no prefix was found it will return the {@link #getDefaultValue()}
 	 * If {@link #shouldCacheValues()}, it'll cache the value as well (using {@link #setCached(String, String)})
+	 *
 	 * @return The loaded value
 	 */
 	@Nonnull
@@ -166,10 +174,12 @@ public class SQLValueCache implements Bindable {
 
 	/**
 	 * Loads the value using {@link #load(String)}, by the given key
-	 * If the guild is <code>null</code>, it will return the {@link #getDefaultValue()}
-	 * @see #getValue(String)
+	 * If the guild is {@code null}, it will return the {@link #getDefaultValue()}
+	 *
 	 * @param key The key to which the searched value should be stored to. If <code>null</code>, it will return {@link #getDefaultValue()}
 	 * @return Returns the prefix loaded
+	 *
+	 * @see #getValue(String)
 	 */
 	@Nonnull
 	@CheckReturnValue
@@ -183,16 +193,7 @@ public class SQLValueCache implements Bindable {
 
 	public synchronized void set(@Nonnull String key, String value) throws SQLException {
 		if (cacheValues) setCached(key, value);
-		if (value == null) {
-			setNull(key);
-			return;
-		}
-		try {
-			getFromDatabase(key); // Checks if the guild is in the database (throws IllegalStateException if not)
-			data.update("UPDATE " + table + " SET " + valueColumn + " = ? WHERE " + keyColumn + " = ?", value, key);
-		} catch (IllegalStateException ignored) {
-			data.update("INSERT INTO " + table + " (" + keyColumn + ", " + valueColumn + ") VALUES (?, ?)", key, value);
-		}
+		SQLHelper.update(data, table, valueColumn, value, keyColumn, key);
 	}
 
 	public synchronized void setNull(@Nonnull String key) throws SQLException {
@@ -206,6 +207,7 @@ public class SQLValueCache implements Bindable {
 
 	/**
 	 * Sets if values are saved in the ram when they were loaded from the database once
+	 *
 	 * @see #shouldCacheValues()
 	 */
 	public synchronized void setCacheValues(boolean cacheValues) {
