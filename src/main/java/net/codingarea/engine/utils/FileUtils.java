@@ -10,6 +10,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -22,10 +23,10 @@ public final class FileUtils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static File createTempFile(@Nonnull ISnowflake snowflake, @Nonnull String format) throws IOException {
+	public static File createTempFile(@Nonnull String format) throws IOException {
 		File folder = new File("./temp");
 		if (!folder.exists()) folder.mkdir();
-		File file = new File(folder, System.currentTimeMillis() + "-" + snowflake.getId() + "." + format);
+		File file = new File(folder, UUID.randomUUID().toString() + "." + format);
 		file.createNewFile();
 		return file;
 	}
