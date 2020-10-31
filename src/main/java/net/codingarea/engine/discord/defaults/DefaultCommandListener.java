@@ -25,7 +25,7 @@ public class DefaultCommandListener implements Listener {
 	}
 
 	/**
-	 * @param prefix The {@link Guild} param is null when the message is not from a guild
+	 * @param prefix The {@link Guild} param is {@code null} when the message is not from a guild
 	 */
 	public DefaultCommandListener(@Nonnull CommandHandler commandHandler, @Nonnull Factory<String, Guild> prefix) {
 		this.commandHandler = commandHandler;
@@ -34,8 +34,8 @@ public class DefaultCommandListener implements Listener {
 
 	/**
 	 * @param prefix {@link Factory#get(Object)} is used to get the prefix which should be used
-	 *               The {@link Guild} param is null when the message is not from a guild
-	 * @return <code>this</code> for chaining
+	 *               The {@link Guild} param is {@code null} when the message is not from a guild
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public DefaultCommandListener setPrefix(@Nonnull Factory<String, Guild> prefix) {
