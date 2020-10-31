@@ -101,7 +101,7 @@ public abstract class SubCommandHandler extends Command {
 		Utils.getMethodsAnnotatedWith(this.getClass(), SubCommand.class).forEach(this::registerSubCommand);
 	}
 
-	private void registerSubCommand(@Nonnull Method method) {
+	private void registerSubCommand(final @Nonnull Method method) {
 
 		SubCommandInstance command = new SubCommandInstance(method, this);
 
@@ -119,7 +119,7 @@ public abstract class SubCommandHandler extends Command {
 		commands.add(command);
 	}
 
-	protected final SubCommandInstance findCommand(@Nonnull String name, int args, boolean ignoreArgs) {
+	protected final SubCommandInstance findCommand(final @Nonnull String name, final int args, final boolean ignoreArgs) {
 
 		for (SubCommandInstance command : commands) {
 			if (!ignoreArgs && command.getArgs().length != args) continue;
@@ -134,7 +134,7 @@ public abstract class SubCommandHandler extends Command {
 	}
 
 	@Override
-	public final void onCommand(@Nonnull CommandEvent event) throws Exception {
+	public final void onCommand(final @Nonnull CommandEvent event) throws Exception {
 
 		if (event.getArgsLength() == 0) {
 			onNoCommandGiven(event);
@@ -175,21 +175,21 @@ public abstract class SubCommandHandler extends Command {
 
 	}
 
-	protected void onNoCommandGiven(@Nonnull CommandEvent event) throws Exception {
+	protected void onNoCommandGiven(final @Nonnull CommandEvent event) throws Exception {
 		sendSyntax(event, "<subcommand>");
 	}
 
-	protected void onSubCommandNotFound(@Nonnull CommandEvent event, @Nonnull String subCommand) throws Exception {
+	protected void onSubCommandNotFound(final @Nonnull CommandEvent event, final @Nonnull String subCommand) throws Exception {
 		event.queueReply(getMessage(event, "sub-command-not-found", "The SubCommand `%subcommand%` is invalid.",
 						 new Replacement("%subcommand%", subCommand)));
 	}
 
-	protected void onInvalidSubCommandArguments(@Nonnull CommandEvent event, @Nonnull SubCommandInstance command) throws Exception {
+	protected void onInvalidSubCommandArguments(final @Nonnull CommandEvent event, final @Nonnull SubCommandInstance command) throws Exception {
 		event.queueReply(syntax(event, command.getName() + " " + command.getSyntax()));
 	}
 
-	protected void onInvalidSubCommandArgument(@Nonnull CommandEvent event, @Nonnull SubCommandInstance command,
-	                                           @Nonnull Class<?> expected, @Nonnull String given, int argumentIndex) throws Exception {
+	protected void onInvalidSubCommandArgument(final @Nonnull CommandEvent event, final @Nonnull SubCommandInstance command,
+	                                           final @Nonnull Class<?> expected, final @Nonnull String given, final int argumentIndex) throws Exception {
 		event.queueReply(getMessage(event, "invalid-sub-command-argument",
 									"Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
 									new Replacement("%index%", argumentIndex),
@@ -198,7 +198,7 @@ public abstract class SubCommandHandler extends Command {
 	}
 
 	@CheckReturnValue
-	protected Object parseArgument(@Nonnull Class<?> argument, @Nonnull String input, @Nonnull CommandEvent event) throws Exception {
+	protected Object parseArgument(final @Nonnull Class<?> argument, final @Nonnull String input, final @Nonnull CommandEvent event) throws Exception {
 		if (argument == Object.class || argument == String.class || argument == CharSequence.class) {
 			return input;
 		} else if (argument == char[].class) {
@@ -228,6 +228,8 @@ public abstract class SubCommandHandler extends Command {
 			return findTextChannel(event, input);
 		} else if (argument == VoiceChannel.class) {
 			return findVoiceChannel(event, input);
+		} else if (argument == GuildChannel.class) {
+			return findGuildChannel(event, input);
 		} else if (argument == Category.class) {
 			return findCategory(event, input);
 		} else if (argument == Role.class) {
