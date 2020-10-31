@@ -197,6 +197,7 @@ public abstract class SQL implements Bindable {
 		return statement;
 	}
 
+	@Nonnull
 	public CachedRowSet query(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql, params);
 		ResultSet resultSet = statement.executeQuery();
