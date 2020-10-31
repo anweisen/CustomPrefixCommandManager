@@ -1,5 +1,6 @@
 package net.codingarea.engine.utils;
 
+import net.dv8tion.jda.annotations.DeprecatedSince;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -33,8 +34,13 @@ public class GateWayHelper {
 	 *
 	 * @throws NullPointerException
 	 *         If the {@link Message Message} is {@code null}
+	 *
+	 * @deprecated Replaced with {@link Message#crosspost()}
+	 * @see Message#crosspost()
 	 */
 	@Nonnull
+	@Deprecated
+	@DeprecatedSince("JDA 4.2.0_214")
 	@CheckReturnValue
 	public static RestAction<Void> publishMessage(@Nonnull Message message) {
 		CompiledRoute route = Route.post("channels/{channel.id}/messages/{message.id}/crosspost").compile(message.getChannel().getId(), message.getId());
