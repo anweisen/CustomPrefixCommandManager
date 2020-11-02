@@ -1,7 +1,7 @@
-package net.codingarea.engine.discord.commandmanager.events;
+package net.codingarea.engine.discord.commandmanager.impl;
 
-import com.sun.org.apache.bcel.internal.generic.ICONST;
 import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.CommandHandler;
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -17,18 +17,20 @@ import javax.annotation.Nullable;
  * @author anweisen | https://github.com/anweisen
  * @since 2.6
  */
-public abstract class GenericCommandEvent implements CommandEvent {
+public class CommandEventImpl implements CommandEvent {
 
 	@Nonnull
 	@CheckReturnValue
-	public static CommandEvent ofEvent(@Nonnull GenericMessageEvent event, @Nonnull String prefix,
-	                                   @Nonnull String commandName, @Nonnull ICommand command) {
-		if (event instanceof MessageUpdateEvent) {
-			return new UpdatedCommandEvent((MessageUpdateEvent) event, prefix, commandName, command);
-		} else if (event instanceof MessageReceivedEvent) {
-			return new ReceivedCommandEvent((MessageReceivedEvent) event, prefix, commandName, command);
+	public static CommandEvent create(final @Nonnull GenericMessageEvent event, final @Nonnull String prefix, final @Nonnull String commandName,
+	                                  final @Nonnull ICommand command, final @Nonnull CommandHandler handler) {
+		if (event instanceof MessageReceivedEvent) {
+			MessageReceivedEvent receivedEvent = (MessageReceivedEvent) event;
+			return new CommandEventImpl(event, receivedEvent.getMessage(), prefix, commandName, command, handler);
+		} else if (event instanceof MessageUpdateEvent) {
+			MessageUpdateEvent updateEvent = (MessageUpdateEvent) event;
+			return new CommandEventImpl(event, updateEvent.getMessage(), prefix, commandName, command, handler);
 		} else {
-			throw new IllegalArgumentException(event.getClass().getName() + " is not supported!");
+			throw new IllegalArgumentException(event.getClass() + " is not supported yet.");
 		}
 	}
 
@@ -38,21 +40,45 @@ public abstract class GenericCommandEvent implements CommandEvent {
 	protected final String commandName;
 	protected final Message message;
 	protected final ICommand command;
+	protected final CommandHandler handler;
 
-	public GenericCommandEvent(@Nonnull GenericMessageEvent event, @Nonnull Message message, @Nonnull String prefix,
-	                           @Nonnull String commandName, @Nonnull ICommand command) {
+	public CommandEventImpl(final @Nonnull GenericMessageEvent event, final @Nonnull Message message, final @Nonnull String prefix,
+	                        final @Nonnull String commandName, final @Nonnull ICommand command, final @Nonnull CommandHandler handler) {
 		this.event = event;
 		this.prefix = prefix;
 		this.commandName = commandName;
 		this.command = command;
 		this.message = message;
+		this.handler = handler;
 		this.args = CommandEvent.parseArgs(message, prefix, commandName);
+	}
+
+	@Nonnull
+	@Override
+	public MessageReceivedEvent getReceiveEvent() {
+		if (!(event instanceof MessageReceivedEvent))
+			throw new IllegalStateException();
+		return (MessageReceivedEvent) event;
+	}
+
+	@Nonnull
+	@Override
+	public MessageUpdateEvent getUpdateEvent() {
+		if (!(event instanceof MessageUpdateEvent))
+			throw new IllegalStateException();
+		return (MessageUpdateEvent) event;
 	}
 
 	@Nonnull
 	@Override
 	public ICommand getCommand() {
 		return command;
+	}
+
+	@Nonnull
+	@Override
+	public CommandHandler getHandler() {
+		return handler;
 	}
 
 	@Nonnull
