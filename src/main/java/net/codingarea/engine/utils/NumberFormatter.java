@@ -79,6 +79,30 @@ public interface NumberFormatter {
 			},
 
 			/**
+			 * input: millis
+			 * 1 Tag, H:M:S
+			 */
+			GERMAN_TIME = value -> {
+
+				DecimalFormat format = new DecimalFormat("00");
+
+				long millis = (long) value;
+				long seconds = millis / 1000;
+				long minutes = seconds / 60;
+				long hours = minutes / 60;
+				long days = hours / 24;
+				seconds %= 60;
+				minutes %= 60;
+				hours %= 24;
+
+				return (days > 0 ? (days == 1 ? "1 Tag " : days + " Tage ") : "")
+					 + (hours > 0 ? format.format(hours) + ":" : "")
+					 + format.format(minutes) + ":"
+					 + format.format(seconds);
+
+			},
+
+			/**
 			 *  billion, million, thousand, number
 			 */
 			BIG_NUMBER = value -> {
