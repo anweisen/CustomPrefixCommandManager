@@ -1,5 +1,7 @@
 package net.codingarea.engine.utils;
 
+import java.util.Objects;
+
 /**
  * Utils for casting number types to other number types
  *
@@ -104,6 +106,26 @@ public final class NumberConversions {
         } catch (final NumberFormatException | NullPointerException ignored) {
             return 0;
         }
+    }
+
+    public static boolean toBoolean(final Object object) {
+
+        if (object instanceof Boolean) {
+            return (Boolean) object;
+        }
+        if (object instanceof Number) {
+            return ((Number) object).byteValue() == 1;
+        }
+        if (object instanceof String) {
+            return Boolean.getBoolean((String) object);
+        }
+
+        return false;
+
+    }
+
+    public static int booleanToInt(boolean bool) {
+        return bool ? 1 : 0;
     }
 
 }
