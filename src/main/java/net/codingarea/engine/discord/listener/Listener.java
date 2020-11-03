@@ -1,5 +1,6 @@
 package net.codingarea.engine.discord.listener;
 
+import net.codingarea.engine.exceptions.InvalidListenerException;
 import net.codingarea.engine.exceptions.ListenerException;
 import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -21,10 +22,14 @@ public interface Listener extends EventListener {
 		List<Method> methods = Utils.getMethodsAnnotatedWith(this.getClass(), DiscordEvent.class);
 		for (Method currentMethod : methods) {
 
-			if (currentMethod.getParameterTypes().length != 1) continue;
+			if (currentMethod.getParameterTypes().length != 1)
+				throw new InvalidListenerException(currentMethod);
 
 			Class<?> parameter = currentMethod.getParameterTypes()[0];
-			if (parameter == null || !parameter.isAssignableFrom(event.getClass())) continue;
+			if (parameter == null)
+				throw new InvalidListenerException(currentMethod);
+
+			if (!parameter.isAssignableFrom(event.getClass())) continue;
 
 			try {
 				currentMethod.setAccessible(true);

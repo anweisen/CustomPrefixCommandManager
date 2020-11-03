@@ -16,17 +16,16 @@ import javax.annotation.Nullable;
  */
 public interface ResultHandler {
 
-	void handle(@Nonnull GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user, @Nullable Member member, @Nonnull CommandResult result, Object arg);
+	void handle(@Nonnull GenericMessageEvent event, @Nonnull MessageChannel channel, @Nonnull User user,
+	            @Nullable Member member, @Nonnull CommandResult result, @Nullable Object arg);
 
-	default void handle(@Nonnull GenericMessageEvent event, @Nonnull CommandResult result, Object arg) {
+	default void handle(final @Nonnull GenericMessageEvent event, final @Nonnull CommandResult result, final @Nullable Object arg) {
 		if (event instanceof MessageReceivedEvent) {
 			MessageReceivedEvent receivedEvent = (MessageReceivedEvent) event;
 			handle(event, event.getChannel(), receivedEvent.getAuthor(), receivedEvent.getMember(), result, arg);
 		} else if (event instanceof MessageUpdateEvent) {
 			MessageUpdateEvent updatedEvent = (MessageUpdateEvent) event;
 			handle(event, event.getChannel(), updatedEvent.getAuthor(), updatedEvent.getMember(), result, arg);
-		} else {
-			throw new IllegalArgumentException(event.getClass().getName() + " is not supported!");
 		}
 	}
 

@@ -1,6 +1,7 @@
 package net.codingarea.engine.utils;
 
 import net.dv8tion.jda.annotations.DeprecatedSince;
+import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -17,6 +18,12 @@ import javax.annotation.Nonnull;
  * @since 2.7
  */
 public class GateWayHelper {
+
+	@Nonnull
+	@CheckReturnValue
+	public static String defaultAvatar() {
+		return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
+	}
 
 	/**
 	 * The following {@link ErrorResponse ErrorResponses} are possible:
@@ -40,8 +47,9 @@ public class GateWayHelper {
 	 */
 	@Nonnull
 	@Deprecated
-	@DeprecatedSince("JDA 4.2.0_214")
 	@CheckReturnValue
+	@DeprecatedSince("JDA 4.2.0_214")
+	@ReplaceWith("Message#crosspost()")
 	public static RestAction<Void> publishMessage(@Nonnull Message message) {
 		CompiledRoute route = Route.post("channels/{channel.id}/messages/{message.id}/crosspost").compile(message.getChannel().getId(), message.getId());
 		return new RestActionImpl<>(message.getJDA(), route);

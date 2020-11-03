@@ -18,7 +18,10 @@ public interface DataSource {
 
 	/**
 	 * @return Creates a connection to the SQL server using the url ({@link #getURL()}) (Default: using {@link DriverManager#getConnection(String)})
-	 * @throws SQLException If a {@link SQLException} happens while creating the connection
+	 *
+	 * @throws SQLException
+	 *         If a {@link SQLException} happens while creating the connection
+	 *
 	 * @see DriverManager#getConnection(String)
 	 */
 	@Nonnull
@@ -29,6 +32,7 @@ public interface DataSource {
 
 	/**
 	 * @return The URL which is used to connect to a database
+	 *
 	 * @see #createConnection()
 	 */
 	@Nonnull

@@ -16,7 +16,7 @@ public class DefaultPrefixCache extends SQLValueCache implements Factory<String,
 
 	@CheckReturnValue
 	public DefaultPrefixCache(@Nonnull SQL data, @Nonnull String defaultPrefix) {
-		super(data, "server", "guildID", "prefix", defaultPrefix);
+		super(data, "guilds", "guildID", "prefix", defaultPrefix);
 	}
 
 	@CheckReturnValue

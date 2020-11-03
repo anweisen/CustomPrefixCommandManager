@@ -24,6 +24,12 @@ public interface ICommand {
 
 	@Nullable
 	@CheckReturnValue
+	default String getDescription() {
+		return null;
+	}
+
+	@Nullable
+	@CheckReturnValue
 	Permission getPermissionNeeded();
 
 	@Nonnull

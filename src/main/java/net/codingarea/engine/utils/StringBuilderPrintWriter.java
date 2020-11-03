@@ -25,4 +25,5 @@ public class StringBuilderPrintWriter extends PrintWriter {
 	public String toString() {
 		return getBuilder().toString();
 	}
+
 }

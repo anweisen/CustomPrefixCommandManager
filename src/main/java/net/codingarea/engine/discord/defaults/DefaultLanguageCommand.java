@@ -1,7 +1,6 @@
 package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.discord.commandmanager.CommandEvent;
-import net.codingarea.engine.discord.commandmanager.events.ReceivedCommandEvent;
 import net.codingarea.engine.discord.commandmanager.Command;
 import net.codingarea.engine.exceptions.LanguageNotFoundException;
 import net.codingarea.engine.lang.Language;

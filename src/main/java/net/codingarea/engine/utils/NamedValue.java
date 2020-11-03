@@ -1,6 +1,10 @@
 package net.codingarea.engine.utils;
 
+import org.jetbrains.annotations.Contract;
+
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -35,21 +39,26 @@ public class NamedValue {
 		this.key = key;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public String setValue(String value) {
+	@Contract("null -> null; !null -> !null")
+	public String setValue(final String value) {
 		return this.value = value;
 	}
 
-	public String setValue(Object value) {
+	@Contract("null -> null; !null -> !null")
+	public String setValue(final Object value) {
 		return setValue(value == null ? null : value.toString());
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public String getKey() {
 		return key;
+	}
+
+	@Nullable
+	@CheckReturnValue
+	public String getValue() {
+		return value;
 	}
 
 	@Override

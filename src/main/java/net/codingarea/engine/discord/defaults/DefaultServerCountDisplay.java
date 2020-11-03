@@ -3,7 +3,6 @@ package net.codingarea.engine.discord.defaults;
 import net.codingarea.engine.discord.listener.Listener;
 import net.codingarea.engine.utils.LogHelper;
 import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.annotation.CheckReturnValue;
@@ -45,7 +44,7 @@ public class DefaultServerCountDisplay implements Listener {
 					GuildChannel channel = shardManager.getVoiceChannelById(channelID);
 					channel.getManager().setName(name.replace("%server%", String.valueOf(shardManager.getGuilds().size()))).queue();
 				} catch (Exception ex) {
-					LogHelper.warning("Could not update server count :: " + ex.getMessage());
+					LogHelper.warning("Could not update server count due to an exception: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 				}
 			}
 		}, 5*1000, 10*60*10000 + 60*10000);

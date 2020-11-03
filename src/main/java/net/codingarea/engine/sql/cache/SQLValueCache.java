@@ -33,7 +33,7 @@ public class SQLValueCache implements Bindable {
 
 	/**
 	 * Be careful using this constructor, you won't be able to use the functions of
-	 * this class. This may be helpful if you override every method and throw a {@link UnsupportedOperationException}
+	 * this class.
 	 */
 	protected SQLValueCache() {
 		this.data = null;

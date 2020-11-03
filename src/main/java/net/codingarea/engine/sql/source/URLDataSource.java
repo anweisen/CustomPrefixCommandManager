@@ -1,6 +1,6 @@
 package net.codingarea.engine.sql.source;
 
-import net.codingarea.engine.utils.NamedValueConfig;
+import net.codingarea.engine.utils.Config;
 
 import javax.annotation.Nonnull;
 import java.sql.Connection;
@@ -17,7 +17,7 @@ import java.util.List;
 public final class URLDataSource implements DataSource {
 
 	@Nonnull
-	public static URLDataSource ofConfig(@Nonnull NamedValueConfig config) {
+	public static URLDataSource ofConfig(final @Nonnull Config config) {
 		int port = config.getInt("port");
 		String host = config.getString("host");
 		String user = config.getString("user");
@@ -34,7 +34,7 @@ public final class URLDataSource implements DataSource {
 	private final String host, database, user, password;
 	private final Integer port;
 
-	public URLDataSource(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
+	public URLDataSource(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) {
 		this.host = host;
 		this.database = database;
 		this.user = user;
@@ -42,7 +42,7 @@ public final class URLDataSource implements DataSource {
 		this.port = null;
 	}
 
-	public URLDataSource(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password, int port) {
+	public URLDataSource(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password, final int port) {
 		this.host = host;
 		this.database = database;
 		this.user = user;
@@ -92,7 +92,7 @@ public final class URLDataSource implements DataSource {
 	}
 
 	@Nonnull
-	public URLDataSource addAttachment(@Nonnull LinkAttachment... attachment) {
+	public URLDataSource addAttachment(final @Nonnull LinkAttachment... attachment) {
 		linkAttachments.addAll(Arrays.asList(attachment));
 		return this;
 	}
@@ -104,7 +104,7 @@ public final class URLDataSource implements DataSource {
 				", host='" + host + '\'' +
 				", database='" + database + '\'' +
 				", user='" + user + '\'' +
-				", password='" + password + '\'' +
+				", password='" + password.hashCode() + '\'' +
 				", port=" + port +
 				'}';
 	}

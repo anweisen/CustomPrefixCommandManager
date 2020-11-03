@@ -1,6 +1,5 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.exceptions.MessageException;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import javax.annotation.CheckReturnValue;
@@ -25,7 +24,7 @@ public final class ImageUtils {
 	private ImageUtils() { }
 
 	public static void post(@Nonnull RenderedImage image, @Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String fileType, boolean delete) throws IOException {
-		File file = FileUtils.createTempFile(channel, fileType);
+		File file = FileUtils.createTempFile(fileType);
 		ImageIO.write(image, fileType, file);
 		FileUtils.send(channel, fileName, fileType, file, delete);
 	}
@@ -83,11 +82,12 @@ public final class ImageUtils {
 	/**
 	 * Reads a image from url using {@link ImageIO#read(InputStream)} and returns it
 	 * @param request The URL the image is stored to
-	 * @throws IOException When something goes wrong while connecting or reading the image
+	 *
+	 * @throws IOException
+	 *         When something goes wrong while connecting or reading the image
 	 */
 	public static BufferedImage getImage(@Nonnull String request) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(request).openConnection();
-		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+		HttpURLConnection connection = IOUtils.createConnection(request);
 		return ImageIO.read(connection.getInputStream());
 	}
 
