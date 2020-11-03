@@ -1,10 +1,8 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.utils.NamedValue;
-import net.codingarea.engine.utils.NumberConversions;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,14 +12,17 @@ import java.util.Properties;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public abstract class NamedValueConfig implements Iterable<NamedValue> {
+public abstract class NamedValueConfig implements Config {
 
 	protected final ArrayList<NamedValue> values = new ArrayList<>();
 
 	/**
-	 * @return returns null when no value was found by the name
+	 * @return returns {@code null} when no value was found by the name
 	 */
-	public NamedValue get(@Nonnull String key) {
+	@Nullable
+	@Override
+	@CheckReturnValue
+	public NamedValue get(final @Nonnull String key) {
 		for (NamedValue value : values) {
 			if (value.getKey().equals(key)) {
 				return value;
@@ -32,8 +33,8 @@ public abstract class NamedValueConfig implements Iterable<NamedValue> {
 
 	/**
 	 * Gets a {@link NamedValue} using {@link #get(String)}.
-	 * If this is not null, the given value will be set to it ({@link NamedValue#setValue(String)}) and return it.
-	 * If it was null, well create a new {@link NamedValue} and add it to the value list and return it.
+	 * If this is not {@code null}, the given value will be set to it ({@link NamedValue#setValue(String)}) and return it.
+	 * If it was {@code null}, well create a new {@link NamedValue} and add it to the value list and return it.
 	 */
 	@Nonnull
 	protected NamedValue create(@Nonnull String key, Object value) {
@@ -68,47 +69,64 @@ public abstract class NamedValueConfig implements Iterable<NamedValue> {
 		return properties;
 	}
 
+	@Nullable
+	@Override
+	@CheckReturnValue
 	public String getString(@Nonnull String key) {
-		try {
-			return get(key).getValue();
-		} catch (Exception ignored) {
-			return null;
-		}
+		NamedValue value = get(key);
+		return value != null ? value.getValue() : null;
 	}
 
+	@Override
+	@CheckReturnValue
 	public int getInt(@Nonnull String key) {
 		return NumberConversions.toInt(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public float getFloat(@Nonnull String key) {
 		return NumberConversions.toFloat(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public double getDouble(@Nonnull String key) {
 		return NumberConversions.toDouble(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public long getLong(@Nonnull String key) {
 		return NumberConversions.toLong(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public short getShort(@Nonnull String key) {
 		return NumberConversions.toShort(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public byte getByte(@Nonnull String key) {
 		return NumberConversions.toByte(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public boolean getBoolean(@Nonnull String key) {
 		return Boolean.getBoolean(getString(key));
 	}
 
+	@Override
+	@CheckReturnValue
 	public boolean isSet(@Nonnull String key) {
 		return get(key) != null;
 	}
 
 	@Nonnull
+	@Override
 	@CheckReturnValue
 	public List<NamedValue> entries() {
 		return values;
