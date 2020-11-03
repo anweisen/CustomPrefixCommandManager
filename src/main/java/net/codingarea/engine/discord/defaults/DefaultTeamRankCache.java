@@ -4,7 +4,6 @@ import net.codingarea.engine.discord.commandmanager.CommandAccessChecker;
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.cache.SQLValueCache;
-import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,7 +13,6 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.SQLException;
-import java.util.NoSuchElementException;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -37,14 +35,10 @@ public class DefaultTeamRankCache extends SQLValueCache implements CommandAccess
 	@Override
 	public boolean isAllowed(@Nonnull Member member, @Nonnull ICommand command) {
 
-		Role teamRole = null;
-		try {
-			teamRole = getRole(member.getGuild());
-		} catch (NoSuchElementException ignored) { }
-
-		if (command.isTeamCommand() && teamRole != null) {
+		Role teamRole = getRole(member.getGuild());
+		if (command.isTeamCommand()) {
 			return member.hasPermission(command.getPermissionNeeded() == null ? Permission.ADMINISTRATOR : command.getPermissionNeeded())
-				|| member.getRoles().contains(teamRole);
+				|| teamRole != null && member.getRoles().contains(teamRole);
 		} else if (command.getPermissionNeeded() != null) {
 			return member.hasPermission(command.getPermissionNeeded());
 		} else {
