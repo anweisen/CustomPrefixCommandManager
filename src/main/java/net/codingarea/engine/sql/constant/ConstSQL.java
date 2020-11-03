@@ -3,18 +3,20 @@ package net.codingarea.engine.sql.constant;
 import net.codingarea.engine.sql.LiteSQL;
 import net.codingarea.engine.sql.MySQL;
 import net.codingarea.engine.sql.SQL;
+import net.codingarea.engine.sql.helper.PreparedDeletion;
+import net.codingarea.engine.sql.helper.PreparedInsertion;
+import net.codingarea.engine.sql.helper.PreparedQuery;
+import net.codingarea.engine.sql.helper.PreparedUpdate;
 import net.codingarea.engine.sql.source.DataSource;
 import net.codingarea.engine.utils.*;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.sql.rowset.CachedRowSet;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.logging.Logger;
 
 /**
@@ -25,18 +27,18 @@ import java.util.logging.Logger;
  */
 public final class ConstSQL {
 
-	private static SQL instance;
+	private static volatile SQL instance;
 
 	private ConstSQL() {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void connect(@Nonnull DataSource dataSource) throws SQLException {
+	public static void connect(final @Nonnull DataSource dataSource) throws SQLException {
 		closeCurrent();
 		instance = SQL.anonymous(dataSource);
 	}
 
-	public static void connectWithoutException(@Nonnull DataSource dataSource) {
+	public static void connectWithoutException(final @Nonnull DataSource dataSource) {
 		try {
 			connect(dataSource);
 		} catch (SQLException ex) {
@@ -44,12 +46,12 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(@Nonnull File file) throws IOException, SQLException {
+	public static void connect(final @Nonnull File file) throws IOException, SQLException {
 		closeCurrent();
 		instance = new LiteSQL(file);
 	}
 
-	public static void connectWithoutException(@Nonnull File file) {
+	public static void connectWithoutException(final @Nonnull File file) {
 		try {
 			connect(file);
 		} catch (SQLException | IOException ex) {
@@ -57,12 +59,12 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(@Nonnull NamedValueConfig config) throws SQLException {
+	public static void connect(final @Nonnull Config config) throws SQLException {
 		closeCurrent();
 		instance = MySQL.defaultOfConfig(config);
 	}
 
-	public static void connectWithoutException(@Nonnull NamedValueConfig config) {
+	public static void connectWithoutException(final @Nonnull Config config) {
 		try {
 			connect(config);
 		} catch (SQLException ex) {
@@ -70,12 +72,12 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
+	public static void connect(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) throws SQLException {
 		closeCurrent();
 		instance = MySQL.createDefault(host, database, user, password);
 	}
 
-	public static void connectWithoutException(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
+	public static void connectWithoutException(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) {
 		try {
 			connect(host, database, user, password);
 		} catch (SQLException ex) {
@@ -83,12 +85,13 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(@Nonnull String host, int port, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
+	public static void connect(final @Nonnull String host, final int port, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) throws SQLException {
 		closeCurrent();
 		instance = MySQL.createDefault(host, port, database, user, password);
 	}
 
-	public static void connectWithoutException(@Nonnull String host, int port, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
+	public static void connectWithoutException(final @Nonnull String host, final int port, final @Nonnull String database,
+	                                           final @Nonnull String user, final @Nonnull String password) {
 		try {
 			connect(host, port, database, user, password);
 		} catch (SQLException ex) {
@@ -107,7 +110,7 @@ public final class ConstSQL {
 		return instance;
 	}
 
-	public static void setInstance(SQL sql) {
+	public static void setInstance(final @Nullable SQL sql) {
 		closeCurrent();
 		instance = sql;
 	}
@@ -117,6 +120,10 @@ public final class ConstSQL {
 	 * Begin of implementation methods
 	 * ===============================
 	 */
+
+	public void switchDatabase(final @Nonnull String database) throws SQLException {
+		instance.switchDatabase(database);
+	}
 
 	@CheckReturnValue
 	public boolean connectionIsOpened() {
@@ -140,17 +147,50 @@ public final class ConstSQL {
 	}
 
 	@Nonnull
+	@CheckReturnValue
+	public static PreparedQuery query() {
+		return instance.query();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static PreparedUpdate update() {
+		return instance.update();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static PreparedInsertion insert() {
+		return instance.insert();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static PreparedDeletion delete() {
+		return instance.delete();
+	}
+
+	@Nonnull
 	public static Statement createStatement() throws SQLException {
 		return instance.createStatement();
 	}
 
 	@Nonnull
-	public static CachedRowSet executeQuery(@Nonnull String sql) throws SQLException {
+	public static CachedRowSet executeQuery(final @Nonnull String sql) throws SQLException {
 		return instance.executeQuery(sql);
 	}
 
-	public static int executeUpdate(@Nonnull String sql) throws SQLException {
+	@Nonnull
+	public CachedRowSet executeQuery(final @Nonnull PreparedStatement statement) throws SQLException {
+		return instance.executeQuery(statement);
+	}
+
+	public static int executeUpdate(final @Nonnull String sql) throws SQLException {
 		return instance.executeUpdate(sql);
+	}
+
+	public static int executeUpdate(final @Nonnull PreparedStatement statement) throws SQLException {
+		return instance.executeUpdate(statement);
 	}
 
 	@Nonnull
@@ -169,13 +209,18 @@ public final class ConstSQL {
 		return instance.query(sql, params);
 	}
 
-	public static int update(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+	public static int update(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
 		return instance.update(sql, params);
 	}
 
 	@CheckReturnValue
-	public static boolean isSet(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+	public static boolean isSet(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
 		return instance.isSet(sql, params);
+	}
+
+	@CheckReturnValue
+	public static boolean isSet(final @Nonnull ResultSet result) throws SQLException {
+		return instance.isSet(result);
 	}
 
 	@CheckReturnValue
