@@ -1,13 +1,19 @@
 package net.codingarea.engine.sql;
 
-import net.codingarea.engine.utils.DefaultLogger;
 import net.codingarea.engine.sql.constant.ConstSQL;
+import net.codingarea.engine.sql.helper.PreparedDeletion;
+import net.codingarea.engine.sql.helper.PreparedInsertion;
+import net.codingarea.engine.sql.helper.PreparedQuery;
+import net.codingarea.engine.sql.helper.PreparedUpdate;
 import net.codingarea.engine.sql.source.DataSource;
+import net.codingarea.engine.utils.Action;
 import net.codingarea.engine.utils.Bindable;
+import net.codingarea.engine.utils.DefaultLogger;
 import net.codingarea.engine.utils.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
 import java.sql.*;
@@ -27,7 +33,7 @@ public abstract class SQL implements Bindable {
 	@Nonnull
 	@Deprecated
 	@CheckReturnValue
-	public static String removeInjectionPossibility(@Nonnull String string) {
+	public static String removeInjectionPossibility(final @Nonnull String string) {
 		return string.replaceAll("[']", "\\\\'").replaceAll("[`]", "\\\\`");
 	}
 
@@ -39,7 +45,7 @@ public abstract class SQL implements Bindable {
 	 */
 	@Nonnull
 	@CheckReturnValue
-	public static CachedRowSet cache(@Nonnull ResultSet result) throws SQLException {
+	public static CachedRowSet cache(final @Nonnull ResultSet result) throws SQLException {
 		CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
 		cachedRowSet.populate(result);
 		return cachedRowSet;
@@ -49,7 +55,7 @@ public abstract class SQL implements Bindable {
 	/**
 	 * @see PreparedStatement#setObject(int, Object)
 	 */
-	public static void fillParams(@Nonnull PreparedStatement statement, @Nonnull Object... params) throws SQLException {
+	public static void fillParams(final @Nonnull PreparedStatement statement, final @Nonnull Object... params) throws SQLException {
 		for (int i = 0; i < params.length; i++) {
 			statement.setObject(i+1, params[i]);
 		}
@@ -57,13 +63,13 @@ public abstract class SQL implements Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	public static SQL anonymous(@Nonnull DataSource dataSource) throws SQLException {
+	public static SQL anonymous(final @Nonnull DataSource dataSource) throws SQLException {
 		SQL instance = new SQL(dataSource) { };
 		instance.connect();
 		return instance;
 	}
 
-	public static void disconnect(SQL sql) {
+	public static void disconnect(final @Nullable SQL sql) {
 		if (sql != null) {
 			try {
 				sql.disconnect();
@@ -72,14 +78,14 @@ public abstract class SQL implements Bindable {
 	}
 
 	protected final DataSource dataSource;
-	protected Connection connection;
-	protected Logger logger = new DefaultLogger(this);
+	protected volatile Connection connection;
+	protected volatile Logger logger = new DefaultLogger(this);
 
-	public SQL(@Nonnull DataSource dataSource) {
+	public SQL(final @Nonnull DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	public SQL(@Nonnull DataSource dataSource, @Nonnull Logger logger) {
+	public SQL(final @Nonnull DataSource dataSource, final @Nonnull Logger logger) {
 		this.dataSource = dataSource;
 		this.logger = logger;
 	}
@@ -105,7 +111,7 @@ public abstract class SQL implements Bindable {
 			disconnect();
 		}
 		connection = dataSource.createConnection();
-		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database successfully created");
+		Action.ifPresent(logger, l -> l.log(LogLevel.STATUS, "Connection to database successfully created"));
 	}
 
 	/**
@@ -116,14 +122,14 @@ public abstract class SQL implements Bindable {
 	 */
 	public void disconnect() throws SQLException {
 		connection.close();
-		if (logger != null) logger.log(LogLevel.STATUS, "Connection to database closed");
+		Action.ifPresent(logger, l -> l.log(LogLevel.STATUS, "Connection to database closed"));
 	}
 
 	public void disconnectSafely() {
 		try {
 			disconnect();
 		} catch (Throwable ex) {
-			logger.log(LogLevel.WARNING, "Exception while disconnecting", ex);
+			Action.ifPresent(logger, l -> l.log(LogLevel.WARNING, "Exception while disconnecting", ex));
 		}
 	}
 
@@ -140,31 +146,24 @@ public abstract class SQL implements Bindable {
 	}
 
 	@Nonnull
+	@CheckReturnValue
 	public Statement createStatement() throws SQLException {
 		return connection.createStatement();
-	}
-
-	@Nonnull
-	public CachedRowSet executeQuery(@Nonnull String sql) throws SQLException {
-		verifyConnection();
-		Statement statement = createStatement();
-		ResultSet resultSet = statement.executeQuery(sql);
-		CachedRowSet cachedRowSet = cache(resultSet);
-		statement.close();
-		return cachedRowSet;
 	}
 
 	/**
 	 * Executes a update to the database using {@link Statement#executeUpdate(String)}.
 	 * Be aware of SQLInjection.
 	 *
-	 * @see #update(String, Object...)
 	 * @param sql The command which should be executed
+	 *
 	 * @throws SQLException If a {@link SQLException} is thrown while creating a {@link Statement} (using {@link #createStatement()}),
 	 *                      executing the update (using {@link Statement#executeUpdate(String)})
 	 *                      or closing the statement (using {@link Statement#close()})
+	 *
+	 * @see #update(String, Object...)
 	 */
-	public int executeUpdate(@Nonnull String sql) throws SQLException {
+	public int executeUpdate(final @Nonnull String sql) throws SQLException {
 		verifyConnection();
 		Statement statement = createStatement();
 		int result = statement.executeUpdate(sql);
@@ -174,7 +173,7 @@ public abstract class SQL implements Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	public PreparedStatement prepare(@Nonnull String sql) throws SQLException {
+	public PreparedStatement prepare(final @Nonnull String sql) throws SQLException {
 		verifyConnection();
 		return connection.prepareStatement(sql);
 	}
@@ -191,36 +190,83 @@ public abstract class SQL implements Bindable {
 	 */
 	@Nonnull
 	@CheckReturnValue
-	public PreparedStatement prepare(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+	public PreparedStatement prepare(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql);
 		fillParams(statement, params);
 		return statement;
 	}
 
 	@Nonnull
-	public CachedRowSet query(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+	@CheckReturnValue
+	public PreparedQuery query() {
+		return new PreparedQuery(this);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public PreparedUpdate update() {
+		return new PreparedUpdate(this);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public PreparedInsertion insert() {
+		return new PreparedInsertion(this);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public PreparedDeletion delete() {
+		return new PreparedDeletion(this);
+	}
+
+	@Nonnull
+	public CachedRowSet query(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql, params);
+		return executeQuery(statement);
+	}
+
+	@Nonnull
+	public CachedRowSet executeQuery(final @Nonnull String sql) throws SQLException {
+		verifyConnection();
+		Statement statement = createStatement();
+		ResultSet resultSet = statement.executeQuery(sql);
+		CachedRowSet cachedRowSet = cache(resultSet);
+		statement.close();
+		return cachedRowSet;
+	}
+
+	@Nonnull
+	public CachedRowSet executeQuery(final @Nonnull PreparedStatement statement) throws SQLException {
 		ResultSet resultSet = statement.executeQuery();
 		CachedRowSet cachedRowSet = cache(resultSet);
 		statement.close();
 		return cachedRowSet;
 	}
 
-	public int update(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+	public int update(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
 		PreparedStatement statement = prepare(sql, params);
+		return executeUpdate(statement);
+	}
+
+	public int executeUpdate(final @Nonnull PreparedStatement statement) throws SQLException {
 		int result = statement.executeUpdate();
 		statement.close();
 		return result;
 	}
 
-	public boolean isSet(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+	public boolean isSet(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
 		ResultSet result = query(sql, params);
+		return isSet(result);
+	}
+
+	public boolean isSet(final @Nonnull ResultSet result) throws SQLException {
 		boolean set = result.next();
 		result.close();
 		return set;
 	}
 
-	public boolean paramIsSet(@Nonnull String sql, @Nonnull String param, @Nonnull Object... params) throws SQLException {
+	public boolean paramIsSet(final @Nonnull String sql, final @Nonnull String param, final @Nonnull Object... params) throws SQLException {
 		ResultSet result = query(sql, params);
 		boolean set = false;
 		if (result.next()) {
@@ -228,6 +274,11 @@ public abstract class SQL implements Bindable {
 		}
 		result.close();
 		return set;
+	}
+
+	public void switchDatabase(final @Nonnull String database) throws SQLException {
+		executeUpdate("use " + database);
+		Action.ifPresent(logger, l -> l.log(LogLevel.INFO, "Switched database to \"" + database + "\""));
 	}
 
 	@Nonnull
@@ -242,11 +293,12 @@ public abstract class SQL implements Bindable {
 		return dataSource;
 	}
 
+	@Nullable
 	public Logger getLogger() {
 		return logger;
 	}
 
-	public void setLogger(Logger logger) {
+	public void setLogger(final @Nullable Logger logger) {
 		this.logger = logger;
 	}
 
