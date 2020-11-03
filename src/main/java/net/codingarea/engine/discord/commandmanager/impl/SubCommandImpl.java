@@ -1,5 +1,8 @@
-package net.codingarea.engine.discord.commandmanager;
+package net.codingarea.engine.discord.commandmanager.impl;
 
+import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.SubCommand;
+import net.codingarea.engine.discord.commandmanager.SubCommandHandler;
 import net.codingarea.engine.exceptions.IllegalSubCommandException;
 import net.codingarea.engine.exceptions.IllegalSubCommandNameException;
 
@@ -12,7 +15,7 @@ import java.util.Arrays;
  * @author anweisen | https://github.com/anweisen
  * @since 2.6
  */
-public final class SubCommandInstance {
+public final class SubCommandImpl {
 
 	private final String[] names;
 	private final String syntax;
@@ -20,7 +23,7 @@ public final class SubCommandInstance {
 	private final Method method;
 	private final SubCommandHandler root;
 
-	public SubCommandInstance(@Nonnull Method method, @Nonnull SubCommandHandler root) {
+	public SubCommandImpl(@Nonnull Method method, @Nonnull SubCommandHandler root) {
 
 		this.root = root;
 
@@ -65,7 +68,7 @@ public final class SubCommandInstance {
 		String syntax = command.syntax();
 		if (syntax.isEmpty()) {
 			StringBuilder builder = new StringBuilder();
-			for (Class<?> arg : args) {
+			for (Class<?> arg : this.args) {
 				builder.append(" <" + arg.getSimpleName().toLowerCase() + ">");
 			}
 			syntax = builder.toString().trim();

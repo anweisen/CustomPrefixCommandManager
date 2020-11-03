@@ -1,5 +1,8 @@
 package net.codingarea.engine.discord.commandmanager;
 
+import net.codingarea.engine.discord.commandmanager.impl.ArgumentParserImpl;
+import net.codingarea.engine.discord.commandmanager.impl.SubCommandImpl;
+import net.codingarea.engine.exceptions.SimilarArgumentParserRegisteredException;
 import net.codingarea.engine.exceptions.SimilarCommandRegisteredException;
 import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.Utils;
@@ -21,92 +24,108 @@ public abstract class SubCommandHandler extends Command {
 
 	public SubCommandHandler(@Nonnull String name, @Nonnull String... alias) {
 		super(name, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull String... alias) {
 		super(name, processInNewThread, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, @Nonnull CommandType commandType, @Nonnull String... alias) {
 		super(name, commandType, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, @Nonnull Permission permission, @Nonnull String... alias) {
 		super(name, permission, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, @Nonnull String... alias) {
 		super(name, commandType, processInNewThread, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull String... alias) {
 		super(name, processInNewThread, reactToMentionPrefix, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread,
 	                         boolean reactToMentionPrefix, @Nonnull String... alias) {
 		super(name, commandType, processInNewThread, reactToMentionPrefix, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull Permission permission,
 	                         @Nonnull String... alias) {
 		super(name, processInNewThread, reactToMentionPrefix, permission, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, Permission permission, boolean reactToWebhooks,
 	                         boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, @Nonnull String... alias) {
 		super(name, processInNewThread, permission, reactToWebhooks, reactToBots, reactToMentionPrefix, teamCommand, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
 		super(name, permission, teamCommand, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission,
 	                         boolean teamCommand, @Nonnull String... alias) {
 		super(name, processInNewThread, permission, teamCommand, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission, boolean reactToWebhooks,
 	                         boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, boolean executeOnUpdate, @Nonnull String... alias) {
 		super(name, processInNewThread, permission, reactToWebhooks, reactToBots, reactToMentionPrefix, teamCommand, executeOnUpdate, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler(@Nonnull String name, boolean processInNewThread, @Nonnull CommandType type, boolean teamCommand,
 	                         boolean executeOnUpdate, @Nonnull String... alias) {
 		super(name, processInNewThread, type, teamCommand, executeOnUpdate, alias);
-		registerSubCommands();
+		register();
 	}
 
 	public SubCommandHandler() {
 		super();
-		registerSubCommands();
+		register();
 	}
 
-	private final List<SubCommandInstance> commands = new ArrayList<>();
+	private final List<SubCommandImpl> commands = new ArrayList<>();
+	private final List<ArgumentParserImpl> parsers = new ArrayList<>();
 
-	private void registerSubCommands() {
+	private void register() {
 		Utils.getMethodsAnnotatedWith(this.getClass(), SubCommand.class).forEach(this::registerSubCommand);
+		Utils.getMethodsAnnotatedWith(this.getClass(), ArgumentParser.class).forEach(this::registerArgumentParser);
+	}
+
+	private void registerArgumentParser(final @Nonnull Method method) {
+
+		ArgumentParserImpl parser = new ArgumentParserImpl(method, this);
+
+		// Make sure no parser with the same type is registered
+		for (ArgumentParserImpl registered : parsers) {
+			if (registered.getArgument() == parser.getArgument())
+				throw new SimilarArgumentParserRegisteredException(parser.getArgument(), method);
+		}
+
+		parsers.add(parser);
+
 	}
 
 	private void registerSubCommand(final @Nonnull Method method) {
 
-		SubCommandInstance command = new SubCommandInstance(method, this);
+		SubCommandImpl command = new SubCommandImpl(method, this);
 
 		// Make sure no command with the same args length has the same name
-		for (SubCommandInstance registered : commands) {
+		for (SubCommandImpl registered : commands) {
 			if (registered.getArgs().length != command.getArgs().length) continue;
 			for (String name : registered.getNames()) {
 				for (String name2 : command.getNames()) {
@@ -119,9 +138,9 @@ public abstract class SubCommandHandler extends Command {
 		commands.add(command);
 	}
 
-	protected final SubCommandInstance findCommand(final @Nonnull String name, final int args, final boolean ignoreArgs) {
+	protected final SubCommandImpl findCommand(final @Nonnull String name, final int args, final boolean ignoreArgs) {
 
-		for (SubCommandInstance command : commands) {
+		for (SubCommandImpl command : commands) {
 			if (!ignoreArgs && command.getArgs().length != args) continue;
 			for (String alias : command.getNames()) {
 				if (alias.equalsIgnoreCase(name))
@@ -144,14 +163,14 @@ public abstract class SubCommandHandler extends Command {
 		event.sendTyping();
 
 		String commandName = event.getArg(0);
-		SubCommandInstance name = findCommand(commandName, 0, true);
+		SubCommandImpl name = findCommand(commandName, 0, true);
 
 		if (name == null) {
 			onSubCommandNotFound(event, commandName);
 			return;
 		}
 
-		SubCommandInstance command = findCommand(commandName, event.getArgsLength() - 1, false);
+		SubCommandImpl command = findCommand(commandName, event.getArgsLength() - 1, false);
 		if (command == null) {
 			onInvalidSubCommandArguments(event, name);
 			return;
@@ -184,11 +203,11 @@ public abstract class SubCommandHandler extends Command {
 						 new Replacement("%subcommand%", subCommand)));
 	}
 
-	protected void onInvalidSubCommandArguments(final @Nonnull CommandEvent event, final @Nonnull SubCommandInstance command) throws Exception {
+	protected void onInvalidSubCommandArguments(final @Nonnull CommandEvent event, final @Nonnull SubCommandImpl command) throws Exception {
 		event.queueReply(syntax(event, command.getName() + " " + command.getSyntax()));
 	}
 
-	protected void onInvalidSubCommandArgument(final @Nonnull CommandEvent event, final @Nonnull SubCommandInstance command,
+	protected void onInvalidSubCommandArgument(final @Nonnull CommandEvent event, final @Nonnull SubCommandImpl command,
 	                                           final @Nonnull Class<?> expected, final @Nonnull String given, final int argumentIndex) throws Exception {
 		event.queueReply(getMessage(event, "invalid-sub-command-argument",
 									"Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
@@ -199,7 +218,10 @@ public abstract class SubCommandHandler extends Command {
 
 	@CheckReturnValue
 	protected Object parseArgument(final @Nonnull Class<?> argument, final @Nonnull String input, final @Nonnull CommandEvent event) throws Exception {
-		if (argument == Object.class || argument == String.class || argument == CharSequence.class) {
+		for (ArgumentParserImpl parser : parsers) {
+			if (parser.getArgument() == argument)
+				return parser.parse(event, input);
+		} if (argument == Object.class || argument == String.class || argument == CharSequence.class) {
 			return input;
 		} else if (argument == char[].class) {
 			return input.toCharArray();
@@ -213,7 +235,7 @@ public abstract class SubCommandHandler extends Command {
 			return Byte.parseByte(input);
 		} else if (argument == Short.class || argument == short.class) {
 			return Short.parseShort(input);
-		} else if (argument == Double.class || argument == double.class) {
+		} else if (argument == Double.class || argument == double.class ||  argument == Number.class) {
 			return Double.parseDouble(input);
 		} else if (argument == Float.class || argument == float.class) {
 			return Float.parseFloat(input);
@@ -241,8 +263,8 @@ public abstract class SubCommandHandler extends Command {
 		}
 	}
 
-	public final SubCommandInstance[] getSubCommands() {
-		return commands.toArray(new SubCommandInstance[0]);
+	public final SubCommandImpl[] getSubCommands() {
+		return commands.toArray(new SubCommandImpl[0]);
 	}
 
 }

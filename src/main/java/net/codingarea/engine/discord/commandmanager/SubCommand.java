@@ -1,5 +1,6 @@
 package net.codingarea.engine.discord.commandmanager;
 
+import javax.annotation.Nonnull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,10 +17,11 @@ public @interface SubCommand {
 
 	/**
 	 * Represents the name and aliases for the {@link SubCommand SubCommand} <br>
-	 * If the value is left at default value, the {@link Method#getName() MethodName} is used
+	 * If the value is left at default value (empty {@link String}), the {@link Method#getName() MethodName} is used
 	 *
 	 * @return The names for the {@link SubCommand SubCommand}
 	 */
+	@Nonnull
 	String[] name() default {};
 
 	/**
@@ -28,6 +30,7 @@ public @interface SubCommand {
 	 *
 	 * @return The syntax
 	 */
+	@Nonnull
 	String syntax() default "";
 
 }
