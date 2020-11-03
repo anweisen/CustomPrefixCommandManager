@@ -1,15 +1,17 @@
 package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
+import net.codingarea.engine.utils.LogHelper;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.rowset.CachedRowSet;
-import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.util.function.Consumer;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -87,6 +89,31 @@ public abstract class SQLHelper {
 		} catch (Exception ignored) {
 			return null;
 		}
+	}
+
+	public static void logResult(final @Nonnull ResultSet result) throws SQLException {
+		logResult(result, LogHelper::log);
+	}
+
+	public static void logResult(final @Nonnull ResultSet result, final @Nonnull Consumer<? super String> action) throws SQLException {
+		if (result.isLast()) {
+			action.accept("<Empty ResultSet>");
+		} else {
+			ResultSetMetaData data = result.getMetaData();
+			while (result.next()) {
+				action.accept(currentRowToString(result, data));
+			}
+		}
+	}
+
+	public static String currentRowToString(final @Nonnull ResultSet result, final @Nonnull ResultSetMetaData data) throws SQLException {
+		StringBuilder builder = new StringBuilder();
+		builder.append(result.getRow() + " | ");
+		for (int i = 1; i <= data.getColumnCount(); i++) {
+			Object object = result.getObject(i);
+			builder.append(data.getColumnName(i) + "='" + object + "' ");
+		}
+		return builder.toString();
 	}
 
 }
