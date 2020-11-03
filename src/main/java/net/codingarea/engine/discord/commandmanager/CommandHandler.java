@@ -1,12 +1,12 @@
 package net.codingarea.engine.discord.commandmanager;
 
-import net.codingarea.engine.discord.commandmanager.events.GenericCommandEvent;
-import net.codingarea.engine.utils.LogHelper;
+import net.codingarea.engine.discord.commandmanager.impl.CommandEventImpl;
 import net.codingarea.engine.discord.defaults.DefaultCommandAccessChecker;
 import net.codingarea.engine.discord.defaults.DefaultResultHandler;
 import net.codingarea.engine.exceptions.CommandExecutionException;
 import net.codingarea.engine.utils.Bindable;
 import net.codingarea.engine.utils.CoolDownManager;
+import net.codingarea.engine.utils.LogHelper;
 import net.codingarea.engine.utils.LogLevel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -21,10 +21,11 @@ import javax.annotation.Nullable;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author anweisen | https://github.com/anweisen
- * @since 1.0
+ * @since 2.8
  */
 public class CommandHandler implements Bindable {
 
@@ -49,6 +50,17 @@ public class CommandHandler implements Bindable {
 
 	public void unregisterAllCommands() {
 		commands.clear();
+	}
+
+	@Nullable
+	@CheckReturnValue
+	public <T extends ICommand> T getCommand(final @Nonnull Class<T> clazz) {
+		for (ICommand command : commands) {
+			if (command.getClass() == clazz) {
+				return (T) command;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -107,41 +119,57 @@ public class CommandHandler implements Bindable {
 	 * It will return a empty list when there are no commands registered
 	 * @return a copy of the list with all commands
 	 */
-	public ArrayList<ICommand> getCommands() {
+	public List<ICommand> getCommands() {
 		return new ArrayList<>(this.commands);
 	}
 
 	/**
-	 * - {@link CommandResult#INVALID_CHANNEL_PRIVATE_COMMAND} if the command was a private command and was performed in a guild chat <br>
-	 * - {@link CommandResult#INVALID_CHANNEL_GUILD_COMMAND} if the command was a guild command and was performed in a private chat <br>
-	 * - {@link CommandResult#WEBHOOK_MESSAGE_NO_REACT} if the message came from a webhook, and the command should not react <br>
-	 * - {@link CommandResult#BOT_MESSAGE_NO_REACT} if the message came from a bot, and the command should not react <br>
-	 * - {@link CommandResult#PREFIX_NOT_USED} if the given prefix and mention prefix was not used <br>
-	 * - {@link CommandResult#MENTION_PREFIX_NO_REACT} the mention prefix was used, but the command should not react <br>
-	 * - {@link CommandResult#COMMAND_NOT_FOUND} if there was not command with the given name <br>
-	 * - {@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown, see {@link #setCoolDownManager(CoolDownManager)} <br>
-	 * - {@link CommandResult#SUCCESS} if the command was executed <br>
+	 * The {@link ResultHandler} will get one of the following {@link CommandResult CommandResults}
+	 * <ul>
+	 *     <li>{@link CommandResult#INVALID_CHANNEL_PRIVATE_COMMAND} if the command was a private command and was performed in a guild chat</li>
+	 *     <li>{@link CommandResult#INVALID_CHANNEL_GUILD_COMMAND} if the command was a guild command and was performed in a private chat</li>
+	 *     <li>{@link CommandResult#WEBHOOK_MESSAGE_NO_REACT} if the message came from a webhook, and the command should not react</li>
+	 *     <li>{@link CommandResult#BOT_MESSAGE_NO_REACT} if the message came from a bot, and the command should not react</li>
+	 *     <li>{@link CommandResult#PREFIX_NOT_USED} if the given prefix and mention prefix was not used</li>
+	 *     <li>{@link CommandResult#MENTION_PREFIX_NO_REACT} the mention prefix was used, but the command should not react</li>
+	 *     <li>{@link CommandResult#COMMAND_NOT_FOUND} if there was not command with the given name</li>
+	 *     <li>{@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown, see {@link #setCoolDownManager(CoolDownManager)}</li>
+	 *     <li>{@link CommandResult#SELF_MESSAGE_NO_REACT} if the bot it self triggered the event</li>
+	 *     <li>{@link CommandResult#INVALID_MESSAGE_TYPE} if the message was not a normal message</li>
+	 *     <li>{@link CommandResult#SUCCESS} if the command was executed</li>
+	 * </ul>
+	 *
 	 * @param prefix the prefix which should be in front of the command
 	 * @param event the {@link MessageReceivedEvent} the command was received
+	 *
 	 * @see CommandResult
+	 * @see #handleCommand(String, GenericMessageEvent, Member, Message)
 	 */
 	public void handleCommand(@Nonnull String prefix, @Nonnull MessageReceivedEvent event) {
 		handleCommand(prefix, event, event.getMember(), event.getMessage());
 	}
 
 	/**
-	 * - {@link CommandResult#INVALID_CHANNEL_PRIVATE_COMMAND} if the command was a private command and was performed in a guild chat <br>
-	 * - {@link CommandResult#INVALID_CHANNEL_GUILD_COMMAND} if the command was a guild command and was performed in a private chat <br>
-	 * - {@link CommandResult#WEBHOOK_MESSAGE_NO_REACT} if the message came from a webhook, and the command should not react <br>
-	 * - {@link CommandResult#BOT_MESSAGE_NO_REACT} if the message came from a bot, and the command should not react <br>
-	 * - {@link CommandResult#PREFIX_NOT_USED} if the given prefix and mention prefix was not used <br>
-	 * - {@link CommandResult#MENTION_PREFIX_NO_REACT} the mention prefix was used, but the command should not react <br>
-	 * - {@link CommandResult#COMMAND_NOT_FOUND} if there was not command with the given name <br>
-	 * - {@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown, see {@link #setCoolDownManager(CoolDownManager)} <br>
-	 * - {@link CommandResult#SUCCESS} if the command was executed <br>
+	 * The {@link ResultHandler} will get one of the following {@link CommandResult CommandResults}
+	 * <ul>
+	 *     <li>{@link CommandResult#INVALID_CHANNEL_PRIVATE_COMMAND} if the command was a private command and was performed in a guild chat</li>
+	 *     <li>{@link CommandResult#INVALID_CHANNEL_GUILD_COMMAND} if the command was a guild command and was performed in a private chat</li>
+	 *     <li>{@link CommandResult#WEBHOOK_MESSAGE_NO_REACT} if the message came from a webhook, and the command should not react</li>
+	 *     <li>{@link CommandResult#BOT_MESSAGE_NO_REACT} if the message came from a bot, and the command should not react</li>
+	 *     <li>{@link CommandResult#PREFIX_NOT_USED} if the given prefix and mention prefix was not used</li>
+	 *     <li>{@link CommandResult#MENTION_PREFIX_NO_REACT} the mention prefix was used, but the command should not react</li>
+	 *     <li>{@link CommandResult#COMMAND_NOT_FOUND} if there was not command with the given name</li>
+	 *     <li>{@link CommandResult#MEMBER_ON_COOLDOWN} if the member is on cooldown, see {@link #setCoolDownManager(CoolDownManager)}</li>
+	 *     <li>{@link CommandResult#SELF_MESSAGE_NO_REACT} if the bot it self triggered the event</li>
+	 *     <li>{@link CommandResult#INVALID_MESSAGE_TYPE} if the message was not a normal message</li>
+	 *     <li>{@link CommandResult#SUCCESS} if the command was executed</li>
+	 * </ul>
+	 *
 	 * @param prefix the prefix which should be in front of the command
 	 * @param event the {@link MessageReceivedEvent} the command was received
+	 *
 	 * @see CommandResult
+	 * @see #handleCommand(String, GenericMessageEvent, Member, Message)
 	 */
 	public void handleCommand(@Nonnull String prefix, @Nonnull MessageUpdateEvent event) {
 		handleCommand(prefix, event, event.getMember(), event.getMessage());
@@ -207,7 +235,7 @@ public class CommandHandler implements Bindable {
 		} else if (!command.executeOnUpdate() && event instanceof MessageUpdateEvent) {
 			resultHandler.handle(event, CommandResult.MESSAGE_EDIT_NO_REACT, null);
 			return;
-		} else if (member != null && accessChecker != null && !accessChecker.isAllowed(member, command)) {
+		} else if (!hasAccess(member, command)) {
 			resultHandler.handle(event, CommandResult.NO_PERMISSIONS, command.getPermissionNeeded());
 			return;
 		} else if (reactToWebhooks != ReactionBehavior.ALWAYS && message.isWebhookMessage() && (!command.shouldReactToWebhooks() || reactToWebhooks == ReactionBehavior.NEVER)) {
@@ -221,8 +249,12 @@ public class CommandHandler implements Bindable {
 		if (cooldownManager != null)
 			cooldownManager.addToCoolDown(member);
 
-		process(command, GenericCommandEvent.ofEvent(event, prefix, getCommandName(command, commandName), command), resultHandler);
+		process(command, CommandEventImpl.create(event, prefix, getCommandName(command, commandName), command, this), resultHandler);
 
+	}
+
+	public boolean hasAccess(final @Nullable Member member, final @Nonnull ICommand command) {
+		return member != null && accessChecker != null && accessChecker.isAllowed(member, command);
 	}
 
 	protected String mention(Event event) {
@@ -230,7 +262,7 @@ public class CommandHandler implements Bindable {
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public CommandHandler setWebhookMessageBehavior(ReactionBehavior behavior) {
@@ -239,7 +271,7 @@ public class CommandHandler implements Bindable {
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public CommandHandler setBotMessageBehavior(ReactionBehavior behavior) {
@@ -263,7 +295,7 @@ public class CommandHandler implements Bindable {
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public CommandHandler setCoolDownManager(CoolDownManager cooldownManager) {
@@ -272,7 +304,7 @@ public class CommandHandler implements Bindable {
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public CommandHandler setPermissionChecker(CommandAccessChecker accessChecker) {
@@ -285,7 +317,7 @@ public class CommandHandler implements Bindable {
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public CommandHandler setResultHandler(ResultHandler resultHandler) {

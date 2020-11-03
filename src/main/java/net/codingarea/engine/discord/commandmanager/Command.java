@@ -4,6 +4,7 @@ import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 
 /**
@@ -112,6 +113,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 	}
 
 	private String name;
+	private String description;
 	private String[] alias;
 
 	private boolean processInNewThread;
@@ -220,6 +222,17 @@ public abstract class Command extends CommandHelper implements ICommand {
 
 	public final void setExecuteOnUpdate(boolean executeOnUpdate) {
 		this.executeOnUpdate = executeOnUpdate;
+	}
+
+	@Nullable
+	@Override
+	@CheckReturnValue
+	public String getDescription() {
+		return description;
+	}
+
+	protected final void setDescription(final @Nullable CharSequence description) {
+		this.description = description == null ? null : String.valueOf(description);
 	}
 
 }
