@@ -3,6 +3,7 @@ data.db
 Engine.iml
 
 /.idea
+/lib
 /target
 /src/test
 /lang
