@@ -3,6 +3,7 @@ package net.codingarea.engine.utils;
 import sun.reflect.CallerSensitive;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.logging.Level;
 
 /**
@@ -22,6 +23,11 @@ public abstract class LogHelper {
 
 	public static void log(@Nonnull Level level, Class<?> caller, Throwable ex) {
 		DefaultLogger.DEFAULT.log(level, caller, ex != null ? Utils.exceptionToString(ex) : null);
+	}
+
+
+	public static void log(final @Nullable Object message) {
+		LogHelper.log(LogLevel.INFO, String.valueOf(message));
 	}
 
 	public static void info(@Nonnull String message) {
