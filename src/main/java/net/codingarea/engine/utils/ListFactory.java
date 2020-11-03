@@ -5,6 +5,7 @@ import net.codingarea.engine.utils.function.Factory;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -88,6 +89,30 @@ public final class ListFactory {
 	@CheckReturnValue
 	public static <T> String arrayToString(@Nonnull Factory<String, T> factory, @Nonnull T... array) {
 		return arrayToString(",", factory, array);
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T> List<T> merge(final @Nonnull Collection<? extends T>... collections) {
+		List<T> list = new ArrayList<>();
+		for (Collection<? extends T> current : collections) {
+			list.addAll(current);
+		}
+		return list;
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T> T[] toArray(final @Nonnull T[] array, final @Nonnull Collection<? extends T>... collections) {
+		return merge(collections).toArray(array);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static Object[] toArray(final @Nonnull Collection<?>... collections) {
+		return merge(collections).toArray();
 	}
 
 }
