@@ -1,6 +1,6 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.utils.function.ThrowingConsumer;
+import net.codingarea.engine.exceptions.IllegalTypeException;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -8,6 +8,7 @@ import sun.reflect.CallerSensitive;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.time.OffsetDateTime;
@@ -15,7 +16,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -153,7 +153,7 @@ public final class Utils {
 		}
 	}
 
-	static class SecManager extends SecurityManager {
+	private static class SecManager extends SecurityManager {
 		public Class<?>[] callerContext() {
 			return getClassContext();
 		}
@@ -165,7 +165,9 @@ public final class Utils {
 		return writer.toString();
 	}
 
-	public static List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<? extends Annotation> annotation) {
+	@Nonnull
+	@CheckReturnValue
+	public static List<Method> getMethodsAnnotatedWith(@Nonnull Class<?> clazz, Class<? extends Annotation> annotation) {
 		List<Method> methods = new ArrayList<>();
 		for (Method method : clazz.getMethods()) {
 			if (method.isAnnotationPresent(annotation)) {
@@ -263,21 +265,61 @@ public final class Utils {
 		return seconds;
 	}
 
-	public static void repeat(int times, Runnable action) {
-		for (int i = 0; i < times; i++) {
-			action.run();
+	@Nonnull
+	@CheckReturnValue
+	public static <T> T nullPrimitive(final @Nonnull Class<T> clazz) {
+		if (clazz == boolean.class || clazz == Boolean.class) {
+			return (T) Boolean.valueOf(false);
+		} else if (clazz == byte.class || clazz == Byte.class) {
+			return (T) Byte.valueOf((byte) 0);
+		} else if (clazz == short.class || clazz == Short.class) {
+			return (T) Short.valueOf((short) 0);
+		} else if (clazz == int.class || clazz == Integer.class) {
+			return (T) Integer.valueOf(0);
+		} else if (clazz == long.class || clazz == Long.class) {
+			return (T) Long.valueOf(0);
+		} else if (clazz == float.class || clazz == Float.class) {
+			return (T) Float.valueOf(0);
+		} else if (clazz == double.class || clazz == Double.class) {
+			return (T) Double.valueOf(0);
+		} else if (clazz == char.class || clazz == Character.class) {
+			return (T) Character.valueOf(' ');
+		} else {
+			throw new IllegalTypeException();
 		}
 	}
 
-	public static <T> void repeat(int times, T t, Consumer<? super T> action) {
-		for (int i = 0; i < times; i++) {
-			action.accept(t);
+	@Nonnull
+	@CheckReturnValue
+	public static <T> T notNull(final @Nullable T given, final @Nonnull T defauld) {
+		return given != null ? given : defauld;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String trimString(final @Nonnull String string, final int size) {
+		if (size < 0)
+			throw new IllegalArgumentException("Size cannot be less than zero");
+		if (string.length() == size) {
+			return string;
+		} else if (string.length() > size) {
+			return string.substring(0, size);
+		} else {
+			StringBuilder builder = new StringBuilder();
+			Action.repeat(size - string.length(), (Runnable) () -> builder.append(" "));
+			return string + builder;
 		}
 	}
 
-	public static <T> void repeat(int times, T t, ThrowingConsumer<? super T> action) throws Exception {
-		for (int i = 0; i < times; i++) {
-			action.acceptThrowing(t);
+	@Nonnull
+	@CheckReturnValue
+	public static String trimSmaller(final @Nonnull String string, final int size, final @Nullable String ending) {
+		if (size < 0) {
+			throw new IllegalArgumentException("Size cannot be less than zero");
+		} else if (string.length() <= size) {
+			return string;
+		} else {
+			return string.substring(0, size) + (ending != null ? ending : "");
 		}
 	}
 
