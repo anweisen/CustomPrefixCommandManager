@@ -1,6 +1,7 @@
 package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
+import net.codingarea.engine.utils.ListFactory;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -9,7 +10,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -18,8 +19,12 @@ import java.util.Map;
 public final class PreparedQuery extends AbstractPreparedAccess {
 
 	private String[] select = {"*"};
+	private String[] as = null;
 	private Order order;
 	private String orderBy;
+	private String group;
+	private Integer limit = null;
+	private boolean distinct = false;
 
 	@CheckReturnValue
 	public PreparedQuery(final @Nonnull SQL sql) {
@@ -37,7 +42,39 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	}
 
 	/**
+	 * @param column The column which entries should be counted
+	 * @param distinct {@code true} if only different values should be counted
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery count(final @Nonnull String column, final boolean distinct) {
+		this.select = new String[]{"count(" + (distinct ? "DISTINCT " : "") + column + ") count"};
+		return this;
+	}
+
+	/**
+	 * @param column The column which entries should be counted
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery count(final @Nonnull String column) {
+		return count(column, false);
+	}
+
+	/**
 	 * @param key The key to which the value should be assigned
+	 * @param value The value the key should have
+	 * @return {@code this} for chaining
+	 *
+	 * @see AbstractPreparedAccess#where(String, Object, String)
+	 */
+	@Nonnull
+	public PreparedQuery where(final @Nonnull String key, final @Nonnull Object value, final @Nonnull String operator) {
+		return (PreparedQuery) super.where(key, value, operator);
+	}
+
+	/**
+	 * @param key {@link Where#DEFAULT_OPERATOR}
 	 * @param value The value the key should have
 	 * @return {@code this} for chaining
 	 *
@@ -51,33 +88,36 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	/**
 	 * @return {@code this} for chaining
 	 *
-	 * @see AbstractPreparedAccess#where(Map)
+	 * @see AbstractPreparedAccess#where(Collection)
+	 * @see AbstractPreparedAccess#where(String, Object, String)
 	 */
 	@Nonnull
 	@Override
-	public PreparedQuery where(@Nonnull Map<String, Object> where) {
+	public PreparedQuery where(final @Nonnull Collection<? extends Where> where) {
 		return (PreparedQuery) super.where(where);
 	}
 
 	/**
-	 * @param key The column the result should be ordered by
+	 * @apiNote key word {@code ORDER BY %column% %order%}
+	 * @param column The column the result should be ordered by
 	 * @param order The order the result should have
 	 * @return {@code this} for chaining
 	 */
 	@Nonnull
-	public PreparedQuery order(final @Nonnull String key, final @Nullable Order order) {
-		this.orderBy = key;
+	public PreparedQuery order(final @Nonnull String column, final @Nullable Order order) {
+		this.orderBy = column;
 		this.order = order;
 		return this;
 	}
 
 	/**
-	 * @param key The column the result should be ordered by
+	 * @apiNote key word {@code ORDER BY %column%}
+	 * @param column The column the result should be ordered by
 	 * @return {@code this} for chaining
 	 */
 	@Nonnull
-	public PreparedQuery order(final @Nonnull String key) {
-		this.orderBy = key;
+	public PreparedQuery order(final @Nonnull String column) {
+		this.orderBy = column;
 		return this;
 	}
 
@@ -92,6 +132,50 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 		return (PreparedQuery) super.table(table);
 	}
 
+	/**
+	 * @apiNote key word {@code LIMIT %limit%}
+	 * @param limit Sets the limit of rows to be selected
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery limit(final int limit) {
+		this.limit = limit;
+		return this;
+	}
+
+	/**
+	 * @apiNote key word {@code DISTINCT}
+	 * @param distinct {@code true} if the result should return different values
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery distinct(final boolean distinct) {
+		this.distinct = distinct;
+		return this;
+	}
+
+	/**
+	 * @apiNote key word {@code GROUP BY %column%}
+	 * @param group The column the result should be grouped by
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery group(final @Nonnull String group) {
+		this.group = group;
+		return this;
+	}
+
+	/**
+	 * @apiNote key word {@code AS}
+	 * @param as The column names the result columns should have
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery as(final @Nonnull String... as) {
+		this.as = as;
+		return this;
+	}
+
 	@Nonnull
 	@Override
 	@CheckReturnValue
@@ -101,9 +185,13 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 			throw new IllegalArgumentException("Cannot select noting");
 		if (table == null)
 			throw new IllegalArgumentException("Table cannot be null");
+		if (as != null && as.length != select.length)
+			throw new IllegalArgumentException("Length of 'as' cannot be different as length of 'select'");
 
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT ");
+		if (distinct)
+			query.append(" DISTINCT ");
 
 		for (int i = 0; i < select.length; i++) {
 			String current = select[i];
@@ -112,9 +200,23 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 			query.append(current);
 		}
 
+		if (as != null) {
+			query.append(" AS ");
+			for (int i = 0; i < as.length; i++) {
+				if (i != 0)
+					query.append(", ");
+				query.append(as[i]);
+			}
+		}
+
 		query.append(" FROM ");
 		query.append(table);
 		query.append(super.whereAsString());
+
+		if (group != null) {
+			query.append(" GROUP BY ");
+			query.append(group);
+		}
 
 		if (orderBy != null) {
 			query.append(" ORDER BY " + orderBy);
@@ -122,8 +224,13 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 				query.append(" " + order.name());
 		}
 
+		if (limit != null) {
+			query.append(" LIMIT ");
+			query.append(limit);
+		}
+
 		String finalQuery = query.toString();
-		return sql.prepare(finalQuery, where.values().toArray());
+		return sql.prepare(finalQuery, ListFactory.list(Where::getValue, where.values()).toArray());
 
 	}
 

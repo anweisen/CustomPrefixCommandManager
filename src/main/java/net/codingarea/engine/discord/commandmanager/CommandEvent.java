@@ -34,6 +34,10 @@ public interface CommandEvent {
 
 	@Nonnull
 	@CheckReturnValue
+	CommandHandler getHandler();
+
+	@Nonnull
+	@CheckReturnValue
 	ICommand getCommand();
 
 	@Nonnull
@@ -78,6 +82,22 @@ public interface CommandEvent {
 	@Nonnull
 	@CheckReturnValue
 	String[] getArgs();
+
+	@Nonnull
+	@CheckReturnValue
+	default String[] getArgs(int startIndex) {
+		return getArgs(startIndex, getArgsLength());
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String[] getArgs(int startIndex, int endIndex) {
+		List<String> args = new ArrayList<>();
+		for (int i = startIndex; i < endIndex; i++) {
+			args.add(getArg(i));
+		}
+		return args.toArray(new String[0]);
+	}
 
 	@CheckReturnValue
 	default int getArgsLength() {

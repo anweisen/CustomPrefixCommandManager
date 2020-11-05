@@ -44,6 +44,14 @@
 
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub anweisen Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/anweisen/JDACommandManager</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -63,7 +71,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.0_210</version>
+            <version>4.2.0_214</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>

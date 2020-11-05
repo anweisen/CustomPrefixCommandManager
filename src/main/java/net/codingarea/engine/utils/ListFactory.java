@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 /**
@@ -113,6 +114,30 @@ public final class ListFactory {
 	@CheckReturnValue
 	public static Object[] toArray(final @Nonnull Collection<?>... collections) {
 		return merge(collections).toArray();
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T, R> List<R> list(final @Nonnull Function<? super T, ? extends R> mapper, final @Nonnull Collection<? extends T>... collections) {
+		return list(new ArrayList<>(), mapper, collections);
+	}
+
+	@Nonnull
+	@SafeVarargs
+	@CheckReturnValue
+	public static <T, R> List<R> list(final @Nonnull List<R> list, final @Nonnull Function<? super T, ? extends R> mapper,
+	                                          final @Nonnull Collection<? extends T>... collections) {
+
+		for (Collection<? extends T> collection : collections) {
+			for (T t : collection) {
+				R r = mapper.apply(t);
+				list.add(r);
+			}
+		}
+
+		return list;
+
 	}
 
 }

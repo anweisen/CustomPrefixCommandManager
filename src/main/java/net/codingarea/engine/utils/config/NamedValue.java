@@ -1,5 +1,6 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.config;
 
+import net.codingarea.engine.utils.INamed;
 import org.jetbrains.annotations.Contract;
 
 import javax.annotation.CheckReturnValue;
@@ -10,7 +11,7 @@ import javax.annotation.Nullable;
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
  */
-public class NamedValue {
+public class NamedValue implements INamed {
 
 	public static NamedValue[] ofStrings(String... values) {
 
@@ -53,6 +54,12 @@ public class NamedValue {
 	@CheckReturnValue
 	public String getKey() {
 		return key;
+	}
+
+	@Nonnull
+	@Override
+	public String getName() {
+		return getKey();
 	}
 
 	@Nullable

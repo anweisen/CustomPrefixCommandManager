@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -59,7 +60,7 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K extends Comparable<K>, V> TreeMap<K, V> sort(@Nonnull Map<K, V> map) {
+	public static <K extends Comparable<K>, V> TreeMap<K, V> sort(final @Nonnull Map<K, V> map) {
 		TreeMap<K, V> sorted = new TreeMap<>(Collections.reverseOrder());
 		for (Entry<K, V> entry : map.entrySet()) {
 			sorted.put(entry.getKey(), entry.getValue());
@@ -69,7 +70,7 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K, V> Map<K, V> create(K[] keys, V[] values) {
+	public static <K, V> Map<K, V> create(final @Nonnull K[] keys, final @Nonnull V[] values) {
 		if (keys.length != values.length)
 			throw new IllegalArgumentException();
 		Map<K, V> map = new HashMap<>();
@@ -77,6 +78,23 @@ public final class MapFactory {
 			map.put(keys[i], values[i]);
 		}
 		return map;
+	}
+
+	public static <K, V, OldK, OldV> Map<K, V> map(final @Nonnull Map<K, V> map, final @Nonnull Map<OldK, OldV> input,
+	                                               final @Nonnull Function<? super OldK, ? extends K> keyMapper,
+	                                               final @Nonnull Function<? super OldV, ? extends V> valueMapper) {
+
+		for (Entry<OldK, OldV> entry : input.entrySet()) {
+
+			K k = keyMapper.apply(entry.getKey());
+			V v = valueMapper.apply(entry.getValue());
+
+			map.put(k, v);
+
+		}
+
+		return map;
+
 	}
 
 }

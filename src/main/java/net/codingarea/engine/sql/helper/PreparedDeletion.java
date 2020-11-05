@@ -6,7 +6,7 @@ import net.codingarea.engine.utils.ListFactory;
 import javax.annotation.Nonnull;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -20,19 +20,31 @@ public final class PreparedDeletion extends AbstractPreparedAccess {
 
 	@Nonnull
 	@Override
-	public PreparedDeletion table(@Nonnull String table) {
+	public PreparedDeletion table(final @Nonnull String table) {
 		return (PreparedDeletion) super.table(table);
 	}
 
 	@Nonnull
 	@Override
-	public PreparedDeletion where(@Nonnull String key, @Nonnull Object value) {
-		return (PreparedDeletion) super.where(key, value);
+	public PreparedDeletion where(final @Nonnull String key, final @Nonnull Object value, final @Nonnull String operator) {
+		return (PreparedDeletion) super.where(key, value, operator);
+	}
+
+	/**
+	 * @param key {@link Where#DEFAULT_OPERATOR}
+	 * @param value The value the key should have
+	 * @return {@code this} for chaining
+	 *
+	 * @see AbstractPreparedAccess#where(String, Object)
+	 */
+	@Nonnull
+	public PreparedQuery where(final @Nonnull String key, final @Nonnull Object value) {
+		return (PreparedQuery) super.where(key, value);
 	}
 
 	@Nonnull
 	@Override
-	public PreparedDeletion where(@Nonnull Map<String, Object> where) {
+	public PreparedDeletion where(final @Nonnull Collection<? extends Where> where) {
 		return (PreparedDeletion) super.where(where);
 	}
 
@@ -46,7 +58,7 @@ public final class PreparedDeletion extends AbstractPreparedAccess {
 		deletion.append(super.whereAsString());
 
 		String finalDeletion = deletion.toString();
-		return sql.prepare(finalDeletion, ListFactory.toArray(where.values()));
+		return sql.prepare(finalDeletion, ListFactory.list(Where::getValue, where.values()).toArray());
 
 	}
 

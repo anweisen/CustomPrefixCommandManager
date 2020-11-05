@@ -2,6 +2,7 @@ package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.utils.LogHelper;
+import net.codingarea.engine.utils.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -37,14 +38,14 @@ public abstract class SQLHelper {
 	@Nonnull
 	@CheckReturnValue
 	public static CachedRowSet select(final @Nonnull SQL sql, final @Nonnull String table, final @Nonnull String selection) throws SQLException {
-		return sql.query("SELECT " + selection + " FROM " + table);
+		return sql.query().table(table).select(selection).execute();
 	}
 
 	@Nonnull
 	@CheckReturnValue
 	public static CachedRowSet select(final @Nonnull SQL sql, final @Nonnull String table, final @Nonnull String selection,
 	                                  final @Nonnull String key, final @Nonnull Object keyValue) throws SQLException {
-		return sql.query("SELECT " + selection + " FROM " + table + " WHERE " + key + " = ?", keyValue);
+		return sql.query().table(table).select(selection).where(key, keyValue).execute();
 	}
 
 	@Nonnull
@@ -92,7 +93,7 @@ public abstract class SQLHelper {
 	}
 
 	public static void logResult(final @Nonnull ResultSet result) throws SQLException {
-		logResult(result, LogHelper::log);
+		logResult(result, r -> LogHelper.log(LogLevel.DEBUG, SQLHelper.class, r));
 	}
 
 	public static void logResult(final @Nonnull ResultSet result, final @Nonnull Consumer<? super String> action) throws SQLException {

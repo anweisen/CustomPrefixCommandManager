@@ -1,7 +1,7 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.utils.ConfigLoader;
-import net.codingarea.engine.utils.NamedValue;
+import net.codingarea.engine.utils.config.ConfigLoader;
+import net.codingarea.engine.utils.config.NamedValue;
 
 import java.io.IOException;
 

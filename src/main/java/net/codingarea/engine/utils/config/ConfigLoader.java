@@ -1,4 +1,7 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.config;
+
+import net.codingarea.engine.utils.Bindable;
+import net.codingarea.engine.utils.PropertiesUtils;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

@@ -9,6 +9,7 @@ import net.codingarea.engine.sql.helper.PreparedQuery;
 import net.codingarea.engine.sql.helper.PreparedUpdate;
 import net.codingarea.engine.sql.source.DataSource;
 import net.codingarea.engine.utils.*;
+import net.codingarea.engine.utils.config.Config;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -121,7 +122,7 @@ public final class ConstSQL {
 	 * ===============================
 	 */
 
-	public void switchDatabase(final @Nonnull String database) throws SQLException {
+	public static void switchDatabase(final @Nonnull String database) throws SQLException {
 		instance.switchDatabase(database);
 	}
 
@@ -150,6 +151,12 @@ public final class ConstSQL {
 	@CheckReturnValue
 	public static PreparedQuery query() {
 		return instance.query();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static PreparedQuery select() {
+		return instance.select();
 	}
 
 	@Nonnull

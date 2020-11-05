@@ -2,7 +2,7 @@ package net.codingarea.engine.sql.helper;
 
 /**
  * @author anweisen | https://github.com/anweisen
- * @since 1.0
+ * @since 2.8
  */
 public enum Order {
 

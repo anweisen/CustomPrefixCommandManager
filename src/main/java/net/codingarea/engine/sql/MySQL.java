@@ -2,8 +2,7 @@ package net.codingarea.engine.sql;
 
 import net.codingarea.engine.sql.source.LinkAttachment;
 import net.codingarea.engine.sql.source.URLDataSource;
-import net.codingarea.engine.utils.Config;
-import net.codingarea.engine.utils.NamedValueConfig;
+import net.codingarea.engine.utils.config.Config;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

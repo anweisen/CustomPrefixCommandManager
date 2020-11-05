@@ -28,7 +28,7 @@ public abstract class SQL implements Bindable {
 	/**
 	 * @deprecated You should use the {@link PreparedStatement} to prevent SQLInjection.
 	 *             You can use ? as placeholders and set its value afterwords using {@link PreparedStatement#setObject(int, Object)}
-	 *             If you use {@link #prepare(String, Object...)} it will already set the object array as the params to the {@link PreparedStatement}
+	 *             If you use {@link #prepare(String, Object...)} it will set the object array as the params to the {@link PreparedStatement}
 	 */
 	@Nonnull
 	@Deprecated
@@ -200,6 +200,12 @@ public abstract class SQL implements Bindable {
 	@CheckReturnValue
 	public PreparedQuery query() {
 		return new PreparedQuery(this);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public PreparedQuery select() {
+		return query();
 	}
 
 	@Nonnull

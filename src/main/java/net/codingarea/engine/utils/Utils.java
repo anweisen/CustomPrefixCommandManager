@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -321,6 +322,23 @@ public final class Utils {
 		} else {
 			return string.substring(0, size) + (ending != null ? ending : "");
 		}
+	}
+
+	public static <T> boolean arrayContains(final @Nonnull T[] array, final @Nullable T search) {
+		for (T t : array) {
+			if (Objects.equals(search, t))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean arrayContainsIgnoreCase(final @Nonnull String[] array, final @Nullable String search) {
+		if (search == null) return false;
+		for (String string : array) {
+			if (search.equalsIgnoreCase(string))
+				return true;
+		}
+		return false;
 	}
 
 }

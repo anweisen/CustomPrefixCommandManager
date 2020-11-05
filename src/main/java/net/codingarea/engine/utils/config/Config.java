@@ -1,4 +1,4 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.config;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

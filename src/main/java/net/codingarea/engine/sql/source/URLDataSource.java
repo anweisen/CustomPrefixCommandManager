@@ -1,6 +1,6 @@
 package net.codingarea.engine.sql.source;
 
-import net.codingarea.engine.utils.Config;
+import net.codingarea.engine.utils.config.Config;
 
 import javax.annotation.Nonnull;
 import java.sql.Connection;

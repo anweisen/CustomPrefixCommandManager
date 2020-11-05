@@ -1,4 +1,6 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.config;
+
+import net.codingarea.engine.utils.PropertiesUtils;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -41,7 +43,7 @@ public class PropertiesConfig extends ConfigLoader {
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public PropertiesConfig set(@Nonnull String key, Object value) {

@@ -1,6 +1,6 @@
 package net.codingarea.engine.sql.source;
 
-import net.codingarea.engine.utils.NamedValue;
+import net.codingarea.engine.utils.config.NamedValue;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

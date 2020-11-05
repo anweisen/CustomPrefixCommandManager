@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,14 +63,14 @@ public final class PreparedInsertion extends AbstractPreparedAccess {
 	@Nonnull
 	@Override
 	@Deprecated
-	public AbstractPreparedAccess where(final @Nonnull String key,final  @Nonnull Object value) {
+	public AbstractPreparedAccess where(final @Nonnull String key, final @Nonnull Object value, final @Nonnull String operator) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Nonnull
 	@Override
 	@Deprecated
-	public AbstractPreparedAccess where(@Nonnull Map<String, Object> where) {
+	public AbstractPreparedAccess where(final @Nonnull Collection<? extends Where> where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -97,18 +98,16 @@ public final class PreparedInsertion extends AbstractPreparedAccess {
 
 		insertion.append(") VALUES (");
 
-		argument = 0;
-		for (Entry<String, Object> entry : values.entrySet()) {
-			if (argument != 0)
+		for (int i = 0; i < values.size(); i++) {
+			if (i != 0)
 				insertion.append(", ");
 			insertion.append("?");
-			argument++;
 		}
 
 		insertion.append(")");
 
 		String finalInsertion = insertion.toString();
-		return sql.prepare(finalInsertion, ListFactory.toArray(values.values()));
+		return sql.prepare(finalInsertion, ListFactory.list(Where::getValue, where.values()).toArray());
 
 	}
 

@@ -90,4 +90,10 @@ public final class Action {
 		return new GetAction<>(object);
 	}
 
+	public static void silent(final @Nonnull Runnable action) {
+		try {
+			action.run();
+		} catch (Exception ignored) { }
+	}
+
 }

@@ -1,8 +1,13 @@
 package net.codingarea.engine.utils;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -53,6 +58,26 @@ public final class IOUtils {
 			output.write(buffer, 0, n);
 		}
 		return count;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static HttpURLConnection createConnection(final @Nonnull String url) throws IOException {
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+		return connection;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static HttpURLConnection createConnection(final @Nonnull String url, final @Nonnull Map<String, String> header) throws IOException {
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+		connection.setRequestProperty("Content-Type", "application/json");
+		for (Entry<String, String> entry : header.entrySet()) {
+			connection.setRequestProperty(entry.getKey(), entry.getValue());
+		}
+		return connection;
 	}
 
 }
