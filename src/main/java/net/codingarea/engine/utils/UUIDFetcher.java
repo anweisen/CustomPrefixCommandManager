@@ -27,7 +27,7 @@ public final class UUIDFetcher {
 	 * It is also caching the uuids so we don't have to do make a request every time
 	 *
 	 * @param playerName The player's name whose uuid we are searching for
-	 * @return <code>null</code> if something goes wrong
+	 * @return {@code null} if something goes wrong
 	 *
 	 * @see #fetchUUID(String)
 	 */
@@ -49,7 +49,8 @@ public final class UUIDFetcher {
 	 * Fetches a player's UUID using the mojang api servers by the player name.
 	 *
 	 * @param playerName The player's name whose uuid we are searching for
-	 * @return <code>null</code> if no player was found according to this name
+	 * @return {@code null} if no player was found according to this name
+	 *
 	 * @throws ExecutionException
 	 *         If something goes wrong
 	 */
@@ -71,7 +72,8 @@ public final class UUIDFetcher {
 	 * Fetches a player's name history using the mojang api servers by the player name.
 	 *
 	 * @param uuid The player's uuid whose name history we are searching for
-	 * @return <code>null</code> if no player was found according to this uuid
+	 * @return {@code null} if no player was found according to this uuid
+	 *
 	 * @throws ExecutionException
 	 *         If something goes wrong
 	 */
@@ -89,11 +91,15 @@ public final class UUIDFetcher {
 	}
 
 	public static String fetchName(@Nonnull String uuid) {
+
 		JSONArray history = fetchNameHistory(uuid);
 		if (history == null || history.isEmpty()) return null;
+
 		JSONObject current = (JSONObject) history.get(history.size() - 1);
 		if (current.isEmpty()) return null;
+
 		return current.get("name").toString();
+
 	}
 
 	/**
@@ -101,7 +107,8 @@ public final class UUIDFetcher {
 	 * It is also caching the names so we don't have to do make a request every time
 	 *
 	 * @param uuid The player's uuid whose name we are searching for
-	 * @return <code>null</code> if no user was found by that uuid
+	 * @return {@code null} if no user was found by that uuid
+	 *
 	 * @throws ExecutionException
 	 *         If something goes wrong
 	 *
