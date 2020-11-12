@@ -1,9 +1,8 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.utils.function.Factory;
-
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,12 +19,12 @@ public final class ListFactory {
 
 	private ListFactory() { }
 
-	public static <T> List<T> stringToList(String string, @Nonnull Factory<T, String> factory) {
+	public static <T> List<T> stringToList(final @Nullable String string, final @Nonnull Function<String, T> factory) {
 		List<T> list = new ArrayList<>();
 		if (string == null || string.isEmpty()) return list;
 		for (String arg : string.split(REGEX)) {
 			try {
-				T t = factory.get(arg);
+				T t = factory.apply(arg);
 				if (t == null) throw new NullPointerException();
 				list.add(t);
 			} catch (Exception ex) {
@@ -37,11 +36,11 @@ public final class ListFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> String listToString(@Nonnull String split, @Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
+	public static <T> String listToString(final @Nonnull String split, final @Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
 			try {
-				String string = factory.get(current);
+				String string = factory.apply(current);
 				if (builder.length() != 0) builder.append(split);
 				builder.append(string);
 			} catch (Exception ex) {
@@ -51,24 +50,24 @@ public final class ListFactory {
 		return builder.toString();
 	}
 
-	public static <T> String listToString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
+	public static <T> String listToString(final @Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
 		return listToString(REGEX, list, factory);
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> String listToFancyString(@Nonnull Iterable<? extends T> list, @Nonnull Factory<String, T> factory) {
+	public static <T> String listToFancyString(final @Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
 		return listToString(", ", list, factory);
 	}
 
 	@Nonnull
 	@SafeVarargs
 	@CheckReturnValue
-	public static <T> String arrayToString(@Nonnull String split, @Nonnull Factory<String, T> factory, @Nonnull T... array) {
+	public static <T> String arrayToString(final @Nonnull String split, final @Nonnull Function<T, String> factory, final @Nonnull T... array) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : array) {
 			try {
-				String string = factory.get(current);
+				String string = factory.apply(current);
 				if (builder.length() != 0) builder.append(split);
 				builder.append(string);
 			} catch (Exception ex) {
@@ -81,15 +80,15 @@ public final class ListFactory {
 	@Nonnull
 	@SafeVarargs
 	@CheckReturnValue
-	public static <T> String arrayToFancyString(@Nonnull Factory<String, T> factory, @Nonnull T... array) {
-		return arrayToString(", ", factory, array);
+	public static <T> String arrayToFancyString(@Nonnull Function<T, String> mapper, @Nonnull T... array) {
+		return arrayToString(", ", mapper, array);
 	}
 
 	@Nonnull
 	@SafeVarargs
 	@CheckReturnValue
-	public static <T> String arrayToString(@Nonnull Factory<String, T> factory, @Nonnull T... array) {
-		return arrayToString(",", factory, array);
+	public static <T> String arrayToString(final @Nonnull Function<T, String> mapper, final @Nonnull T... array) {
+		return arrayToString(",", mapper, array);
 	}
 
 	@Nonnull
@@ -127,7 +126,7 @@ public final class ListFactory {
 	@SafeVarargs
 	@CheckReturnValue
 	public static <T, R> List<R> list(final @Nonnull List<R> list, final @Nonnull Function<? super T, ? extends R> mapper,
-	                                          final @Nonnull Collection<? extends T>... collections) {
+	                                  final @Nonnull Collection<? extends T>... collections) {
 
 		for (Collection<? extends T> collection : collections) {
 			for (T t : collection) {

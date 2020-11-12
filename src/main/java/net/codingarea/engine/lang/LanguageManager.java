@@ -3,7 +3,6 @@ package net.codingarea.engine.lang;
 import net.codingarea.engine.exceptions.LanguageNotFoundException;
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.cache.SQLValueCache;
-import net.codingarea.engine.utils.function.BiFactory;
 import net.dv8tion.jda.api.entities.Guild;
 
 import javax.annotation.CheckReturnValue;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
  * @author anweisen | https://github.com/anweisen
  * @since 2.2
  */
-public class LanguageManager extends SQLValueCache implements BiFactory<String, Guild, String> {
+public class LanguageManager extends SQLValueCache {
 
 	@Nonnull
 	@CheckReturnValue
@@ -75,7 +74,7 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	}
 
 	/**
-	 * @return <code>this</code> for chaining
+	 * @return {@code this} for chaining
 	 */
 	@Nonnull
 	public LanguageManager loadLanguageFromFile(@Nonnull String path) throws IOException {
@@ -134,7 +133,6 @@ public class LanguageManager extends SQLValueCache implements BiFactory<String, 
 	}
 
 	@Nonnull
-	@Override
 	@CheckReturnValue
 	public String get(Guild guild, String key) {
 		try {

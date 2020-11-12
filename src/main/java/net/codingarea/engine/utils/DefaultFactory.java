@@ -1,12 +1,12 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.function.Function;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -18,133 +18,133 @@ public final class DefaultFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> Factory<String, T> objectToString() {
+	public static <T> Function<T, String> objectToString() {
 		return String::valueOf;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> Factory<Integer, T> objectToInt() {
+	public static <T> Function<T, Integer> objectToInt() {
 		return NumberConversions::toInt;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T extends ISnowflake> Factory<String, T> mentionableToID() {
+	public static <T extends ISnowflake> Function<T, String> mentionableToID() {
 		return ISnowflake::getId;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<Integer, String> stringToInteger() {
+	public static Function<String, Integer> stringToInteger() {
 		return Integer::valueOf;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<Double, String> stringToDouble() {
+	public static Function<String, Double> stringToDouble() {
 		return Double::valueOf;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String, String> stringToString() {
+	public static Function<String, String> stringToString() {
 		return string -> string;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<Role, String> stringToRole(Guild guild) {
+	public static Function<String, Role> stringToRole(Guild guild) {
 		return guild::getRoleById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<TextChannel, String> stringToTextChannel(Guild guild) {
+	public static Function<String, TextChannel> stringToTextChannel(Guild guild) {
 		return guild::getTextChannelById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<TextChannel, String> stringToTextChannel(ShardManager shardManager) {
+	public static Function<String, TextChannel> stringToTextChannel(ShardManager shardManager) {
 		return shardManager::getTextChannelById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<VoiceChannel, String> stringToVoiceChannel(Guild guild) {
+	public static Function<String, VoiceChannel> stringToVoiceChannel(Guild guild) {
 		return guild::getVoiceChannelById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<Member, String> stringToMember(Guild guild) {
+	public static Function<String, Member> stringToMember(Guild guild) {
 		return guild::getMemberById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<User, String> stringToUser(ShardManager shardManager) {
+	public static Function<String, User> stringToUser(ShardManager shardManager) {
 		return shardManager::getUserById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T extends GuildChannel> Factory<String, T> guildChannelToName() {
+	public static <T extends GuildChannel> Function<T, String> guildChannelToName() {
 		return GuildChannel::getName;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String, IMentionable> mentionableToMention() {
+	public static Function<IMentionable, String> mentionableToMention() {
 		return IMentionable::getAsMention;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String, Enum<?>> enumToName() {
+	public static Function<Enum<?>, String> enumToName() {
 		return Enum::name;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<Integer, Enum<?>> enumToOrdinal() {
+	public static Function<Enum<?>, Integer> enumToOrdinal() {
 		return Enum::ordinal;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String, Role> roleToName() {
+	public static Function<Role, String> roleToName() {
 		return Role::getName;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String, Class<?>> classToSimpleName() {
+	public static Function<Class<?>, String> classToSimpleName() {
 		return Class::getSimpleName;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String, Class<?>> classToName() {
+	public static Function<Class<?>, String> classToName() {
 		return Class::getName;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T extends INamed> Factory<String, T> namedToName() {
+	public static <T extends INamed> Function<T, String> namedToName() {
 		return INamed::getName;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<GuildChannel, String> stringToGuildChannel(final @Nonnull Guild guild) {
+	public static Function<String, GuildChannel> stringToGuildChannel(final @Nonnull Guild guild) {
 		return guild::getGuildChannelById;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<GuildChannel, String> stringToGuildChannel(final @Nonnull JDA jda) {
+	public static Function<String, GuildChannel> stringToGuildChannel(final @Nonnull JDA jda) {
 		return jda::getGuildChannelById;
 	}
 

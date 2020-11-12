@@ -1,7 +1,9 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.utils.*;
-import net.codingarea.engine.utils.function.Factory;
+import net.codingarea.engine.utils.Bindable;
+import net.codingarea.engine.utils.NumberFormatter;
+import net.codingarea.engine.utils.Replacement;
+import net.codingarea.engine.utils.ScheduleTimer;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -10,6 +12,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Function;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -21,7 +24,7 @@ public class DefaultStatusChanger implements Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String[], ShardManager> createNewFactory(@Nonnull String prefix, @Nonnull ShardManager shardManager) {
+	public static Function<ShardManager, String[]> createNewFactory(@Nonnull String prefix, @Nonnull ShardManager shardManager) {
 		return createByReplacements(prefix, new String[]{"%user% User", "%guilds% Server"},
 				new Replacement("%user%", () -> NumberFormatter.MIDDLE_NUMBER.format(shardManager.getUsers().size())),
 				new Replacement("%guilds%", () -> NumberFormatter.MIDDLE_NUMBER.format(shardManager.getGuilds().size())));
@@ -29,7 +32,7 @@ public class DefaultStatusChanger implements Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	public static Factory<String[], ShardManager> createByReplacements(@Nonnull String prefix, @Nonnull String[] suffix, @Nonnull Replacement... replacements) {
+	public static Function<ShardManager, String[]> createByReplacements(@Nonnull String prefix, @Nonnull String[] suffix, @Nonnull Replacement... replacements) {
 		return shardManager -> {
 			String[] status = new String[suffix.length];
 			for (int i = 0; i < status.length; i++) {
@@ -64,38 +67,39 @@ public class DefaultStatusChanger implements Bindable {
 	private int updateRate = 15;
 
 	private final ShardManager shardManager;
-	private final Factory<String[], ShardManager> status;
+	private final Function<ShardManager, String[]> status;
 
 	private Timer timer;
 
 	private ActivityType type = ActivityType.DEFAULT;
 
 	@CheckReturnValue
-	public DefaultStatusChanger(@Nonnull ShardManager shardManager) {
+	public DefaultStatusChanger(final @Nonnull ShardManager shardManager) {
 		this.shardManager = shardManager;
 		this.status = createNewFactory("", shardManager);
 	}
 
 	@CheckReturnValue
-	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull Factory<String[], ShardManager> status) {
+	public DefaultStatusChanger(final @Nonnull ShardManager shardManager, final @Nonnull Function<ShardManager, String[]> status) {
 		this.shardManager = shardManager;
 		this.status = status;
 	}
 
 	@CheckReturnValue
-	public DefaultStatusChanger(int updateRate, @Nonnull ShardManager shardManager, @Nonnull Factory<String[], ShardManager> status) {
+	public DefaultStatusChanger(final int updateRate, final @Nonnull ShardManager shardManager, final @Nonnull Function<ShardManager, String[]> status) {
 		this.updateRate = updateRate;
 		this.shardManager = shardManager;
 		this.status = status;
 	}
 
 	@CheckReturnValue
-	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull String prefix, @Nonnull String... suffix) {
+	public DefaultStatusChanger(final @Nonnull ShardManager shardManager, final @Nonnull String prefix, final @Nonnull String... suffix) {
 		this(shardManager, ActivityType.DEFAULT, prefix, suffix);
 	}
 
 	@CheckReturnValue
-	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull ActivityType type, @Nonnull String prefix, @Nonnull String... suffix) {
+	public DefaultStatusChanger(final @Nonnull ShardManager shardManager, final @Nonnull ActivityType type,
+	                            final @Nonnull String prefix, final @Nonnull String... suffix) {
 		this.shardManager = shardManager;
 		this.type = type;
 		if (suffix.length == 0) {
@@ -108,7 +112,8 @@ public class DefaultStatusChanger implements Bindable {
 	}
 
 	@CheckReturnValue
-	public DefaultStatusChanger(@Nonnull ShardManager shardManager, @Nonnull String prefix, @Nonnull String[] suffix, @Nonnull Replacement... replacements) {
+	public DefaultStatusChanger(final @Nonnull ShardManager shardManager, final @Nonnull String prefix,
+	                            final @Nonnull String[] suffix, final @Nonnull Replacement... replacements) {
 		this.shardManager = shardManager;
 		if (suffix.length == 0) {
 			this.status = createNewFactory(prefix, shardManager);
@@ -123,7 +128,7 @@ public class DefaultStatusChanger implements Bindable {
 			@Override
 			public void run() {
 
-				String[] messages = status.get(shardManager);
+				String[] messages = status.apply(shardManager);
 
 				if (messages.length == 0) throw new IllegalArgumentException();
 
@@ -184,7 +189,7 @@ public class DefaultStatusChanger implements Bindable {
 		return shardManager;
 	}
 
-	public Factory<String[], ShardManager> getStatus() {
+	public Function<ShardManager, String[]> getStatus() {
 		return status;
 	}
 

@@ -2,17 +2,17 @@ package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.sql.cache.SQLValueCache;
-import net.codingarea.engine.utils.function.Factory;
 import net.dv8tion.jda.api.entities.Guild;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.function.Function;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public class DefaultPrefixCache extends SQLValueCache implements Factory<String, Guild> {
+public class DefaultPrefixCache extends SQLValueCache implements Function<Guild, String> {
 
 	@CheckReturnValue
 	public DefaultPrefixCache(@Nonnull SQL data, @Nonnull String defaultPrefix) {
@@ -37,13 +37,20 @@ public class DefaultPrefixCache extends SQLValueCache implements Factory<String,
 
 	/**
 	 * Uses {@link Guild#getId()} as the key and passes it to {@link SQLValueCache#get(String)}
-	 * @return {@link #getDefaultValue()} if guild is <code>null</code>
+	 *
+	 * @return {@link #getDefaultValue()} if guild is {@code null}
 	 */
 	@Nonnull
 	@Override
 	@CheckReturnValue
-	public String get(Guild guild) {
+	public String apply(Guild guild) {
 		return super.get(guild == null ? null : guild.getId());
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public String get(Guild guild) {
+		return apply(guild);
 	}
 
 }
