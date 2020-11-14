@@ -38,8 +38,8 @@ public final class PreparedDeletion extends AbstractPreparedAccess {
 	 * @see AbstractPreparedAccess#where(String, Object)
 	 */
 	@Nonnull
-	public PreparedQuery where(final @Nonnull String key, final @Nonnull Object value) {
-		return (PreparedQuery) super.where(key, value);
+	public PreparedDeletion where(final @Nonnull String key, final @Nonnull Object value) {
+		return (PreparedDeletion) super.where(key, value);
 	}
 
 	@Nonnull
@@ -69,7 +69,7 @@ public final class PreparedDeletion extends AbstractPreparedAccess {
 
 	@Override
 	public void execute0() throws SQLException {
-
+		execute();
 	}
 
 }

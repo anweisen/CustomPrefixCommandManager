@@ -1,7 +1,6 @@
 package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
-import net.codingarea.engine.utils.ListFactory;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -107,7 +106,7 @@ public final class PreparedInsertion extends AbstractPreparedAccess {
 		insertion.append(")");
 
 		String finalInsertion = insertion.toString();
-		return sql.prepare(finalInsertion, ListFactory.list(Where::getValue, where.values()).toArray());
+		return sql.prepare(finalInsertion, values.values().toArray());
 
 	}
 
