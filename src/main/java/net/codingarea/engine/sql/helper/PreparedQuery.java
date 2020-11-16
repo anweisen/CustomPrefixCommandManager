@@ -3,6 +3,7 @@ package net.codingarea.engine.sql.helper;
 import net.codingarea.engine.sql.SQL;
 import net.codingarea.engine.utils.ListFactory;
 import net.codingarea.engine.utils.function.ThrowingFunction;
+import net.codingarea.engine.utils.function.ThrowingPredicate;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -11,12 +12,10 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -48,22 +47,32 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	}
 
 	/**
-	 * @param column The column which entries should be counted
-	 * @param distinct {@code true} if only different values should be counted
-	 * @return {@code this} for chaining
+	 * @param column The column whose entries should be counted
+	 * @return The amount of rows the table has matching the where requirements.
+	 *         The value cannot be greater than the {@link #getLimit() limit}
+	 *
+	 * @throws SQLException
+	 *         If a database error occurs
 	 */
-	@Nonnull
-	public PreparedQuery count(final @Nonnull String column, final boolean distinct) {
-		this.select = new String[]{"count(" + (distinct ? "DISTINCT " : "") + column + ") count"};
-		return this;
+	public int count(final @Nonnull String column, final boolean distinct) throws SQLException {
+		PreparedQuery query = this.clone()
+				.select("count(" + (distinct ? "DISTINCT " : "") + column + ") count")
+				.removeAs().removeGrouping().removeLimit().distinct(false);
+		CachedRowSet result = query.execute();
+		int count = result.getInt("count");
+		result.close();
+		return count;
 	}
 
 	/**
-	 * @param column The column which entries should be counted
-	 * @return {@code this} for chaining
+	 * @param column The column whose entries should be counted
+	 * @return The amount of rows the table has matching the where requirements.
+	 *         The value cannot be greater than the {@link #getLimit() limit}
+	 *
+	 * @throws SQLException
+	 *         If a database error occurs
 	 */
-	@Nonnull
-	public PreparedQuery count(final @Nonnull String column) {
+	public int count(final @Nonnull String column) throws SQLException {
 		return count(column, false);
 	}
 
@@ -104,6 +113,17 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	}
 
 	/**
+	 * @return {@code this} for chaining
+	 *
+	 * @see AbstractPreparedAccess#removeWhere()
+	 */
+	@Nonnull
+	@Override
+	public PreparedQuery removeWhere() {
+		return (PreparedQuery) super.removeWhere();
+	}
+
+	/**
 	 * @apiNote key word {@code ORDER BY %column% %order%}
 	 * @param column The column the result should be ordered by
 	 * @param order The order the result should have
@@ -113,6 +133,16 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	public PreparedQuery order(final @Nonnull String column, final @Nullable Order order) {
 		this.orderBy = column;
 		this.order = order;
+		return this;
+	}
+
+	/**
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery removeOrder() {
+		this.orderBy = null;
+		this.order = null;
 		return this;
 	}
 
@@ -150,6 +180,15 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	}
 
 	/**
+	 * @return {@code this}
+	 */
+	@Nonnull
+	public PreparedQuery removeLimit() {
+		this.limit = null;
+		return this;
+	}
+
+	/**
 	 * @apiNote key word {@code DISTINCT}
 	 * @param distinct {@code true} if the result should return different values
 	 * @return {@code this} for chaining
@@ -172,6 +211,15 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	}
 
 	/**
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery removeGrouping() {
+		this.group = null;
+		return this;
+	}
+
+	/**
 	 * @apiNote key word {@code AS}
 	 * @param as The column names the result columns should have
 	 * @return {@code this} for chaining
@@ -182,15 +230,24 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 		return this;
 	}
 
+	/**
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedQuery removeAs() {
+		this.as = null;
+		return this;
+	}
+
 	@Nonnull
 	@Override
 	@CheckReturnValue
 	public PreparedStatement prepare() throws SQLException {
 
-		if (select.length == 0)
-			throw new IllegalArgumentException("Cannot select noting");
 		if (table == null)
 			throw new IllegalArgumentException("Table cannot be null");
+		if (select.length == 0)
+			throw new IllegalArgumentException("Cannot select noting");
 		if (as != null && as.length != select.length)
 			throw new IllegalArgumentException("Length of 'as' cannot be different as length of 'select'");
 
@@ -273,7 +330,7 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	@Nonnull
 	@CheckReturnValue
 	public <T> Optional<T> findFirst(final @Nonnull Function<? super CachedRowSet, T> mapper) throws SQLException {
-		CachedRowSet result = execute();
+		CachedRowSet result = this.clone().limit(1).execute();
 		if (result.next()) {
 			T value = mapper.apply(result);
 			result.close();
@@ -292,15 +349,16 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 
 	/**
 	 * @param mapper The result is listed and returned
-	 * @param <T> The type of the objects to map to
-	 * @return A new {@link Collection} filled with the objects generated by the mapper
+	 * @param <T> The type of the objects to which it should map to
+	 * @return A new {@link List} filled with the objects generated by the mapper.
+	 *        The maximal size of the {@link List} is {@link #getLimit()}
 	 *
 	 * @throws SQLException
 	 *         If a database error occurs
 	 */
 	@Nonnull
 	@CheckReturnValue
-	public <T> Collection<T> findAll(final @Nonnull Function<? super CachedRowSet, ? extends T> mapper) throws SQLException {
+	public <T> List<T> findAll(final @Nonnull Function<? super CachedRowSet, ? extends T> mapper) throws SQLException {
 		CachedRowSet result = execute();
 		List<T> list = new ArrayList<>();
 		while (result.next()) {
@@ -318,7 +376,7 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 
 	@Nonnull
 	@CheckReturnValue
-	public <T> Collection<T> findAll(final @Nonnull ThrowingFunction<? super CachedRowSet, ? extends T> mapper) throws SQLException {
+	public <T> List<T> findAll(final @Nonnull ThrowingFunction<? super CachedRowSet, ? extends T> mapper) throws SQLException {
 		return findAll((Function<? super CachedRowSet, ? extends T>) mapper);
 	}
 
@@ -334,6 +392,51 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 		int size = result.size();
 		result.close();
 		return size;
+	}
+
+	@CheckReturnValue
+	public int position(final @Nonnull Predicate<? super CachedRowSet> filter) throws SQLException {
+
+		int pos;
+		CachedRowSet result = execute();
+		for (pos = 1; result.next(); pos++) {
+			if (filter.test(result))
+				return pos;
+		}
+
+		return pos;
+
+	}
+
+	@CheckReturnValue
+	public int position(final @Nonnull ThrowingPredicate<? super CachedRowSet> filter) throws SQLException {
+		return position((Predicate<? super CachedRowSet>) filter);
+	}
+
+	@CheckReturnValue
+	public <T> int position(final @Nonnull Function<? super CachedRowSet, ? extends T> mapper,
+	                        final @Nonnull Predicate<? super T> filter) throws SQLException {
+
+		int pos;
+		CachedRowSet result = execute();
+		for (pos = 1; result.next(); pos++) {
+			try {
+
+				T current = mapper.apply(result);
+				if (filter.test(current))
+					return pos;
+
+			} catch (Exception ignored) { }
+		}
+
+		return pos;
+
+	}
+
+	@CheckReturnValue
+	public <T> int position(final @Nonnull ThrowingFunction<? super CachedRowSet, ? extends T> mapper,
+	                        final @Nonnull ThrowingPredicate<? super T> filter) throws SQLException {
+		return position((Function<? super CachedRowSet, ? extends T>) mapper, (Predicate<? super T>) filter);
 	}
 
 	/**
@@ -388,6 +491,41 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	@CheckReturnValue
 	public String[] getSelection() {
 		return select;
+	}
+
+	@Override
+	public PreparedQuery clone() {
+		PreparedQuery clone = new PreparedQuery(sql);
+		clone.where(where.values());
+		clone.select(select);
+		clone.distinct(distinct);
+		if (table != null) clone.table(table);
+		if (as != null) clone.as(as);
+		if (orderBy != null) clone.order(orderBy, order);
+		if (limit != null) clone.limit(limit);
+		return clone;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PreparedQuery query = (PreparedQuery) o;
+		return distinct == query.distinct &&
+				Arrays.equals(select, query.select) &&
+				Arrays.equals(as, query.as) &&
+				order == query.order &&
+				Objects.equals(orderBy, query.orderBy) &&
+				Objects.equals(group, query.group) &&
+				Objects.equals(limit, query.limit);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hash(order, orderBy, group, limit, distinct);
+		result = 31 * result + Arrays.hashCode(select);
+		result = 31 * result + Arrays.hashCode(as);
+		return result;
 	}
 
 }
