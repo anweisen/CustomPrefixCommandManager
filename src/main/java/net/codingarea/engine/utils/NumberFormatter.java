@@ -102,6 +102,44 @@ public interface NumberFormatter {
 
 			},
 
+			FULL_GERMAN_TIME = value -> {
+
+				long seconds = (long) value;
+				long minutes = seconds / 60;
+				long hours = minutes / 60;
+				long days = hours / 24;
+				long years = days / 365;
+
+				seconds %= 60;
+				minutes %= 60;
+				hours %= 24;
+				days %= 265;
+
+				return ((years > 0 ? (years == 1 ? "1 Jahr " : years + " Jahre ") : "")
+					  + (days > 0 ? (days == 1 ? "1 Tag " : days + " Tage ") : "")
+				      + (hours > 0 ? (hours == 1 ? "1 Stunde " : hours + " Stunden ") : "")
+					  + (minutes > 0 ? (minutes == 1 ? "1 Minute " : years + " Minute ") : "")
+				      + (seconds > 0 || years == 0 && hours == 0 && minutes == 0 ? (seconds == 1 ? "1 Sekunde" : seconds + " Sekunden") : "")).trim();
+
+			},
+
+			BIG_FULL_GERMAN_TIME = value -> {
+
+				long seconds = (long) value;
+				long minutes = seconds / 60;
+				long hours = minutes / 60;
+				long days = hours / 24;
+				long years = days / 365;
+
+				hours %= 24;
+				days %= 265;
+
+				return ((years > 0 ? (years == 1 ? "1 Jahr " : years + " Jahre ") : "")
+				  	  + (days > 0 ? (days == 1 ? "1 Tag " : days + " Tage ") : "")
+					  + (hours > 0 || years == 0 && days == 0 ? (hours == 1 ? "1 Stunde" : hours + " Stunden") : "")).trim();
+
+			},
+
 			/**
 			 *  billion, million, thousand, number
 			 */
