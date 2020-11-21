@@ -1,5 +1,7 @@
-package net.codingarea.engine.discord.commandmanager;
+package net.codingarea.engine.discord.commandmanager.events;
 
+import net.codingarea.engine.discord.commandmanager.CommandHandler;
+import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.codingarea.engine.exceptions.MessageException;
 import net.codingarea.engine.utils.Colors;
@@ -276,7 +278,7 @@ public interface CommandEvent {
 		reply(message).queue(sent, MessageException::create);
 	}
 
-	default void queueSyntax(@Nonnull final String syntax) {
+	default void queueSyntax(final @Nonnull String syntax) {
 		queueReply(CommandHelper.syntax(this, syntax));
 	}
 
@@ -362,7 +364,7 @@ public interface CommandEvent {
 
 	/**
 	 * @return Returns the first {@link Member} of the {@link #getMentionedMembers() mentioned members}
-	 *         Null if empty
+	 *         {@code null} if empty
 	 *
 	 * @see #getMentionedMembers()
 	 */

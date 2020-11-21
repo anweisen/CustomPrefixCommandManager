@@ -1,6 +1,5 @@
-package net.codingarea.engine.discord.commandmanager.impl;
+package net.codingarea.engine.discord.commandmanager.events;
 
-import net.codingarea.engine.discord.commandmanager.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.CommandHandler;
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.dv8tion.jda.api.JDA;

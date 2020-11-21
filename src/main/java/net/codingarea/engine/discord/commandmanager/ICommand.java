@@ -1,5 +1,6 @@
 package net.codingarea.engine.discord.commandmanager;
 
+import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
 import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.CheckReturnValue;

@@ -1,7 +1,8 @@
-package net.codingarea.engine.discord.commandmanager;
+package net.codingarea.engine.discord.commandmanager.sub;
 
-import net.codingarea.engine.discord.commandmanager.impl.ArgumentParserImpl;
-import net.codingarea.engine.discord.commandmanager.impl.SubCommandImpl;
+import net.codingarea.engine.discord.commandmanager.Command;
+import net.codingarea.engine.discord.commandmanager.CommandType;
+import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
 import net.codingarea.engine.exceptions.SimilarArgumentParserRegisteredException;
 import net.codingarea.engine.exceptions.SimilarCommandRegisteredException;
 import net.codingarea.engine.utils.Replacement;

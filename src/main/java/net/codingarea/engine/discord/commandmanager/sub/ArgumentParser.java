@@ -1,4 +1,4 @@
-package net.codingarea.engine.discord.commandmanager;
+package net.codingarea.engine.discord.commandmanager.sub;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.ElementType;

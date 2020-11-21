@@ -1,6 +1,7 @@
 package net.codingarea.engine.discord.commandmanager;
 
-import net.codingarea.engine.discord.commandmanager.impl.CommandEventImpl;
+import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.events.CommandEventImpl;
 import net.codingarea.engine.discord.defaults.DefaultCommandAccessChecker;
 import net.codingarea.engine.discord.defaults.DefaultResultHandler;
 import net.codingarea.engine.exceptions.CommandExecutionException;
@@ -37,13 +38,13 @@ public class CommandHandler implements Bindable {
 	protected ResultHandler resultHandler = new DefaultResultHandler();
 
 	@Nonnull
-	public CommandHandler registerCommand(ICommand command) {
+	public CommandHandler registerCommand(final @Nonnull ICommand command) {
 		commands.add(command);
 		return this;
 	}
 
 	@Nonnull
-	public CommandHandler registerCommands(ICommand... commands) {
+	public CommandHandler registerCommands(final @Nonnull ICommand... commands) {
 		this.commands.addAll(Arrays.asList(commands));
 		return this;
 	}
@@ -68,7 +69,7 @@ public class CommandHandler implements Bindable {
 	 */
 	@Nullable
 	@CheckReturnValue
-	public ICommand getCommand(String name) {
+	public ICommand getCommand(@Nonnull String name) {
 
 		name = name.toLowerCase();
 

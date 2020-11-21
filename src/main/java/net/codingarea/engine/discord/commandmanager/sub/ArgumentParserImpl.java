@@ -1,8 +1,6 @@
-package net.codingarea.engine.discord.commandmanager.impl;
+package net.codingarea.engine.discord.commandmanager.sub;
 
-import net.codingarea.engine.discord.commandmanager.ArgumentParser;
-import net.codingarea.engine.discord.commandmanager.CommandEvent;
-import net.codingarea.engine.discord.commandmanager.SubCommandHandler;
+import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
 import net.codingarea.engine.exceptions.IllegalArgumentParserException;
 
 import javax.annotation.CheckReturnValue;

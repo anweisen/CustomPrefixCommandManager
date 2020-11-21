@@ -1,8 +1,6 @@
-package net.codingarea.engine.discord.commandmanager.impl;
+package net.codingarea.engine.discord.commandmanager.sub;
 
-import net.codingarea.engine.discord.commandmanager.CommandEvent;
-import net.codingarea.engine.discord.commandmanager.SubCommand;
-import net.codingarea.engine.discord.commandmanager.SubCommandHandler;
+import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
 import net.codingarea.engine.exceptions.IllegalSubCommandException;
 import net.codingarea.engine.exceptions.IllegalSubCommandNameException;
 
