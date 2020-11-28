@@ -7,18 +7,20 @@ import java.util.TimerTask;
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.4
+ *
+ * @see TimerTask
  */
 public abstract class ThrowingTimerTask extends TimerTask {
 
 	@Override
 	public final void run() {
 		try {
-			runThrowing();
+			runExceptionally();
 		} catch (Throwable ex) {
 			throw new ExecutionException(ex);
 		}
 	}
 
-	public abstract void runThrowing() throws Exception;
+	public abstract void runExceptionally() throws Exception;
 
 }

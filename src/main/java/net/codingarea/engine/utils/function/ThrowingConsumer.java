@@ -7,7 +7,10 @@ import java.util.function.Consumer;
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 1.0
+ *
+ * @see java.util.function.Consumer
  */
+@FunctionalInterface
 public interface ThrowingConsumer<T> extends Consumer<T> {
 
 	@Override

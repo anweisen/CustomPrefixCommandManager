@@ -7,7 +7,10 @@ import java.util.function.Predicate;
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.8
+ *
+ * @see java.util.function.Predicate
  */
+@FunctionalInterface
 public interface ThrowingPredicate<T> extends Predicate<T> {
 
 	@Override

@@ -8,7 +8,10 @@ import java.util.function.Function;
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
+ *
+ * @see java.util.function.Function
  */
+@FunctionalInterface
 public interface ThrowingFunction<T, R> extends Function<T, R> {
 
 	@Nonnull
