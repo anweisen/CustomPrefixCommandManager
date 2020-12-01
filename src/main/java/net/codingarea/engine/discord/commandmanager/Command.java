@@ -1,6 +1,6 @@
 package net.codingarea.engine.discord.commandmanager;
 
-import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.Nullable;
@@ -20,10 +20,10 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this(name, false, alias);
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull String... alias) {
+	public Command(@Nonnull String name, boolean async, @Nonnull String... alias) {
 		this.name = name;
 		this.alias = alias;
-		this.processInNewThread = processInNewThread;
+		this.async = async;
 	}
 
 	public Command(@Nonnull String name, @Nonnull CommandType commandType, @Nonnull String... alias) {
@@ -37,33 +37,33 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this.type = CommandType.GUILD;
 	}
 
-	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, @Nonnull String... alias) {
-		this(name, processInNewThread, alias);
+	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean async, @Nonnull String... alias) {
+		this(name, async, alias);
 		this.type = commandType;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull String... alias) {
-		this(name, processInNewThread, alias);
+	public Command(@Nonnull String name, boolean async, boolean reactToMentionPrefix, @Nonnull String... alias) {
+		this(name, async, alias);
 		this.reactToMentionPrefix = reactToMentionPrefix;
 	}
 
-	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean processInNewThread, boolean reactToMentionPrefix,
+	public Command(@Nonnull String name, @Nonnull CommandType commandType, boolean async, boolean reactToMentionPrefix,
 	               @Nonnull String... alias) {
-		this(name, commandType, processInNewThread, alias);
+		this(name, commandType, async, alias);
 		this.reactToMentionPrefix = reactToMentionPrefix;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, boolean reactToMentionPrefix, @Nonnull Permission permission,
+	public Command(@Nonnull String name, boolean async, boolean reactToMentionPrefix, @Nonnull Permission permission,
 	               @Nonnull String... alias) {
-		this(name, CommandType.GUILD, processInNewThread, reactToMentionPrefix, alias);
+		this(name, CommandType.GUILD, async, reactToMentionPrefix, alias);
 		this.permission = permission;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, Permission permission, boolean reactToWebhooks,
+	public Command(@Nonnull String name, boolean async, Permission permission, boolean reactToWebhooks,
 	               boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, @Nonnull String... alias) {
 		this.name = name;
 		this.alias = alias;
-		this.processInNewThread = processInNewThread;
+		this.async = async;
 		this.reactToWebhooks = reactToWebhooks;
 		this.reactToBots = reactToBots;
 		this.reactToMentionPrefix = reactToMentionPrefix;
@@ -80,20 +80,20 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this.type = CommandType.GUILD;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
+	public Command(@Nonnull String name, boolean async, @Nonnull Permission permission, boolean teamCommand, @Nonnull String... alias) {
 		this.name = name;
 		this.alias = alias;
-		this.processInNewThread = processInNewThread;
+		this.async = async;
 		this.permission = permission;
 		this.teamCommand = teamCommand;
 		this.type = CommandType.GUILD;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull Permission permission, boolean reactToWebhooks,
+	public Command(@Nonnull String name, boolean async, @Nonnull Permission permission, boolean reactToWebhooks,
 	               boolean reactToBots, boolean reactToMentionPrefix, boolean teamCommand, boolean executeOnUpdate, @Nonnull String... alias) {
 		this.name = name;
 		this.alias = alias;
-		this.processInNewThread = processInNewThread;
+		this.async = async;
 		this.permission = permission;
 		this.type = CommandType.GUILD;
 		this.reactToWebhooks = reactToWebhooks;
@@ -103,11 +103,11 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this.executeOnUpdate = executeOnUpdate;
 	}
 
-	public Command(@Nonnull String name, boolean processInNewThread, @Nonnull CommandType type,
+	public Command(@Nonnull String name, boolean async, @Nonnull CommandType type,
 	               boolean teamCommand, boolean executeOnUpdate, @Nonnull String... alias) {
 		this.name = name;
 		this.alias = alias;
-		this.processInNewThread = processInNewThread;
+		this.async = async;
 		this.type = type;
 		this.teamCommand = teamCommand;
 		this.executeOnUpdate = executeOnUpdate;
@@ -117,7 +117,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 	private String description;
 	private String[] alias;
 
-	private boolean processInNewThread;
+	private boolean async;
 	private Permission permission;
 
 	private CommandType type = CommandType.GENERAL;
@@ -164,8 +164,8 @@ public abstract class Command extends CommandHelper implements ICommand {
 	}
 
 	@Override
-	public final boolean shouldProcessInNewThread() {
-		return processInNewThread;
+	public final boolean isAsync() {
+		return async;
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 	}
 
 	@Override
-	public final boolean executeOnUpdate() {
+	public final boolean shouldReactOnEdit() {
 		return executeOnUpdate;
 	}
 
@@ -189,7 +189,8 @@ public abstract class Command extends CommandHelper implements ICommand {
 
 	protected final void setType(@Nonnull CommandType type) {
 		this.type = type;
-		if (type == CommandType.PRIVATE || type == CommandType.GENERAL) permission = null;
+		if (type == CommandType.PRIVATE || type == CommandType.GENERAL)
+			permission = null;
 	}
 
 	protected final void setPermission(Permission permission) {
@@ -205,8 +206,8 @@ public abstract class Command extends CommandHelper implements ICommand {
 		this.name = name;
 	}
 
-	protected final void setProcessInNewThread(boolean processInNewThread) {
-		this.processInNewThread = processInNewThread;
+	protected final void setAsync(boolean async) {
+		this.async = async;
 	}
 
 	protected final void setReactToMentionPrefix(boolean reactToMentionPrefix) {
@@ -218,6 +219,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 	}
 
 	protected final void setTeamCommand(boolean teamCommand) {
+		if (teamCommand && permission == null) permission = Permission.ADMINISTRATOR;
 		this.teamCommand = teamCommand;
 	}
 
@@ -232,7 +234,7 @@ public abstract class Command extends CommandHelper implements ICommand {
 		return description;
 	}
 
-	protected final void setDescription(final @Nullable CharSequence description) {
+	protected final void setDescription(@Nullable CharSequence description) {
 		this.description = description == null ? null : String.valueOf(description);
 	}
 

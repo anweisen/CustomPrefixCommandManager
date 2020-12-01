@@ -1,6 +1,8 @@
 package net.codingarea.engine.discord.commandmanager;
 
-import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
+import net.codingarea.engine.utils.IAlias;
+import net.codingarea.engine.utils.INamed;
 import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.CheckReturnValue;
@@ -11,15 +13,17 @@ import javax.annotation.Nullable;
  * @author anweisen | https://github.com/anweisen
  * @since 1.2
  */
-public interface ICommand {
+public interface ICommand extends INamed, IAlias {
 
-	void onCommand(@Nonnull final CommandEvent event) throws Exception;
+	void onCommand(@Nonnull CommandEvent event) throws Exception;
 
 	@Nonnull
+	@Override
 	@CheckReturnValue
 	String getName();
 
 	@Nonnull
+	@Override
 	@CheckReturnValue
 	String[] getAlias();
 
@@ -31,7 +35,9 @@ public interface ICommand {
 
 	@Nullable
 	@CheckReturnValue
-	Permission getPermissionNeeded();
+	default Permission getPermissionNeeded(){
+		return null;
+	}
 
 	@Nonnull
 	@CheckReturnValue
@@ -50,7 +56,7 @@ public interface ICommand {
 	}
 
 	@CheckReturnValue
-	default boolean shouldProcessInNewThread() {
+	default boolean isAsync() {
 		return false;
 	}
 
@@ -65,7 +71,7 @@ public interface ICommand {
 	}
 
 	@CheckReturnValue
-	default boolean executeOnUpdate() {
+	default boolean shouldReactOnEdit() {
 		return true;
 	}
 
