@@ -2,6 +2,8 @@ package net.codingarea.engine.utils.function;
 
 import net.codingarea.engine.exceptions.ConsumeException;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
 
 /**
@@ -23,5 +25,11 @@ public interface ThrowingBiConsumer<A, B> extends BiConsumer<A, B> {
 	}
 
 	void acceptExceptionally(A a, B b) throws Exception;
+
+	@Nonnull
+	@CheckReturnValue
+	static <A, B> ThrowingBiConsumer<A, B> of(@Nonnull BiConsumer<A, B> consumer) {
+		return consumer::accept;
+	}
 
 }

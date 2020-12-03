@@ -2,6 +2,8 @@ package net.codingarea.engine.utils.function;
 
 import net.codingarea.engine.exceptions.ConsumeException;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 /**
@@ -23,5 +25,11 @@ public interface ThrowingConsumer<T> extends Consumer<T> {
 	}
 
 	void acceptThrowing(T t) throws Exception;
+
+	@Nonnull
+	@CheckReturnValue
+	static <T> ThrowingConsumer<T> of(@Nonnull Consumer<T> consumer) {
+		return consumer::accept;
+	}
 
 }

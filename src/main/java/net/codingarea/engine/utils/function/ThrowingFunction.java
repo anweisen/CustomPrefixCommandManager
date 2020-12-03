@@ -2,6 +2,7 @@ package net.codingarea.engine.utils.function;
 
 import net.codingarea.engine.exceptions.ConsumeException;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import java.util.function.Function;
 
@@ -25,5 +26,11 @@ public interface ThrowingFunction<T, R> extends Function<T, R> {
 	}
 
 	R applyExceptionally(T t) throws Exception;
+
+	@Nonnull
+	@CheckReturnValue
+	static <T, R> ThrowingFunction<T, R> of(@Nonnull Function<T, R> function) {
+		return function::apply;
+	}
 
 }

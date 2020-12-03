@@ -2,6 +2,9 @@ package net.codingarea.engine.utils.function;
 
 import net.codingarea.engine.exceptions.ConsumeException;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
@@ -10,6 +13,8 @@ import net.codingarea.engine.exceptions.ConsumeException;
  */
 @FunctionalInterface
 public interface ThrowingTripleConsumer<A, B, C> extends TripleConsumer<A, B, C> {
+
+	void acceptExceptionally(A a, B b, C c) throws Exception;
 
 	@Override
 	default void accept(A a, B b, C c) {
@@ -20,6 +25,10 @@ public interface ThrowingTripleConsumer<A, B, C> extends TripleConsumer<A, B, C>
 		}
 	}
 
-	void acceptExceptionally(A a, B b, C c) throws Exception;
+	@Nonnull
+	@CheckReturnValue
+	static <A, B, C> ThrowingTripleConsumer<A, B, C> of(@Nonnull TripleConsumer<A, B, C> consumer) {
+		return consumer::accept;
+	}
 
 }

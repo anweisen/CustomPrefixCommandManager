@@ -2,6 +2,8 @@ package net.codingarea.engine.utils.function;
 
 import net.codingarea.engine.exceptions.ConsumeException;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -23,4 +25,11 @@ public interface ThrowingBooleanSupplier extends BooleanSupplier {
 			throw new ConsumeException(ex);
 		}
 	}
+
+	@Nonnull
+	@CheckReturnValue
+	static ThrowingBooleanSupplier of(@Nonnull BooleanSupplier supplier) {
+		return supplier::getAsBoolean;
+	}
+
 }

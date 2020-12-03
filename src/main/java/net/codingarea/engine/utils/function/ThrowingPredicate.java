@@ -1,7 +1,9 @@
 package net.codingarea.engine.utils.function;
 
-import net.codingarea.engine.exceptions.ExecutionException;
+import net.codingarea.engine.exceptions.UnexpectedExecutionException;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 /**
@@ -18,10 +20,16 @@ public interface ThrowingPredicate<T> extends Predicate<T> {
 		try {
 			return testExceptionally(t);
 		} catch (Exception ignored) {
-			throw new ExecutionException();
+			throw new UnexpectedExecutionException();
 		}
 	}
 
 	boolean testExceptionally(T t) throws Exception;
+
+	@Nonnull
+	@CheckReturnValue
+	static <T> ThrowingPredicate<T> of(@Nonnull Predicate<T> predicate) {
+		return predicate::test;
+	}
 
 }
