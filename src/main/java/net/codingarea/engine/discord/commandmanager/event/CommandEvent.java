@@ -1,12 +1,11 @@
-package net.codingarea.engine.discord.commandmanager.events;
+package net.codingarea.engine.discord.commandmanager.event;
 
-import net.codingarea.engine.discord.commandmanager.CommandHandler;
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
+import net.codingarea.engine.discord.commandmanager.ICommandHandler;
 import net.codingarea.engine.exceptions.MessageException;
 import net.codingarea.engine.utils.Colors;
 import net.codingarea.engine.utils.function.ThrowingConsumer;
-import net.codingarea.engine.utils.UtilMethod;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -36,7 +35,7 @@ public interface CommandEvent {
 
 	@Nonnull
 	@CheckReturnValue
-	CommandHandler getHandler();
+	ICommandHandler getHandler();
 
 	@Nonnull
 	@CheckReturnValue
@@ -130,13 +129,11 @@ public interface CommandEvent {
 	@CheckReturnValue
 	Member getMember();
 
-	@UtilMethod
 	@CheckReturnValue
 	default Color getMemberColor() {
 		return getMember() == null ? null : getMember().getColor();
 	}
 
-	@UtilMethod
 	@CheckReturnValue
 	default Color getSelfColor() {
 		try {
@@ -147,7 +144,6 @@ public interface CommandEvent {
 	}
 
 	@Nonnull
-	@UtilMethod
 	@CheckReturnValue
 	default Color getSelfColorNotNull() {
 		return Colors.getMemberColorNotNull(getSelfMember());
@@ -278,19 +274,59 @@ public interface CommandEvent {
 		reply(message).queue(sent, MessageException::create);
 	}
 
-	default void queueSyntax(final @Nonnull String syntax) {
+	default void queueMessage(@Nonnull EmbedBuilder message) {
+		queueMessage(message, sent -> {});
+	}
+
+	default void queueMessage(@Nonnull MessageEmbed message) {
+		queueMessage(message, sent -> {});
+	}
+
+	default void queueMessage(@Nonnull CharSequence message) {
+		queueMessage(message, sent -> {});
+	}
+
+	default void queueMessage(@Nonnull EmbedBuilder message, @Nonnull ThrowingConsumer<Message> sent) {
+		send(message.build()).queue(sent, MessageException::create);
+	}
+
+	default void queueMessage(@Nonnull MessageEmbed message, @Nonnull ThrowingConsumer<Message> sent) {
+		send(message).queue(sent, MessageException::create);
+	}
+
+	default void queueMessage(@Nonnull CharSequence message, @Nonnull ThrowingConsumer<Message> sent) {
+		send(message).queue(sent, MessageException::create);
+	}
+
+	default void queueSyntaxReply(@Nonnull String syntax) {
 		queueReply(CommandHelper.syntax(this, syntax));
+	}
+
+	default void queueSyntaxSend(@Nonnull String syntax) {
+		queueMessage(CommandHelper.syntax(this, syntax));
 	}
 
 	@Nonnull
 	@CheckReturnValue
 	default MessageAction reply(@Nonnull MessageEmbed message) {
-		return getChannel().sendMessage(message);
+		return getMessage().reply(message).mentionRepliedUser(false);
 	}
 
 	@Nonnull
 	@CheckReturnValue
 	default MessageAction reply(@Nonnull CharSequence message) {
+		return getMessage().reply(message).mentionRepliedUser(false);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default MessageAction send(@Nonnull MessageEmbed message) {
+		return getChannel().sendMessage(message);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default MessageAction send(@Nonnull CharSequence message) {
 		return getChannel().sendMessage(message);
 	}
 
@@ -460,21 +496,18 @@ public interface CommandEvent {
 	}
 
 	@Nonnull
-	@UtilMethod
 	@CheckReturnValue
 	default String syntax(String syntax) {
 		return syntax(this, syntax);
 	}
 
 	@Nonnull
-	@UtilMethod
 	@CheckReturnValue
 	static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
 		return syntax(event, syntax, true);
 	}
 
 	@Nonnull
-	@UtilMethod
 	@CheckReturnValue
 	static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax, boolean command) {
 		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;

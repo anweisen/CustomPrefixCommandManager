@@ -1,14 +1,15 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.discord.commandmanager.CommandHandler;
+import net.codingarea.engine.discord.commandmanager.CommandResult;
+import net.codingarea.engine.discord.commandmanager.ICommandHandler;
 import net.codingarea.engine.discord.listener.DiscordEvent;
 import net.codingarea.engine.discord.listener.Listener;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import java.util.function.Function;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -16,41 +17,36 @@ import java.util.function.Function;
  */
 public class DefaultCommandListener implements Listener {
 
-	private final CommandHandler commandHandler;
-	private Function<Guild, String> prefix;
+	protected final ICommandHandler handler;
 
-	public DefaultCommandListener(@Nonnull CommandHandler commandHandler, @Nonnull String prefix) {
-		this.commandHandler = commandHandler;
-		this.prefix = guild -> prefix;
+	public DefaultCommandListener(final @Nonnull ICommandHandler handler) {
+		this.handler = handler;
 	}
 
-	/**
-	 * @param prefix The {@link Guild} param is {@code null} when the message is not from a guild
-	 */
-	public DefaultCommandListener(@Nonnull CommandHandler commandHandler, @Nonnull Function<Guild, String> prefix) {
-		this.commandHandler = commandHandler;
-		this.prefix = prefix;
-	}
-
-	/**
-	 * @param prefix {@link Function#apply(Object)} is used to get the prefix which should be used
-	 *               The {@link Guild} param is {@code null} when the message is not from a guild
-	 * @return {@code this} for chaining
-	 */
 	@Nonnull
-	public DefaultCommandListener setPrefix(final @Nonnull Function<Guild, String> prefix) {
-		this.prefix = prefix;
-		return this;
+	@CheckReturnValue
+	public ICommandHandler getHandler() {
+		return handler;
 	}
 
 	@DiscordEvent
-	public void onMessage(MessageReceivedEvent event) {
-		commandHandler.handleCommand(prefix.apply(event.isFromGuild() ? event.getGuild() : null), event);
+	public void onMessage(final @Nonnull MessageReceivedEvent event) {
+		handler.handleEvent(event).thenAccept(result -> react(result, event));
 	}
 
 	@DiscordEvent
-	public void onEdit(MessageUpdateEvent event) {
-		commandHandler.handleCommand(prefix.apply(event.isFromGuild() ? event.getGuild() : null), event);
+	public void onEdit(final @Nonnull MessageUpdateEvent event) {
+		handler.handleEvent(event).thenAccept(result -> react(result, event));
+	}
+
+	protected void react(final @Nonnull CommandResult result, final @Nonnull GenericMessageEvent event) {
+
+		if (result == CommandResult.SELF_MESSAGE_NO_REACT) return;
+		String answer = result.getAnswer();
+		if (answer == null) return;
+
+		event.getChannel().sendMessage(answer).queue(message -> {}, ex -> {});
+
 	}
 
 }

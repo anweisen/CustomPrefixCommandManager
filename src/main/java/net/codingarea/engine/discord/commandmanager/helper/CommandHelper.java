@@ -1,12 +1,13 @@
 package net.codingarea.engine.discord.commandmanager.helper;
 
-import net.codingarea.engine.discord.commandmanager.events.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.lang.LanguageManager;
 import net.codingarea.engine.utils.LogHelper;
 import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.StaticBinder;
 import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.Event;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -329,6 +330,10 @@ public abstract class CommandHelper extends LogHelper {
 
 		return false;
 
+	}
+
+	public static String mentionJDA(final @Nonnull Event event) {
+		return "<@!" + event.getJDA().getSelfUser().getId() + ">";
 	}
 
 }

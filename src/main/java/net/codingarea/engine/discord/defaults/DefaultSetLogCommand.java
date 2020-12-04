@@ -1,6 +1,6 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.Command;
 import net.codingarea.engine.utils.Replacement;
 import net.dv8tion.jda.api.Permission;

@@ -1,7 +1,7 @@
-package net.codingarea.engine.discord.commandmanager.events;
+package net.codingarea.engine.discord.commandmanager.event;
 
-import net.codingarea.engine.discord.commandmanager.CommandHandler;
 import net.codingarea.engine.discord.commandmanager.ICommand;
+import net.codingarea.engine.discord.commandmanager.ICommandHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
@@ -20,8 +20,9 @@ public class CommandEventImpl implements CommandEvent {
 
 	@Nonnull
 	@CheckReturnValue
-	public static CommandEvent create(final @Nonnull GenericMessageEvent event, final @Nonnull String prefix, final @Nonnull String commandName,
-	                                  final @Nonnull ICommand command, final @Nonnull CommandHandler handler) {
+	public static CommandEvent create(@Nonnull GenericMessageEvent event, @Nonnull String prefix,
+	                                  @Nonnull String commandName, @Nonnull ICommand command,
+	                                  @Nonnull ICommandHandler handler) {
 		if (event instanceof MessageReceivedEvent) {
 			MessageReceivedEvent receivedEvent = (MessageReceivedEvent) event;
 			return new CommandEventImpl(event, receivedEvent.getMessage(), prefix, commandName, command, handler);
@@ -39,10 +40,10 @@ public class CommandEventImpl implements CommandEvent {
 	protected final String commandName;
 	protected final Message message;
 	protected final ICommand command;
-	protected final CommandHandler handler;
+	protected final ICommandHandler handler;
 
-	public CommandEventImpl(final @Nonnull GenericMessageEvent event, final @Nonnull Message message, final @Nonnull String prefix,
-	                        final @Nonnull String commandName, final @Nonnull ICommand command, final @Nonnull CommandHandler handler) {
+	public CommandEventImpl(@Nonnull GenericMessageEvent event, @Nonnull Message message, @Nonnull String prefix,
+	                        @Nonnull String commandName, @Nonnull ICommand command, @Nonnull ICommandHandler handler) {
 		this.event = event;
 		this.prefix = prefix;
 		this.commandName = commandName;
@@ -76,7 +77,7 @@ public class CommandEventImpl implements CommandEvent {
 
 	@Nonnull
 	@Override
-	public CommandHandler getHandler() {
+	public ICommandHandler getHandler() {
 		return handler;
 	}
 

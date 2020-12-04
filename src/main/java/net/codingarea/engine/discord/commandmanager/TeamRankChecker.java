@@ -9,8 +9,8 @@ import javax.annotation.Nonnull;
  * @since 2.4
  */
 @FunctionalInterface
-public interface CommandAccessChecker {
+public interface TeamRankChecker {
 
-	boolean isAllowed(@Nonnull Member member, @Nonnull ICommand command);
+	boolean hasTeamRank(@Nonnull Member member);
 
 }
