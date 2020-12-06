@@ -1,19 +1,20 @@
 package net.codingarea.engine.discord.commandmanager.event;
 
 import net.codingarea.engine.discord.commandmanager.ICommand;
-import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.codingarea.engine.discord.commandmanager.ICommandHandler;
-import net.codingarea.engine.exceptions.MessageException;
+import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.codingarea.engine.utils.Colors;
+import net.codingarea.engine.utils.InviteManager;
+import net.codingarea.engine.utils.Utils;
 import net.codingarea.engine.utils.function.ThrowingConsumer;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDA.ShardInfo;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.User.UserFlag;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.annotation.CheckReturnValue;
@@ -21,17 +22,20 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
  * @author anweisen | https://github.com/anweisen
- * @since 2.6
+ * @since 2.9
  */
-public interface CommandEvent {
+public interface CommandEvent extends MessagePipeline {
 
-	/*
-	 * Begin of CommandInfo section
-	 */
+
+	//
+	// General information about the execution
+	// (handler, command, prefix, async, ...)
+	//
 
 	@Nonnull
 	@CheckReturnValue
@@ -50,39 +54,379 @@ public interface CommandEvent {
 	String getPrefix();
 
 	@CheckReturnValue
-	default boolean isMentionPrefix() {
-		return CommandHelper.containsMention(getPrefix().trim());
-	}
+	boolean isMentionPrefix();
 
-	/*
-	 * Begin of message section
-	 */
+	@CheckReturnValue
+	boolean isAsyncExecution();
+
+	@CheckReturnValue
+	boolean isGuild();
+
+	@CheckReturnValue
+	boolean isPrivate();
+
+	@CheckReturnValue
+	boolean isBot();
+
+	@CheckReturnValue
+	boolean isWebHook();
+
+	//
+	// General info about the bot
+	// (jda, shardmanager, shard, ...)
+	//
 
 	@Nonnull
+	@CheckReturnValue
+	JDA getJDA();
+
+	@Nonnull
+	@CheckReturnValue
+	default SelfUser getSelfUser() {
+		return getJDA().getSelfUser();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default Member getSelfMember() {
+		return getGuild().getSelfMember();
+	}
+
+	@Nullable
+	@CheckReturnValue
+	default Member getSelfMemberNullable() {
+		try {
+			return getSelfMember();
+		} catch (IllegalStateException ex) {
+			return null;
+		}
+	}
+
+	@Nullable
+	@CheckReturnValue
+	default ShardManager getShardManager() {
+		return getJDA().getShardManager();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default ShardInfo getShardInfo() {
+		return getJDA().getShardInfo();
+	}
+
+	@CheckReturnValue
+	default int getShardID() {
+		return getShardInfo().getShardId();
+	}
+
+	@CheckReturnValue
+	default int getTotalShards() {
+		return getShardInfo().getShardTotal();
+	}
+
+	//
+	// Information about the event
+	//
+
+	@Nonnull
+	@CheckReturnValue
+	GenericMessageEvent getEvent();
+
+	@Nonnull
+	@CheckReturnValue
+	default MessageUpdateEvent getUpdateEvent() {
+		if (!(getEvent() instanceof MessageUpdateEvent))
+			throw new IllegalStateException();
+		return (MessageUpdateEvent) getEvent();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default MessageReceivedEvent getReceivedEvent() {
+		if (!(getEvent() instanceof MessageReceivedEvent))
+			throw new IllegalStateException();
+		return (MessageReceivedEvent) getEvent();
+	}
+
+	//
+	// Information about the sender
+	// (user, member, color, id, ...)
+	//
+
+	@Nonnull
+	@Override
+	@CheckReturnValue
+	User getUser();
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the command was not triggered by a member / not in a guild
+	 */
+	@Nonnull
+	@CheckReturnValue
+	Member getMember();
+
+	@Nullable
+	@CheckReturnValue
+	default Member getMemberNullable() {
+		try {
+			return getMember();
+		} catch (IllegalStateException ex) {
+			return null;
+		}
+	}
+
+	@CheckReturnValue
+	default boolean memberHasPermission(@Nonnull Permission... permission) {
+		return getMember().hasPermission(permission);
+	}
+
+	@CheckReturnValue
+	default boolean memberHasRole(@Nonnull Role role) {
+		return getMember().getRoles().contains(role);
+	}
+
+	@CheckReturnValue
+	default boolean memberHasRole(long roleID) {
+		return getMember().getRoles().stream().anyMatch(role -> role.getIdLong() == roleID);
+	}
+
+	@CheckReturnValue
+	default boolean memberHasRole(@Nonnull String roleID) {
+		return getMember().getRoles().stream().anyMatch(role -> role.getId().equals(roleID));
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getUserID() {
+		return getUser().getId();
+	}
+
+	@CheckReturnValue
+	default long getUserIDLong() {
+		return getUser().getIdLong();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getUserTag() {
+		return getUser().getAsTag();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getUserAsMention() {
+		return getUser().getAsMention();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getUserName() {
+		return getUser().getName();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getEffectiveUserName() {
+		return getMemberNullable() != null ? getMember().getEffectiveName() : getUserName();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getUserAvatarURL() {
+		return getUser().getEffectiveAvatarUrl();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default EnumSet<UserFlag> getUserFlags() {
+		return getUser().getFlags();
+	}
+
+	//
+	// Information about guild
+	// (guild, id, name, icon, ...)
+	//
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nonnull
+	@CheckReturnValue
+	Guild getGuild();
+
+	@Nullable
+	@CheckReturnValue
+	default Guild getGuildNullable() {
+		try {
+			return getGuild();
+		} catch (IllegalStateException ex) {
+			return null;
+		}
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nonnull
+	@CheckReturnValue
+	default String getGuildID() {
+		return getGuild().getId();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@CheckReturnValue
+	default long getGuildIDLong() {
+		return getGuild().getIdLong();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nonnull
+	@CheckReturnValue
+	default String getGuildName() {
+		return getGuild().getName();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nullable
+	@CheckReturnValue
+	default String getGuildIconURL() {
+		return getGuild().getIconUrl();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nullable
+	@CheckReturnValue
+	default String getGuildBannerURL() {
+		return getGuild().getBannerUrl();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the command was not triggered in a guild
+	 */
+	default void createGuildInvite(@Nonnull ThrowingConsumer<? super String> created) {
+		InviteManager.getInvite(getGuild(), getTextChannel(), created);
+	}
+
+	//
+	// Channel information
+	// (channel, guildchannel, privatechannel, ...)
+	//
+
+	@Nonnull
+	@Override
+	@CheckReturnValue
+	MessageChannel getChannel();
+
+	@Nonnull
+	@CheckReturnValue
+	default ChannelType getChannelType() {
+		return getChannel().getType();
+	}
+
+	@CheckReturnValue
+	default boolean isFrom(@Nonnull ChannelType type) {
+		return getEvent().isFromType(type);
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a private chat
+	 */
+	@Nonnull
+	@CheckReturnValue
+	default PrivateChannel getPrivateChannel() {
+		if (!(getChannel() instanceof PrivateChannel))
+			throw new IllegalStateException();
+		return (PrivateChannel) getChannel();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nonnull
+	@CheckReturnValue
+	default GuildChannel getGuildChannel() {
+		if (!(getChannel() instanceof GuildChannel))
+			throw new IllegalStateException();
+		return (GuildChannel) getChannel();
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 *         If the event was not triggered in a guild
+	 */
+	@Nonnull
+	@CheckReturnValue
+	default TextChannel getTextChannel() {
+		if (!(getChannel() instanceof TextChannel))
+			throw new IllegalStateException();
+		return (TextChannel) getChannel();
+	}
+
+	//
+	// Message information
+	// (message, id, content, args, ...)
+	//
+
+	@Nonnull
+	@Override
 	@CheckReturnValue
 	Message getMessage();
 
 	@Nonnull
 	@CheckReturnValue
-	default String getMessageContentRaw() {
-		return getMessage().getContentRaw();
+	default String getMessageID() {
+		return getMessage().getId();
+	}
+
+	@CheckReturnValue
+	default long getMessageIDLong() {
+		return getMessage().getIdLong();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	default String getMessageContentDisplay() {
+	default String getContentDisplay()  {
 		return getMessage().getContentDisplay();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	default String getMessageContentStripped() {
+	default String getContentRaw()  {
+		return getMessage().getContentRaw();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getContentStripped()  {
 		return getMessage().getContentStripped();
 	}
 
 	@Nonnull
 	@CheckReturnValue
 	String[] getArgs();
+
+	@CheckReturnValue
+	default int getArgsLength() {
+		return getArgs().length;
+	}
 
 	@Nonnull
 	@CheckReturnValue
@@ -100,250 +444,28 @@ public interface CommandEvent {
 		return args.toArray(new String[0]);
 	}
 
+	@Nonnull
 	@CheckReturnValue
-	default int getArgsLength() {
-		return getArgs().length;
+	default String getArg(int index) {
+		return getArgs()[index];
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	ChannelType getChannelType();
-
-	/*
-	 * Begin of guild section
-	 */
-
-	@CheckReturnValue
-	Guild getGuild();
-
-	@CheckReturnValue
-	default String getGuildID() {
-		return getGuild() == null ? null : getGuild().getId();
-	}
-
-	@CheckReturnValue
-	default String getGuildName() {
-		return getGuild() == null ? null : getGuild().getName();
-	}
-
-	@CheckReturnValue
-	Member getMember();
-
-	@CheckReturnValue
-	default Color getMemberColor() {
-		return getMember() == null ? null : getMember().getColor();
-	}
-
-	@CheckReturnValue
-	default Color getSelfColor() {
-		try {
-			return getSelfMember().getColor();
-		} catch (Exception ignored) {
-			return null;
-		}
+	default String getArgsAsString() {
+		return Utils.arrayToString(getArgs());
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	default Color getSelfColorNotNull() {
-		return Colors.getMemberColorNotNull(getSelfMember());
+	default String getArgsAsString(int startIndex) {
+		return Utils.arrayToString(getArgs(), startIndex);
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	User getUser();
-
-	@Nonnull
-	@CheckReturnValue
-	default String getUserID() {
-		return getUser().getId();
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	JDA getJDA();
-
-	@Nullable
-	@CheckReturnValue
-	default ShardManager getShardManager() {
-		return getJDA().getShardManager();
-	}
-
-	@CheckReturnValue
-	default boolean isWebhookMessageEvent() {
-		return getMessage().isWebhookMessage();
-	}
-
-	@CheckReturnValue
-	default boolean isBotMessageEvent() {
-		return getMessage().getAuthor().isBot();
-	}
-
-	/**
-	 * @return The {@link MessageChannel} the command was accessed from
-	 */
-	@Nonnull
-	@CheckReturnValue
-	MessageChannel getChannel();
-
-	/**
-	 * @return The {@link TextChannel} the command was access from
-	 *
-	 * @throws IllegalStateException
-	 *         If the command was not accessed from a {@link TextChannel}
-	 *
-	 * @see #getChannel()
-	 */
-	@Nonnull
-	@CheckReturnValue
-	TextChannel getTextChannel();
-
-	/**
-	 * @return The {@link PrivateChannel} the command was access from
-	 *
-	 * @throws IllegalStateException
-	 *         If the command was not accessed from a {@link PrivateChannel}
-	 *
-	 * @see #getChannel()
-	 */
-	@Nonnull
-	@CheckReturnValue
-	PrivateChannel getPrivateChannel();
-
-	@Nonnull
-	@CheckReturnValue
-	String getMessageID();
-
-	@Nonnull
-	@CheckReturnValue
-	default String getMemberID() {
-		return getUserID();
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getMemberAvatarURL() {
-		return getUser().getEffectiveAvatarUrl();
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getUserTag() {
-		return getUser().getAsTag();
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getMemberName() {
-		return isFromGuild() && getMember() != null ? getMember().getEffectiveName() : getUserName();
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getUserName() {
-		return getUser().getName();
-	}
-
-	@CheckReturnValue
-	boolean isPrivate();
-
-	@CheckReturnValue
-	boolean isFromGuild();
-
-	default void queueReply(@Nonnull EmbedBuilder message) {
-		queueReply(message, sent -> {});
-	}
-
-	default void queueReply(@Nonnull MessageEmbed message) {
-		queueReply(message, sent -> {});
-	}
-
-	default void queueReply(@Nonnull CharSequence message) {
-		queueReply(message, sent -> {});
-	}
-
-	default void queueReply(@Nonnull EmbedBuilder message, @Nonnull ThrowingConsumer<Message> sent) {
-		reply(message.build()).queue(sent, MessageException::create);
-	}
-
-	default void queueReply(@Nonnull MessageEmbed message, @Nonnull ThrowingConsumer<Message> sent) {
-		reply(message).queue(sent, MessageException::create);
-	}
-
-	default void queueReply(@Nonnull CharSequence message, @Nonnull ThrowingConsumer<Message> sent) {
-		reply(message).queue(sent, MessageException::create);
-	}
-
-	default void queueMessage(@Nonnull EmbedBuilder message) {
-		queueMessage(message, sent -> {});
-	}
-
-	default void queueMessage(@Nonnull MessageEmbed message) {
-		queueMessage(message, sent -> {});
-	}
-
-	default void queueMessage(@Nonnull CharSequence message) {
-		queueMessage(message, sent -> {});
-	}
-
-	default void queueMessage(@Nonnull EmbedBuilder message, @Nonnull ThrowingConsumer<Message> sent) {
-		send(message.build()).queue(sent, MessageException::create);
-	}
-
-	default void queueMessage(@Nonnull MessageEmbed message, @Nonnull ThrowingConsumer<Message> sent) {
-		send(message).queue(sent, MessageException::create);
-	}
-
-	default void queueMessage(@Nonnull CharSequence message, @Nonnull ThrowingConsumer<Message> sent) {
-		send(message).queue(sent, MessageException::create);
-	}
-
-	default void queueSyntaxReply(@Nonnull String syntax) {
-		queueReply(CommandHelper.syntax(this, syntax));
-	}
-
-	default void queueSyntaxSend(@Nonnull String syntax) {
-		queueMessage(CommandHelper.syntax(this, syntax));
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default MessageAction reply(@Nonnull MessageEmbed message) {
-		return getMessage().reply(message).mentionRepliedUser(false);
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default MessageAction reply(@Nonnull CharSequence message) {
-		return getMessage().reply(message).mentionRepliedUser(false);
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default MessageAction send(@Nonnull MessageEmbed message) {
-		return getChannel().sendMessage(message);
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default MessageAction send(@Nonnull CharSequence message) {
-		return getChannel().sendMessage(message);
-	}
-
-	default void replyPrivate(@Nonnull EmbedBuilder embed) {
-		replyPrivate(embed.build());
-	}
-
-	default void replyPrivate(@Nonnull MessageEmbed embed) {
-		getUser().openPrivateChannel().queue(channel -> {
-			channel.sendMessage(embed).queue(message -> {}, MessageException::create);
-		}, MessageException::create);
-	}
-
-	default void replyPrivate(@Nonnull CharSequence embed) {
-		getUser().openPrivateChannel().queue(channel -> {
-			channel.sendMessage(embed).queue(message -> {}, MessageException::create);
-		}, MessageException::create);
+	default String getArgsAsString(int startIndex, int endIndex) {
+		return Utils.arrayToString(getArgs(), startIndex, endIndex);
 	}
 
 	@Nonnull
@@ -367,8 +489,8 @@ public interface CommandEvent {
 	}
 
 	/**
-	 * @return Returns the first {@link TextChannel} of the {@link #getMentionedChannels() mentioned channels}
-	 *         Null if empty
+	 * @return Returns the first {@link TextChannel} of the {@link #getMentionedChannels() mentioned channels}.
+	 *         {@code null} if empty
 	 *
 	 * @see #getMentionedChannels()
 	 */
@@ -383,8 +505,8 @@ public interface CommandEvent {
 	}
 
 	/**
-	 * @return Returns the first {@link Role} of the {@link #getMentionedRoles() mentioned roles}
-	 *         Null if empty
+	 * @return Returns the first {@link Role} of the {@link #getMentionedRoles() mentioned roles}.
+	 *          {@code null} if empty
 	 *
 	 * @see #getMentionedRoles()
 	 */
@@ -414,130 +536,55 @@ public interface CommandEvent {
 		}
 	}
 
-	@CheckReturnValue
-	default boolean senderHasPermission(@Nonnull Permission... permission) {
-		if (getMember() == null) {
-			return false;
-		} else {
-			return getMember().hasPermission(permission);
-		}
-	}
+	//
+	// Message actions
+	//
 
-	@CheckReturnValue
-	default String getArg(int index) {
-		return getArgs()[index];
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getArgsAsString(int startIndex, int endIndex) {
-		StringBuilder builder = new StringBuilder();
-		for (int i = startIndex; i < endIndex; i++) {
-			builder.append(getArg(i) + " ");
-		}
-		return builder.toString().trim();
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getArgsAsString(int startIndex) {
-		return getArgsAsString(startIndex, getArgsLength());
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String getArgsAsString() {
-		return getArgsAsString(0);
-	}
-
-	@CheckReturnValue
-	default boolean memberHasRole(@Nonnull Role role) {
-		return getMember().getRoles().contains(role);
-	}
-
-	@CheckReturnValue
-	default boolean memberHasRole(@Nonnull String roleID) {
-		for (Role role : getMember().getRoles()) {
-			if (role.getId().equals(roleID)) return true;
-		}
-		return false;
-	}
-
-	@CheckReturnValue
-	default boolean memberHasRole(long roleID) {
-		for (Role role : getMember().getRoles()) {
-			if (role.getIdLong() == roleID) return true;
-		}
-		return false;
+	default void replySyntax(@Nonnull CharSequence syntax) {
+		reply(CommandHelper.syntax(this, syntax));
 	}
 
 	default void deleteMessage() {
 		getMessage().delete().queue();
 	}
 
-	default void sendTyping() {
-		getChannel().sendTyping().queue();
+	//
+	// Util methods
+	// (colors)
+	//
+
+	@Nullable
+	@CheckReturnValue
+	default Color getMemberColor() {
+		return getMemberNullable() == null ? null : getMember().getColor();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	default SelfUser getSelfUser() {
-		return getJDA().getSelfUser();
+	default Color getMemberColorNotNull() {
+		return Colors.getMemberColorNotNull(getSelfMember());
 	}
 
 	@Nullable
 	@CheckReturnValue
-	default Member getSelfMember() {
+	default Color getSelfColor() {
 		try {
-			return getGuild().getSelfMember();
-		} catch (Exception ignored) {
+			return getSelfMember().getColor();
+		} catch (IllegalStateException ignored) {
 			return null;
 		}
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	default String syntax(String syntax) {
-		return syntax(this, syntax);
+	default Color getSelfColorNotNull() {
+		return Colors.getMemberColorNotNull(getSelfMember());
 	}
 
-	@Nonnull
-	@CheckReturnValue
-	static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
-		return syntax(event, syntax, true);
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax, boolean command) {
-		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;
-		boolean mark = !CommandHelper.containsMention(message);
-		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
-	}
-
-	/**
-	 * @return The {@link MessageReceivedEvent} this {@link CommandEvent} was triggered by
-	 *
-	 * @throws IllegalStateException
-	 *         If this {@link CommandEvent} was not triggered by a {@link MessageReceivedEvent}
-	 */
-	@Nonnull
-	@CheckReturnValue
-	MessageReceivedEvent getReceiveEvent();
-
-	/**
-	 * @return The {@link MessageUpdateEvent} this {@link CommandEvent} was triggered by
-	 *
-	 * @throws IllegalStateException
-	 *         If this {@link CommandEvent} was not triggered by a {@link MessageUpdateEvent}
-	 */
-	@Nonnull
-	@CheckReturnValue
-	MessageUpdateEvent getUpdateEvent();
-
-	@Nonnull
-	@CheckReturnValue
-	GenericMessageEvent getEvent();
+	//
+	// Static methods
+	// (utils)
+	//
 
 	@Nonnull
 	@CheckReturnValue
@@ -551,6 +598,26 @@ public interface CommandEvent {
 			return argsRaw.split(" ");
 		}
 
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String syntax(@Nonnull CharSequence syntax) {
+		return syntax(this, syntax);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	static String syntax(@Nonnull CommandEvent event, @Nonnull CharSequence syntax) {
+		return syntax(event, syntax, true);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	static String syntax(@Nonnull CommandEvent event, @Nonnull CharSequence syntax, boolean command) {
+		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;
+		boolean mark = !CommandHelper.containsMention(message);
+		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
 	}
 
 }

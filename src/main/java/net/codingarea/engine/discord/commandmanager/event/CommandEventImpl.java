@@ -2,83 +2,69 @@ package net.codingarea.engine.discord.commandmanager.event;
 
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.codingarea.engine.discord.commandmanager.ICommandHandler;
+import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 
-import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author anweisen | https://github.com/anweisen
- * @since 2.6
+ * @since 2.9
  */
 public class CommandEventImpl implements CommandEvent {
 
-	@Nonnull
-	@CheckReturnValue
-	public static CommandEvent create(@Nonnull GenericMessageEvent event, @Nonnull String prefix,
-	                                  @Nonnull String commandName, @Nonnull ICommand command,
-	                                  @Nonnull ICommandHandler handler) {
-		if (event instanceof MessageReceivedEvent) {
-			MessageReceivedEvent receivedEvent = (MessageReceivedEvent) event;
-			return new CommandEventImpl(event, receivedEvent.getMessage(), prefix, commandName, command, handler);
-		} else if (event instanceof MessageUpdateEvent) {
-			MessageUpdateEvent updateEvent = (MessageUpdateEvent) event;
-			return new CommandEventImpl(event, updateEvent.getMessage(), prefix, commandName, command, handler);
-		} else {
-			throw new IllegalArgumentException(event.getClass() + " is not supported yet.");
-		}
-	}
-
-	protected final GenericMessageEvent event;
-	protected final String[] args;
-	protected final String prefix;
-	protected final String commandName;
-	protected final Message message;
-	protected final ICommand command;
 	protected final ICommandHandler handler;
+	protected final ICommand command;
+	protected final String commandName, prefix;
+	protected final boolean mentionPrefix;
+	protected final boolean async, fromGuild, bot, webhook;
+	protected final GenericMessageEvent event;
+	protected final JDA jda;
+	protected final User user;
+	protected final Member member;
+	protected final Guild guild;
+	protected final MessageChannel channel;
+	protected final Message message;
+	protected final String[] args;
 
-	public CommandEventImpl(@Nonnull GenericMessageEvent event, @Nonnull Message message, @Nonnull String prefix,
-	                        @Nonnull String commandName, @Nonnull ICommand command, @Nonnull ICommandHandler handler) {
-		this.event = event;
-		this.prefix = prefix;
-		this.commandName = commandName;
-		this.command = command;
-		this.message = message;
+	public CommandEventImpl(@Nonnull ICommandHandler handler, @Nonnull ICommand command,
+	                        @Nonnull String commandName, @Nonnull String prefix, boolean mentionPrefix,
+	                        @Nonnull GenericMessageEvent event) {
+		if (!(event instanceof MessageUpdateEvent || event instanceof MessageReceivedEvent))
+			throw new IllegalStateException();
 		this.handler = handler;
+		this.command = command;
+		this.commandName = commandName;
+		this.prefix = prefix;
+		this.mentionPrefix = mentionPrefix;
+		this.async = command.isAsync();
+		this.fromGuild = event.isFromGuild();
+		this.event = event;
+		this.jda = event.getJDA();
+		this.guild = event.getGuild();
+		this.channel = event.getChannel();
+		this.message = CommandHelper.getMessage(event);
+		this.member = CommandHelper.getMember(event);
 		this.args = CommandEvent.parseArgs(message, prefix, commandName);
-	}
-
-	@Nonnull
-	@Override
-	public MessageReceivedEvent getReceiveEvent() {
-		if (!(event instanceof MessageReceivedEvent))
-			throw new IllegalStateException();
-		return (MessageReceivedEvent) event;
-	}
-
-	@Nonnull
-	@Override
-	public MessageUpdateEvent getUpdateEvent() {
-		if (!(event instanceof MessageUpdateEvent))
-			throw new IllegalStateException();
-		return (MessageUpdateEvent) event;
-	}
-
-	@Nonnull
-	@Override
-	public ICommand getCommand() {
-		return command;
+		this.user = message.getAuthor();
+		this.bot = user.isBot();
+		this.webhook = message.isWebhookMessage();
 	}
 
 	@Nonnull
 	@Override
 	public ICommandHandler getHandler() {
 		return handler;
+	}
+
+	@Nonnull
+	@Override
+	public ICommand getCommand() {
+		return command;
 	}
 
 	@Nonnull
@@ -93,6 +79,74 @@ public class CommandEventImpl implements CommandEvent {
 		return prefix;
 	}
 
+	@Override
+	public boolean isMentionPrefix() {
+		return mentionPrefix;
+	}
+
+	@Override
+	public boolean isAsyncExecution() {
+		return async;
+	}
+
+	@Override
+	public boolean isGuild() {
+		return fromGuild;
+	}
+
+	@Override
+	public boolean isPrivate() {
+		return !fromGuild;
+	}
+
+	@Override
+	public boolean isBot() {
+		return bot;
+	}
+
+	@Override
+	public boolean isWebHook() {
+		return webhook;
+	}
+
+	@Nonnull
+	@Override
+	public JDA getJDA() {
+		return jda;
+	}
+
+	@Nonnull
+	@Override
+	public GenericMessageEvent getEvent() {
+		return event;
+	}
+
+	@Nonnull
+	@Override
+	public User getUser() {
+		return user;
+	}
+
+	@Nonnull
+	@Override
+	public Member getMember() {
+		if (member == null)
+			throw new IllegalStateException();
+		return member;
+	}
+
+	@Nonnull
+	@Override
+	public Guild getGuild() {
+		return guild;
+	}
+
+	@Nonnull
+	@Override
+	public MessageChannel getChannel() {
+		return channel;
+	}
+
 	@Nonnull
 	@Override
 	public Message getMessage() {
@@ -103,80 +157,6 @@ public class CommandEventImpl implements CommandEvent {
 	@Override
 	public String[] getArgs() {
 		return args;
-	}
-
-	@Nonnull
-	@Override
-	public ChannelType getChannelType() {
-		return event.getChannelType();
-	}
-
-	@Nullable
-	@Override
-	public Guild getGuild() {
-		try {
-			return event.getGuild();
-		} catch (Exception ignored) {
-			return null;
-		}
-	}
-
-	@Nullable
-	@Override
-	public Member getMember() {
-		return message.getMember();
-	}
-
-	@Nonnull
-	@Override
-	public User getUser() {
-		return message.getAuthor();
-	}
-
-	@Nonnull
-	@Override
-	public JDA getJDA() {
-		return event.getJDA();
-	}
-
-	@Nonnull
-	@Override
-	public MessageChannel getChannel() {
-		return event.getChannel();
-	}
-
-	@Nonnull
-	@Override
-	public TextChannel getTextChannel() {
-		return event.getTextChannel();
-	}
-
-	@Nonnull
-	@Override
-	public PrivateChannel getPrivateChannel() {
-		return event.getPrivateChannel();
-	}
-
-	@Nonnull
-	@Override
-	public String getMessageID() {
-		return event.getMessageId();
-	}
-
-	@Override
-	public boolean isPrivate() {
-		return !event.isFromGuild();
-	}
-
-	@Override
-	public boolean isFromGuild() {
-		return event.isFromGuild();
-	}
-
-	@Nonnull
-	@Override
-	public GenericMessageEvent getEvent() {
-		return event;
 	}
 
 }
