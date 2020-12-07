@@ -4,6 +4,7 @@ import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.event.CommandEventImpl;
 import net.codingarea.engine.discord.commandmanager.helper.CommandHelper;
 import net.codingarea.engine.utils.CoolDownManager;
+import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageType;
@@ -35,17 +36,17 @@ public class CommandHandler implements ICommandHandler {
 	protected final List<ICommand> registry = new ArrayList<>();
 	protected final ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-	public CommandHandler(final @Nonnull PrefixProvider prefixProvider) {
+	public CommandHandler(@Nonnull PrefixProvider prefixProvider) {
 		this.prefixProvider = prefixProvider;
 	}
 
-	public CommandHandler(final @Nonnull String prefix) {
+	public CommandHandler(@Nonnull String prefix) {
 		this(PrefixProvider.constant(prefix));
 	}
 
 	@Nonnull
 	@Override
-	public CompletableFuture<CommandResult> handleEvent(final @Nonnull MessageUpdateEvent event) {
+	public CompletableFuture<CommandResult> handleEvent(@Nonnull MessageUpdateEvent event) {
 		CompletableFuture<CommandResult> future = new CompletableFuture<>();
 		handleEvent(event, event.getMessage(), future, event.getMember());
 		return future;
@@ -53,17 +54,16 @@ public class CommandHandler implements ICommandHandler {
 
 	@Nonnull
 	@Override
-	public CompletableFuture<CommandResult> handleEvent(final @Nonnull MessageReceivedEvent event) {
+	public CompletableFuture<CommandResult> handleEvent(@Nonnull MessageReceivedEvent event) {
 		CompletableFuture<CommandResult> future = new CompletableFuture<>();
 		handleEvent(event, event.getMessage(), future, event.getMember());
 		return future;
 	}
 
+	protected Object handleEvent(@Nonnull GenericMessageEvent event, @Nonnull Message message,
+	                             @Nonnull CompletableFuture<CommandResult> callback, @Nullable Member member) {
 
-	protected Object handleEvent(final @Nonnull GenericMessageEvent event, final @Nonnull Message message,
-	                             final @Nonnull CompletableFuture<CommandResult> callback, final @Nullable Member member) {
-
-		if (message.getType() != MessageType.DEFAULT) {
+		if (message.getType() != MessageType.DEFAULT && message.getType() != MessageType.INLINE_REPLY) {
 			return callback.complete(CommandResult.INVALID_MESSAGE_TYPE);
 		} else if (message.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) {
 			return callback.complete(CommandResult.SELF_MESSAGE_NO_REACT);
@@ -104,7 +104,7 @@ public class CommandHandler implements ICommandHandler {
 			return callback.complete(CommandResult.MESSAGE_EDIT_NO_REACT);
 		} else if (member != null && command.getPermissionNeeded() != null && !member.hasPermission(command.getPermissionNeeded())) {
 			return callback.complete(CommandResult.NO_PERMISSIONS);
-		} else if (member != null && teamRankChecker != null && !teamRankChecker.hasTeamRank(member)) {
+		} else if (command.isTeamCommand() && member != null && teamRankChecker != null && !teamRankChecker.hasTeamRank(member)) {
 			return callback.complete(CommandResult.NO_PERMISSIONS_TEAM_RANK);
 		} else if (webhookReactionBehavior != ReactionBehavior.ALWAYS && message.isWebhookMessage() && (!command.shouldReactToWebhooks() || webhookReactionBehavior == ReactionBehavior.NEVER)) {
 			return callback.complete(CommandResult.WEBHOOK_MESSAGE_NO_REACT);
@@ -115,28 +115,29 @@ public class CommandHandler implements ICommandHandler {
 		if (cooldown != null && member != null)
 			cooldown.addToCoolDown(member);
 
-		process(command, CommandEventImpl.create(event, prefix, givenCommand, command, this), callback);
+		givenCommand = correctName(givenCommand, command);
+
+		process(command, new CommandEventImpl(this, command, givenCommand, prefix, mentionPrefix, event), callback);
 		return null;
 
 	}
 
-	protected void process(final @Nonnull ICommand command, final @Nonnull CommandEvent event,
-	                       final @Nonnull CompletableFuture<CommandResult> callback) {
+	protected void process(@Nonnull ICommand command, @Nonnull CommandEvent event, @Nonnull CompletableFuture<CommandResult> callback) {
 		executedCommands.incrementAndGet();
 		if (command.isAsync()) {
-			executorService.submit(() -> execute(command, event, callback));
+			executorService.execute(() -> execute(command, event, callback));
 		} else {
 			execute(command, event, callback);
 		}
 	}
 
-	protected void execute(final @Nonnull ICommand command, final @Nonnull CommandEvent event,
-	                       final @Nonnull CompletableFuture<CommandResult> callback) {
+	protected void execute(@Nonnull ICommand command, @Nonnull CommandEvent event, @Nonnull CompletableFuture<CommandResult> callback) {
 		try {
 			command.onCommand(event);
 		} catch (Throwable ex) {
-			callback.completeExceptionally(ex);
 			callback.complete(CommandResult.EXCEPTION);
+			callback.completeExceptionally(ex);
+			Utils.handleException(ex);
 			return;
 		}
 		callback.complete(CommandResult.SUCCESS);
@@ -144,14 +145,14 @@ public class CommandHandler implements ICommandHandler {
 
 	@Nonnull
 	@Override
-	public CommandHandler registerCommand(final @Nonnull ICommand command) {
+	public CommandHandler registerCommand(@Nonnull ICommand command) {
 		this.registry.add(command);
 		return this;
 	}
 
 	@Nonnull
 	@Override
-	public CommandHandler registerCommands(final @Nonnull ICommand... command) {
+	public CommandHandler registerCommands(@Nonnull ICommand... command) {
 		Arrays.stream(command).forEach(this::registerCommand);
 		return this;
 	}
@@ -166,15 +167,35 @@ public class CommandHandler implements ICommandHandler {
 	@Nonnull
 	@Override
 	@CheckReturnValue
-	public Optional<ICommand> findCommand(final @Nonnull String message) {
+	public Optional<ICommand> findCommand(@Nonnull String message) {
 		return registry.stream().filter(command -> {
-			if (message.startsWith(command.getName().toLowerCase()))
+			if (nameIsOK(command.getName(), message))
 				return true;
 			for (String alias : command.getAlias())
-				if (message.startsWith(alias.toLowerCase()))
+				if (nameIsOK(alias, message))
 					return true;
 			return false;
 		}).findFirst();
+	}
+
+	@CheckReturnValue
+	protected boolean nameIsOK(@Nonnull String command, @Nonnull String message) {
+		command = command.toLowerCase().trim();
+		if (message.length() == command.length() && message.startsWith(command)) {
+			return true;
+		} else return message.startsWith(command + " ");
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	protected String correctName(@Nonnull String message, @Nonnull ICommand command) {
+		if (nameIsOK(command.getName(), message))
+			return command.getName().toLowerCase();
+		for (String alias : command.getAlias()) {
+			if (nameIsOK(alias, message))
+				return alias.toLowerCase();
+		}
+		throw new IllegalStateException();
 	}
 
 	@Nonnull
@@ -193,7 +214,7 @@ public class CommandHandler implements ICommandHandler {
 
 	@Nonnull
 	@Override
-	public CommandHandler setPrefixProvider(final @Nonnull PrefixProvider provider) {
+	public CommandHandler setPrefixProvider(@Nonnull PrefixProvider provider) {
 		this.prefixProvider = provider;
 		return this;
 	}
@@ -207,7 +228,7 @@ public class CommandHandler implements ICommandHandler {
 
 	@Nonnull
 	@Override
-	public CommandHandler setWebHookReactionBehavior(final @Nonnull ReactionBehavior behavior) {
+	public CommandHandler setWebHookReactionBehavior(@Nonnull ReactionBehavior behavior) {
 		this.webhookReactionBehavior = behavior;
 		return this;
 	}
@@ -221,7 +242,7 @@ public class CommandHandler implements ICommandHandler {
 
 	@Nonnull
 	@Override
-	public CommandHandler setBotReactionBehavior(final @Nonnull ReactionBehavior behavior) {
+	public CommandHandler setBotReactionBehavior(@Nonnull ReactionBehavior behavior) {
 		this.botReactionBehavior = behavior;
 		return this;
 	}
@@ -242,14 +263,14 @@ public class CommandHandler implements ICommandHandler {
 
 	@Nonnull
 	@Override
-	public CommandHandler setCoolDownManager(final @Nullable CoolDownManager manager) {
+	public CommandHandler setCoolDownManager(@Nullable CoolDownManager manager) {
 		this.cooldown = manager;
 		return this;
 	}
 
 	@Nonnull
 	@Override
-	public CommandHandler setTeamRankChecker(final @Nullable TeamRankChecker checker) {
+	public CommandHandler setTeamRankChecker(@Nullable TeamRankChecker checker) {
 		this.teamRankChecker = checker;
 		return this;
 	}
