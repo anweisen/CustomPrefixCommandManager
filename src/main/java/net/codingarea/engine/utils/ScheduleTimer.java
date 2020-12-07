@@ -16,13 +16,16 @@ public final class ScheduleTimer {
 	}
 
 	public ScheduleTimer(@Nonnull Runnable sync, int rate) {
-		if (rate <= 0 || rate >= 60) throw new IllegalArgumentException();
+		if (rate <= 0 || rate > 60) throw new IllegalArgumentException();
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 
-				if ((OffsetDateTime.now().getSecond() / rate) == 0) {
+				OffsetDateTime now = OffsetDateTime.now();
+
+				if ((now.getSecond() % rate) == 0
+				  || now.getSecond() == 0 && rate == 60) {
 					timer.cancel();
 					sync.run();
 				}
