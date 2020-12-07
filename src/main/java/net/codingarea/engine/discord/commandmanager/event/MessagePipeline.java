@@ -22,6 +22,30 @@ public interface MessagePipeline {
 
 	@Nonnull
 	@CheckReturnValue
+	static MessagePipeline create(@Nonnull Message message) {
+		return new MessagePipeline() {
+			@Nonnull
+			@Override
+			public Message getMessage() {
+				return message;
+			}
+
+			@Nonnull
+			@Override
+			public MessageChannel getChannel() {
+				return message.getChannel();
+			}
+
+			@Nonnull
+			@Override
+			public User getUser() {
+				return message.getAuthor();
+			}
+		};
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	Message getMessage();
 
 	@Nonnull
