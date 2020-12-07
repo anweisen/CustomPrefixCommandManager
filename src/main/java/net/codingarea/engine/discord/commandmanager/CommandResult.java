@@ -80,7 +80,7 @@ public enum CommandResult {
 	/**
 	 * Used when the bot it self triggers the CommandEvent
 	 */
-	SELF_MESSAGE_NO_REACT,
+	SELF_MESSAGE_NO_REACT(true),
 
 	/**
 	 * Used when the command event was triggered without using a valid prefix
@@ -88,14 +88,14 @@ public enum CommandResult {
 	 * @see PrefixProvider
 	 * @see ICommandHandler#setPrefixProvider(PrefixProvider)
 	 */
-	PREFIX_NOT_USED,
+	PREFIX_NOT_USED(true),
 
 	/**
 	 * Used when a mention prefix was used, which was not the guild prefix, and the {@link ICommand Command} should not react
 	 *
 	 * @see ICommand#shouldReactToMentionPrefix()
 	 */
-	MENTION_PREFIX_NO_REACT,
+	MENTION_PREFIX_NO_REACT(true),
 
 	/**
 	 * Used when the command event was triggered by a message update, but the command should not react
@@ -105,9 +105,10 @@ public enum CommandResult {
 	MESSAGE_EDIT_NO_REACT,
 
 	/**
-	 * Used when the {@link MessageType} of the {@link Message}, which triggered the command, is not {@link MessageType#DEFAULT}
+	 * Used when the {@link MessageType} of the {@link Message}, which triggered the command,
+	 * is not {@link MessageType#DEFAULT} and not {@link MessageType#INLINE_REPLY}
 	 */
-	INVALID_MESSAGE_TYPE,
+	INVALID_MESSAGE_TYPE(true),
 
 	/**
 	 * Used when no command was found by the name used
@@ -122,13 +123,25 @@ public enum CommandResult {
 	SUCCESS;
 
 	private String answer;
+	private final boolean system;
+
+	CommandResult(boolean system, String answer) {
+		this.answer = answer;
+		this.system = system;
+	}
 
 	CommandResult(String answer) {
 		this.answer = answer;
+		this.system = false;
+	}
+
+	CommandResult(boolean system) {
+		this.system = system;
 	}
 
 	CommandResult() {
 		this.answer = null;
+		this.system = false;
 	}
 
 	public String getAnswer() {
@@ -137,6 +150,10 @@ public enum CommandResult {
 
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	public boolean isSystemResult() {
+		return system;
 	}
 
 }
