@@ -47,7 +47,7 @@ public class DefaultServerCountDisplay implements Listener {
 					LogHelper.warning("Could not update server count due to an exception: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 				}
 			}
-		}, 5*1000, 10*60*10000 + 60*10000);
+		}, 5*1000, 10*60*1000 + 60*1000);
 	}
 
 }
