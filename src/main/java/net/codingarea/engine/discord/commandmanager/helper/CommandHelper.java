@@ -8,6 +8,11 @@ import net.codingarea.engine.utils.StaticBinder;
 import net.codingarea.engine.utils.Utils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -275,27 +280,33 @@ public abstract class CommandHelper extends LogHelper {
 
 	@Nonnull
 	@CheckReturnValue
-	public static String syntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
+	public static String syntax(@Nonnull CommandEvent event, @Nonnull CharSequence syntax) {
 		return getMessage(event, "syntax", "Please use `%syntax%`",
 						  new Replacement("%syntax%", event.syntax(syntax)));
 	}
 
-	public static void sendSyntax(@Nonnull CommandEvent event, @Nonnull String syntax) {
-		event.queueReply(syntax(event, syntax));
+	public static void sendSyntax(@Nonnull CommandEvent event, @Nonnull CharSequence syntax) {
+		event.reply(syntax(event, syntax));
 	}
 
 	@Nonnull
 	@CheckReturnValue
 	public static String removeMarkdown(@Nonnull String string) {
-		return string.replace("`", "\\`")
-				.replace("_", "\\_")
-				.replace("*", "\\*");
+		return removeMarkdown(string, false);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String removeMarkdown(@Nonnull String string, boolean inMarkDown) {
+		return string.replace("`", inMarkDown ? "" : "\\`")
+				.replace("_", inMarkDown ? "_" : "\\_")
+				.replace("*", inMarkDown ? "?" : "\\*")
+				.replace("@", inMarkDown ? "@" : "");
 	}
 
 	/**
 	 * @return returns if the given text mentions a {@link Member}
 	 *
-	 * @see IMentionable
 	 * @since 1.2
 	 */
 	@CheckReturnValue
@@ -332,8 +343,35 @@ public abstract class CommandHelper extends LogHelper {
 
 	}
 
-	public static String mentionJDA(final @Nonnull Event event) {
+	@Nonnull
+	@CheckReturnValue
+	public static String mentionJDA(@Nonnull Event event) {
 		return "<@!" + event.getJDA().getSelfUser().getId() + ">";
+	}
+	@CheckReturnValue
+	public static Member getMember(@Nonnull GenericMessageEvent event) {
+		if (event instanceof MessageUpdateEvent) {
+			return ((MessageUpdateEvent) event).getMember();
+		} else if (event instanceof MessageReceivedEvent) {
+			return ((MessageReceivedEvent) event).getMember();
+		} else if (event instanceof MessageReactionAddEvent) {
+			return ((MessageReactionAddEvent) event).getMember();
+		} else if (event instanceof MessageReactionRemoveEvent) {
+			return ((MessageReactionRemoveEvent) event).getMember();
+		} else {
+			return null;
+		}
+	}
+
+	@CheckReturnValue
+	public static Message getMessage(@Nonnull GenericMessageEvent event) {
+		if (event instanceof MessageUpdateEvent) {
+			return ((MessageUpdateEvent) event).getMessage();
+		} else if (event instanceof MessageReceivedEvent) {
+			return ((MessageReceivedEvent) event).getMessage();
+		} else {
+			return null;
+		}
 	}
 
 }
