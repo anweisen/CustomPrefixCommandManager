@@ -1,6 +1,8 @@
 package net.codingarea.engine.discord.commandmanager;
 
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -21,6 +23,18 @@ public interface PrefixProvider {
 
 	default void setGuildPrefix(@Nonnull Guild guild, @Nonnull String prefix) throws Exception {
 		throw new UnsupportedOperationException();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getPrefix(@Nonnull GenericMessageEvent event) {
+		return event.isFromGuild() ? getGuildPrefix(event.getGuild()) : getDefaultPrefix();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getPrefix(@Nonnull CommandEvent event) {
+		return getPrefix(event.getEvent());
 	}
 
 	static PrefixProvider constant(@Nonnull String prefix) {
