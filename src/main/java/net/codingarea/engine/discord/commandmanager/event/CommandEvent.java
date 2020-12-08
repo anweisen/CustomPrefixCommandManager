@@ -615,7 +615,8 @@ public interface CommandEvent extends MessagePipeline {
 	@Nonnull
 	@CheckReturnValue
 	static String syntax(@Nonnull CommandEvent event, @Nonnull CharSequence syntax, boolean command) {
-		String message = event.getPrefix() + (command ? event.getCommandName() + " " : "") + syntax;
+		String prefix = event.getHandler().getPrefixProvider().getPrefix(event);
+		String message = prefix + (command ? event.getCommandName() + " " : "") + syntax;
 		boolean mark = !CommandHelper.containsMention(message);
 		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
 	}
