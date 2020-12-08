@@ -70,7 +70,7 @@ public class CommandHandler implements ICommandHandler {
 		}
 
 		String raw = message.getContentRaw().toLowerCase().trim();
-		String prefix = member != null ? prefixProvider.getGuildPrefix(member.getGuild()) : prefixProvider.getDefaultPrefix();
+		String prefix = prefixProvider.getPrefix(event);
 		String mention = CommandHelper.mentionJDA(event);
 		boolean mentionPrefix = false;
 
@@ -98,18 +98,23 @@ public class CommandHandler implements ICommandHandler {
 			return callback.complete(CommandResult.INVALID_CHANNEL_PRIVATE_COMMAND);
 		} else if (!event.isFromGuild() && !command.getType().isAccessibleFromPrivate()) {
 			return callback.complete(CommandResult.INVALID_CHANNEL_GUILD_COMMAND);
-		} else if (mentionPrefix && !command.shouldReactToMentionPrefix()) {
-			return callback.complete(CommandResult.MENTION_PREFIX_NO_REACT);
-		} else if (event instanceof MessageUpdateEvent && !command.shouldReactOnEdit()) {
-			return callback.complete(CommandResult.MESSAGE_EDIT_NO_REACT);
-		} else if (member != null && command.getPermissionNeeded() != null && !member.hasPermission(command.getPermissionNeeded())) {
-			return callback.complete(CommandResult.NO_PERMISSIONS);
-		} else if (command.isTeamCommand() && member != null && teamRankChecker != null && !teamRankChecker.hasTeamRank(member)) {
-			return callback.complete(CommandResult.NO_PERMISSIONS_TEAM_RANK);
 		} else if (webhookReactionBehavior != ReactionBehavior.ALWAYS && message.isWebhookMessage() && (!command.shouldReactToWebhooks() || webhookReactionBehavior == ReactionBehavior.NEVER)) {
 			return callback.complete(CommandResult.WEBHOOK_MESSAGE_NO_REACT);
 		} else if (botReactionBehavior != ReactionBehavior.ALWAYS && message.getAuthor().isBot() && (!command.shouldReactToBots() || botReactionBehavior == ReactionBehavior.NEVER)) {
 			return callback.complete(CommandResult.BOT_MESSAGE_NO_REACT);
+		} else if (mentionPrefix && !command.shouldReactToMentionPrefix()) {
+			return callback.complete(CommandResult.MENTION_PREFIX_NO_REACT);
+		} else if (event instanceof MessageUpdateEvent && !command.shouldReactOnEdit()) {
+			return callback.complete(CommandResult.MESSAGE_EDIT_NO_REACT);
+		}
+
+		if (member != null) {
+			boolean hasTeamAccess = command.isTeamCommand() && teamRankChecker != null && teamRankChecker.hasTeamRank(member);
+			if (command.isTeamCommand() && teamRankChecker != null && !hasTeamAccess) {
+				return callback.complete(CommandResult.NO_PERMISSIONS_TEAM_RANK);
+			} else if (command.getPermissionNeeded() != null && !hasTeamAccess && !member.hasPermission(command.getPermissionNeeded())) {
+				return callback.complete(CommandResult.NO_PERMISSIONS);
+			}
 		}
 
 		if (cooldown != null && member != null)
