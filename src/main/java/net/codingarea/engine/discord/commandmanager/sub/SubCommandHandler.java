@@ -107,7 +107,7 @@ public abstract class SubCommandHandler extends Command {
 		Utils.getMethodsAnnotatedWith(this.getClass(), ArgumentParser.class).forEach(this::registerArgumentParser);
 	}
 
-	private void registerArgumentParser(final @Nonnull Method method) {
+	private void registerArgumentParser(@Nonnull Method method) {
 
 		ArgumentParserImpl parser = new ArgumentParserImpl(method, this);
 
@@ -121,7 +121,7 @@ public abstract class SubCommandHandler extends Command {
 
 	}
 
-	private void registerSubCommand(final @Nonnull Method method) {
+	private void registerSubCommand(@Nonnull Method method) {
 
 		SubCommandImpl command = new SubCommandImpl(method, this);
 
@@ -139,7 +139,7 @@ public abstract class SubCommandHandler extends Command {
 		commands.add(command);
 	}
 
-	protected final SubCommandImpl findCommand(final @Nonnull String name, final int args, final boolean ignoreArgs) {
+	protected final SubCommandImpl findCommand(@Nonnull String name, int args, boolean ignoreArgs) {
 
 		for (SubCommandImpl command : commands) {
 			if (!ignoreArgs && command.getArgs().length != args) continue;
@@ -154,7 +154,7 @@ public abstract class SubCommandHandler extends Command {
 	}
 
 	@Override
-	public final void onCommand(final @Nonnull CommandEvent event) throws Exception {
+	public final void onCommand(@Nonnull CommandEvent event) throws Exception {
 
 		if (event.getArgsLength() == 0) {
 			onNoCommandGiven(event);
@@ -195,30 +195,30 @@ public abstract class SubCommandHandler extends Command {
 
 	}
 
-	protected void onNoCommandGiven(final @Nonnull CommandEvent event) throws Exception {
+	protected void onNoCommandGiven(@Nonnull CommandEvent event) throws Exception {
 		sendSyntax(event, "<subcommand>");
 	}
 
-	protected void onSubCommandNotFound(final @Nonnull CommandEvent event, final @Nonnull String subCommand) throws Exception {
-		event.queueReply(getMessage(event, "sub-command-not-found", "The SubCommand `%subcommand%` is invalid.",
+	protected void onSubCommandNotFound(@Nonnull CommandEvent event, @Nonnull String subCommand) throws Exception {
+		event.reply(getMessage(event, "sub-command-not-found", "The SubCommand `%subcommand%` is invalid.",
 						 new Replacement("%subcommand%", subCommand)));
 	}
 
-	protected void onInvalidSubCommandArguments(final @Nonnull CommandEvent event, final @Nonnull SubCommandImpl command) throws Exception {
-		event.queueReply(syntax(event, command.getName() + " " + command.getSyntax()));
+	protected void onInvalidSubCommandArguments(@Nonnull CommandEvent event, @Nonnull SubCommandImpl command) throws Exception {
+		event.reply(syntax(event, command.getName() + " " + command.getSyntax()));
 	}
 
-	protected void onInvalidSubCommandArgument(final @Nonnull CommandEvent event, final @Nonnull SubCommandImpl command,
-	                                           final @Nonnull Class<?> expected, final @Nonnull String given, final int argumentIndex) throws Exception {
-		event.queueReply(getMessage(event, "invalid-sub-command-argument",
-									"Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
-									new Replacement("%index%", argumentIndex),
-									new Replacement("%given%", given),
-									new Replacement("%expected%", expected.getSimpleName())));
+	protected void onInvalidSubCommandArgument(@Nonnull CommandEvent event, @Nonnull SubCommandImpl command,
+	                                           @Nonnull Class<?> expected, @Nonnull String given, int argumentIndex) throws Exception {
+		event.reply(getMessage(event, "invalid-sub-command-argument",
+					"Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
+								new Replacement("%index%", argumentIndex),
+								new Replacement("%given%", given),
+								new Replacement("%expected%", expected.getSimpleName())));
 	}
 
 	@CheckReturnValue
-	protected Object parseArgument(final @Nonnull Class<?> argument, final @Nonnull String input, final @Nonnull CommandEvent event) throws Exception {
+	protected Object parseArgument(@Nonnull Class<?> argument, @Nonnull String input, @Nonnull CommandEvent event) throws Exception {
 		for (ArgumentParserImpl parser : parsers) {
 			if (parser.getArgument() == argument)
 				return parser.parse(event, input);
