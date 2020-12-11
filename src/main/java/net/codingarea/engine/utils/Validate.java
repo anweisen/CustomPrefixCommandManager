@@ -519,4 +519,15 @@ public final class Validate {
             throw new IllegalTypeException("Expected " + expected.getName() + ", got " + clazz.getName());
     }
 
+    public static void lengthEquals(Object[] array, int expectedLength) {
+        Validate.notNull(array);
+        if (array.length != expectedLength)
+            throw new IllegalArgumentException(String.format("Expected array of length %s, got %s", expectedLength, array.length));
+    }
+
+    public static void greaterOrEqual(int given, int expected) {
+        if (given < expected)
+            throw new IllegalStateException(String.format("%s is not greater or equal to %s", given, expected));
+    }
+
 }
