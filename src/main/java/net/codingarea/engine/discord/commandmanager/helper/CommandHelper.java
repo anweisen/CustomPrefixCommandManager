@@ -291,14 +291,15 @@ public abstract class CommandHelper extends LogHelper {
 
 	@Nonnull
 	@CheckReturnValue
-	public static String removeMarkdown(@Nonnull String string) {
+	public static String removeMarkdown(@Nullable String string) {
 		return removeMarkdown(string, false);
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static String removeMarkdown(@Nonnull String string, boolean inMarkDown) {
-		return string.replace("`", inMarkDown ? "" : "\\`")
+	public static String removeMarkdown(@Nullable String string, boolean inMarkDown) {
+		return String.valueOf(string)
+				.replace("`", inMarkDown ? "" : "\\`")
 				.replace("_", inMarkDown ? "_" : "\\_")
 				.replace("*", inMarkDown ? "?" : "\\*")
 				.replace("@", inMarkDown ? "@" : "");
