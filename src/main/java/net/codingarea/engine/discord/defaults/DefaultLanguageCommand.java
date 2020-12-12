@@ -45,14 +45,14 @@ public class DefaultLanguageCommand extends Command {
 		try {
 			language = getLanguageManager().getLanguageByName(givenName);
 		} catch (LanguageNotFoundException ex) {
-			event.queueReply(getMessage(event, "language-not-found", "The language **%language%** was not found",
-							 new Replacement("%language%", removeMarkdown(givenName))));
+			event.reply(getMessage(event, "language-not-found", "The language **%language%** was not found",
+						new Replacement("%language%", removeMarkdown(givenName))));
 			return;
 		}
 
 		getLanguageManager().setLanguage(event.getGuild(), language);
-		event.queueReply(getMessage(event, "language-changed", "The language was changed to **%language%**",
-					     new Replacement("%language%", removeMarkdown(language.getName()))));
+		event.reply(getMessage(event, "language-changed", "The language was changed to **%language%**",
+					new Replacement("%language%", removeMarkdown(language.getName()))));
 
 	}
 

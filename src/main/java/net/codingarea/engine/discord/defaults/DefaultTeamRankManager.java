@@ -19,39 +19,36 @@ import java.sql.SQLException;
  */
 public class DefaultTeamRankManager extends SQLValueCache implements TeamRankChecker {
 
-	public DefaultTeamRankManager(final boolean cacheValues, final @Nonnull String defaultValue,
-	                              final @Nonnull SQL data, final @Nonnull String table,
-	                              final @Nonnull String keyColumn, final @Nonnull String valueColumn,
-	                              final int clearRate) {
+	public DefaultTeamRankManager(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data,
+	                              @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
 		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
 	}
 
-	public DefaultTeamRankManager(final @Nonnull SQL data, final @Nonnull String table, final @Nonnull String keyColumn,
-	                              final @Nonnull String valueColumn) {
+	public DefaultTeamRankManager(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn) {
 		super(data, table, keyColumn, valueColumn, null);
 	}
 
-	public DefaultTeamRankManager(final @Nonnull SQL data) {
+	public DefaultTeamRankManager(@Nonnull SQL data) {
 		super(data, "guilds", "guildID", "teamRole", null);
 	}
 
 	@Override
-	public boolean hasTeamRank(final @Nonnull Member member) {
+	public boolean hasTeamRank(@Nonnull Member member) {
 		Role role = getRole(member.getGuild());
 		return member.hasPermission(Permission.ADMINISTRATOR) || (role != null && member.getRoles().contains(role));
 	}
 
-	public void setRole(final @Nonnull Role role) throws SQLException {
+	public void setRole(@Nonnull Role role) throws SQLException {
 		set(role.getGuild().getId(), role.getId());
 	}
 
-	public void setRole(final @Nonnull Guild guild, final @Nullable Role role) throws SQLException {
+	public void setRole(@Nonnull Guild guild, @Nullable Role role) throws SQLException {
 		set(guild.getId(), role != null ? role.getId() : null);
 	}
 
 	@Nullable
 	@CheckReturnValue
-	public Role getRole(final @Nonnull Guild guild) {
+	public Role getRole(@Nonnull Guild guild) {
 		try {
 			return guild.getRoleById(get(guild.getId()));
 		} catch (Exception ignored) {

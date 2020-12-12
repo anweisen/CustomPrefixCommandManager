@@ -40,12 +40,12 @@ public class DefaultSetLogCommand extends Command {
 
 		TextChannel channel = event.getFirstMentionedChannel();
 		if (channel == null) {
-			event.queueReply(getMessage(event, "invalid-channel", "The there is no such channel"));
+			event.reply(getMessage(event, "invalid-channel", "The there is no such channel"));
 			return;
 		}
 
 		logManager.setLogChannel(channel);
-		event.queueReply(getMessage(event, "log-set", "The log channel was set to %channel%", new Replacement("%channel%", channel.getAsMention())));
+		event.reply(getMessage(event, "log-set", "The log channel was set to %channel%", new Replacement("%channel%", channel.getAsMention())));
 
 	}
 

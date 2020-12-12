@@ -18,7 +18,7 @@ public class DefaultTeamRankCommand extends Command {
 
 	public DefaultTeamRankCommand(@Nonnull String name, @Nonnull DefaultTeamRankManager rankCache,
 	                              @Nonnull String... alias) {
-		super(name, Permission.ADMINISTRATOR, true, alias);
+		super(name, Permission.ADMINISTRATOR, alias);
 		this.rankCache = rankCache;
 	}
 
@@ -31,15 +31,15 @@ public class DefaultTeamRankCommand extends Command {
 	public void onCommand(@Nonnull CommandEvent event) throws Exception {
 
 		if (event.getMentionedRoles().size() != 1) {
-			sendSyntax(event, "<@role>");
+			event.replySyntax("<@role>");
 			return;
 		}
 
 		Role role = event.getFirstMentionedRole();
 		rankCache.setRole(role);
 
-		event.queueReply(getMessage(event, "team-rank-set", "You set the team role to `%role%`",
-						 new Replacement("%role%", role.getName())));
+		event.reply(getMessage(event, "team-rank-set", "You set the team role to `%role%`",
+					new Replacement("%role%", role.getName())));
 
 	}
 

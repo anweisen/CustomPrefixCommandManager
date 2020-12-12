@@ -25,23 +25,22 @@ public class DefaultSetPrefixCommand extends Command {
 	}
 
 	@Override
-	public void onCommand(@Nonnull final CommandEvent event) throws Exception {
+	public void onCommand(@Nonnull CommandEvent event) throws Exception {
 
 		String prefix = event.getArgsAsString().replace("`", "");
 		if (prefix.isEmpty()) {
-			sendSyntax(event, "<prefix>");
+			event.replySyntax("<prefix>");
 			return;
 		}
 		if (prefix.length() > 10) {
-			event.queueReply(getMessage(event, "prefix-too-long", "The prefix cannot be longer than %max% characters",
-							 new Replacement("%max%", 10)));
+			event.reply(getMessage(event, "prefix-too-long", "The prefix cannot be longer than %max% characters",
+						new Replacement("%max%", 10)));
 			return;
 		}
 
 		cache.set(event.getGuildID(), prefix);
-		event.queueReply(getMessage(event, "prefix-set", "The prefix was set to `%prefix%`",
-						 new Replacement("%prefix%", removeMarkdown(prefix))));
-
+		event.reply(getMessage(event, "prefix-set", "The prefix was set to `%prefix%`",
+					new Replacement("%prefix%", removeMarkdown(prefix, true))));
 	}
 
 }
