@@ -64,6 +64,15 @@ public abstract class AbstractPreparedAccess implements PreparedAccess {
 		return this;
 	}
 
+	/**
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public AbstractPreparedAccess removeWhere() {
+		where.clear();
+		return this;
+	}
+
 	protected StringBuilder whereAsString() {
 
 		StringBuilder builder = new StringBuilder();

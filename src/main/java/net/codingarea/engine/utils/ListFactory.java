@@ -36,7 +36,7 @@ public final class ListFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> String listToString(final @Nonnull String split, final @Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
+	public static <T> String listToString(@Nonnull String split, @Nonnull Iterable<? extends T> list, @Nonnull Function<T, String> factory) {
 		StringBuilder builder = new StringBuilder();
 		for (T current : list) {
 			try {
@@ -50,14 +50,20 @@ public final class ListFactory {
 		return builder.toString();
 	}
 
-	public static <T> String listToString(final @Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
+	public static <T> String listToString(@Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
 		return listToString(REGEX, list, factory);
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> String listToFancyString(final @Nonnull Iterable<? extends T> list, final @Nonnull Function<T, String> factory) {
+	public static <T> String listToFancyString(@Nonnull Iterable<? extends T> list, @Nonnull Function<T, String> factory) {
 		return listToString(", ", list, factory);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static <T> String listToFancyString(@Nonnull Iterable<? extends T> list) {
+		return listToString(", ", list, DefaultFactory.objectToString());
 	}
 
 	@Nonnull

@@ -24,11 +24,11 @@ public final class InviteManager {
 		return guild.getSystemChannel();
 	}
 
-	public static void getInvite(@Nonnull Guild guild, @Nonnull Consumer<String> invite) {
+	public static void getInvite(@Nonnull Guild guild, @Nonnull Consumer<? super String> invite) {
 		getInvite(guild, null, invite);
 	}
 
-	public static void getInvite(@Nonnull Guild guild, @Nullable TextChannel channel, @Nonnull Consumer<String> invite) {
+	public static void getInvite(@Nonnull Guild guild, @Nullable TextChannel channel, @Nonnull Consumer<? super String> invite) {
 
 		// If the server has a vanity url, we'll use that one
 		if (guild.getVanityUrl() != null) {
@@ -55,17 +55,17 @@ public final class InviteManager {
 						return;
 					}
 				}
-				createInvite(finalChannel, invite);
-			}, throwable -> createInvite(finalChannel, invite));
+				createInviteIn(finalChannel, invite);
+			}, throwable -> createInviteIn(finalChannel, invite));
 
 		 } catch (Exception ignored) {
 			// When something goes wrong getting an existing invite, we'll just create a new one
-			createInvite(channel, invite);
+			createInviteIn(channel, invite);
 		}
 
 	}
 
-	public static void createInvite(@Nonnull TextChannel channel, @Nonnull Consumer<String> invite) {
+	public static void createInviteIn(@Nonnull TextChannel channel, @Nonnull Consumer<? super String> invite) {
 		InviteAction action = channel.createInvite().setTemporary(false).setUnique(false).setMaxAge(0);
 		action.queue(success -> invite.accept(success == null ? null : success.getUrl()), ex -> invite.accept(null));
 	}

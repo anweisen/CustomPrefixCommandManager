@@ -267,5 +267,6 @@ public class SQLValueCache implements Bindable {
 	public Map<String, String> getCache() {
 		return cache;
 	}
+
 }
 

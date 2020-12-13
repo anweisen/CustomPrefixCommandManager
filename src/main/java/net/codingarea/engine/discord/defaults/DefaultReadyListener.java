@@ -29,7 +29,7 @@ public class DefaultReadyListener implements Listener {
 	}
 
 	@DiscordEvent
-	public void onReady(ReadyEvent event) {
+	public void onReady(@Nonnull ReadyEvent event) {
 		ShardManager shardManager = event.getJDA().getShardManager();
 		if (shardManager == null) {
 			online.run();

@@ -1,7 +1,6 @@
 package net.codingarea.engine.utils;
 
 import net.codingarea.engine.exceptions.MessageException;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -31,7 +30,8 @@ public final class FileUtils {
 		return file;
 	}
 
-	public static void send(@Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String format, @Nonnull File file, boolean delete, @Nonnull Consumer<? super Message> sent) {
+	public static void send(@Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String format,
+	                        @Nonnull File file, boolean delete, @Nonnull Consumer<? super Message> sent) {
 		fileName += "." + format;
 		channel.sendFile(file, fileName).queue(message -> {
 			sent.accept(message);
@@ -39,11 +39,13 @@ public final class FileUtils {
 		}, MessageException::create);
 	}
 
-	public static void send(@Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String format, @Nonnull File file, boolean delete) {
+	public static void send(@Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String format,
+	                        @Nonnull File file, boolean delete) {
 		send(channel, fileName, format, file, delete, m -> {});
 	}
 
-	public static void send(@Nonnull MessageChannel channel, @Nonnull CharSequence text, @Nonnull String fileName, @Nonnull String format, @Nonnull File file,
+	public static void send(@Nonnull MessageChannel channel, @Nonnull CharSequence text, @Nonnull String fileName,
+	                        @Nonnull String format, @Nonnull File file,
 	                        boolean delete, @Nonnull Consumer<? super Message> sent) throws IOException {
 		fileName += "." + format;
 		channel.sendMessage(text).addFile(file, fileName).queue(message -> {
@@ -52,7 +54,8 @@ public final class FileUtils {
 		}, MessageException::create);
 	}
 
-	public static void send(@Nonnull MessageChannel channel, @Nonnull CharSequence text, @Nonnull String fileName, @Nonnull String format, @Nonnull File file, boolean delete) throws IOException {
+	public static void send(@Nonnull MessageChannel channel, @Nonnull CharSequence text, @Nonnull String fileName,
+	                        @Nonnull String format, @Nonnull File file, boolean delete) throws IOException {
 		send(channel, text, fileName, format, file, delete, m -> {});
 	}
 
@@ -65,7 +68,8 @@ public final class FileUtils {
 		}, MessageException::create);
 	}
 
-	public static void send(@Nonnull MessageChannel channel, @Nonnull MessageEmbed embed, @Nonnull String fileName, @Nonnull String format, @Nonnull File file, boolean delete) throws IOException {
+	public static void send(@Nonnull MessageChannel channel, @Nonnull MessageEmbed embed, @Nonnull String fileName,
+	                        @Nonnull String format, @Nonnull File file, boolean delete) throws IOException {
 		send(channel, embed, fileName, format, file, delete, m -> {});
 	}
 

@@ -26,8 +26,12 @@ public abstract class LogHelper {
 	}
 
 
-	public static void log(final @Nullable Object message) {
+	public static void log(@Nullable Object message) {
 		LogHelper.log(LogLevel.INFO, String.valueOf(message));
+	}
+
+	public static void log(@Nullable Object message, @Nonnull Object... format) {
+		LogHelper.log(LogLevel.INFO, String.format(String.valueOf(message), format));
 	}
 
 	public static void info(@Nonnull String message) {

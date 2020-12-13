@@ -4,7 +4,7 @@ package net.codingarea.engine.exceptions;
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public class ConsumeException extends ExecutionException {
+public class ConsumeException extends UnexpectedExecutionException {
 
 	public ConsumeException() {
 		super();

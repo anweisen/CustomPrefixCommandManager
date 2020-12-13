@@ -15,12 +15,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
+ * Util class for VERY VERY VERY simple sql access.
+ * If you are advanced you should NOT use this class!
+ *
  * @author anweisen | https://github.com/anweisen
  * @since 2.8
  */
 public final class PreparedUpdate extends AbstractPreparedAccess {
 
 	private final Map<String, Object> set = new HashMap<>();
+
+	private Integer limit;
 
 	@CheckReturnValue
 	public PreparedUpdate(final @Nonnull SQL sql) {
@@ -67,6 +72,29 @@ public final class PreparedUpdate extends AbstractPreparedAccess {
 	@Override
 	public PreparedUpdate where(@Nonnull Collection<? extends Where> where) {
 		return (PreparedUpdate) super.where(where);
+	}
+
+	/**
+	 * @return {@code this} for chaining
+	 *
+	 * @see AbstractPreparedAccess#removeWhere()
+	 */
+	@Nonnull
+	@Override
+	public PreparedUpdate removeWhere() {
+		return (PreparedUpdate) super.removeWhere();
+	}
+
+	@Nonnull
+	public PreparedUpdate limit(final int limit) {
+		this.limit = limit;
+		return this;
+	}
+
+	@Nonnull
+	public PreparedUpdate removeLimit() {
+		this.limit = null;
+		return this;
 	}
 
 	/**

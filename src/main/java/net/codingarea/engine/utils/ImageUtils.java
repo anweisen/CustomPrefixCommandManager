@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -23,7 +22,8 @@ public final class ImageUtils {
 
 	private ImageUtils() { }
 
-	public static void post(@Nonnull RenderedImage image, @Nonnull MessageChannel channel, @Nonnull String fileName, @Nonnull String fileType, boolean delete) throws IOException {
+	public static void post(@Nonnull RenderedImage image, @Nonnull MessageChannel channel,
+	                        @Nonnull String fileName, @Nonnull String fileType, boolean delete) throws IOException {
 		File file = FileUtils.createTempFile(fileType);
 		ImageIO.write(image, fileType, file);
 		FileUtils.send(channel, fileName, fileType, file, delete);

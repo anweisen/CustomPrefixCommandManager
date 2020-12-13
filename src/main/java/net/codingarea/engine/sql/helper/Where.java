@@ -6,6 +6,9 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 
 /**
+ * Util class for VERY VERY VERY simple sql access.
+ * If you are advanced you should NOT use this class!
+ *
  * @author anweisen | https://github.com/anweisen
  * @since 2.8
  */
@@ -20,7 +23,7 @@ public final class Where {
 
 	public Where(final @Nonnull String operator, final @Nonnull Object value, final @Nonnull String column) {
 		if (!Utils.arrayContainsIgnoreCase(Where.OPERATORS, operator))
-			throw new IllegalArgumentException("Unknown operator: \"" + operator + "\"");
+			throw new IllegalArgumentException("Unknown operator: '" + operator + "'");
 		this.operator = operator;
 		this.value = value;
 		this.column = column;

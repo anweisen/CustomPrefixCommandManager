@@ -7,16 +7,14 @@ import net.codingarea.engine.utils.function.ThrowingSupplier;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.Optional;
+import java.util.function.*;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.7
  */
-public final class Action {
+public final class Action<T> {
 
 	@CheckReturnValue
 	public static <T> T complete(final @Nonnull ThrowingSupplier<T> action) {
@@ -35,7 +33,7 @@ public final class Action {
 
 	public static void repeat(final int times, final @Nonnull ThrowingRunnable action) throws Exception {
 		for (int i = 0; i < times; i++) {
-			action.runThrowing();
+			action.runExceptionally();
 		}
 	}
 
@@ -59,8 +57,8 @@ public final class Action {
 		}
 	}
 
-	public static void doIf(final boolean _if, final @Nonnull Runnable action) {
-		if (_if)
+	public static void doIf(final boolean condition, final @Nonnull Runnable action) {
+		if (condition)
 			action.run();
 	}
 
@@ -69,31 +67,77 @@ public final class Action {
 	}
 
 	public static long count(final @Nonnull BooleanSupplier action) {
-		long count = 0;
-		while (action.getAsBoolean()) {
-			count++;
-			if (count >= Long.MAX_VALUE)
-				break;
-		}
+		long count;
+		for (count = 0; action.getAsBoolean(); count++);
 		return count;
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	public static <T> GetAction<T> get(final @Nonnull Supplier<T> supplier) {
-		return new GetAction<>(supplier);
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	public static <T> GetAction<T> get(final @Nullable T object) {
-		return new GetAction<>(object);
 	}
 
 	public static void silent(final @Nonnull Runnable action) {
 		try {
 			action.run();
 		} catch (Exception ignored) { }
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static <T> Optional<T> silentOptional(final @Nonnull Supplier<? extends T> supplier) {
+		try {
+			T value = supplier.get();
+			return Optional.ofNullable(value);
+		} catch (Exception ignored) {
+			return Optional.empty();
+		}
+	}
+
+
+	@Nonnull
+	@CheckReturnValue
+	public static <T> Optional<T> silentOptional(final @Nonnull ThrowingSupplier<? extends T> supplier) {
+		return silentOptional((Supplier<? extends T>) supplier);
+	}
+
+	@Nullable
+	@CheckReturnValue
+	public static <T> T getSilent(final @Nonnull Supplier<? extends T> supplier) {
+		try {
+			return supplier.get();
+		} catch (Exception ignored) { }
+		return null;
+	}
+
+	public static void execute(final @Nonnull Runnable action, final @Nonnull Consumer<? super Throwable> onError) {
+		try {
+			action.run();
+		} catch (Throwable ex) {
+			onError.accept(ex);
+		}
+	}
+
+	public static void execute(final @Nonnull Runnable action) {
+		execute(action, Throwable::printStackTrace);
+	}
+
+	@Nullable
+	@CheckReturnValue
+	public static <T> T getSilent(final @Nonnull ThrowingSupplier<? extends T> supplier) {
+		return getSilent((Supplier<? extends T>) supplier);
+	}
+
+	@CheckReturnValue
+	public static <R, T> R getOrElse(final @Nullable T origin, final @Nonnull Function<? super T, ? extends R> mapper,
+	                                 final @Nullable R orElse) {
+		if (origin != null) {
+			try {
+				R created = mapper.apply(origin);
+				if (created != null)
+					return created;
+			} catch (Exception ignored) {
+				/* Ignoring any exceptions while mapping */
+			}
+		}
+
+		return orElse;
+
 	}
 
 }

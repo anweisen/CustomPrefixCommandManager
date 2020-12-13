@@ -13,46 +13,47 @@ public interface Config extends Iterable<NamedValue> {
 
 	/**
 	 * @param key The of the value
-	 * @return The {@link NamedValue} containing a value, {@code null} if not set
+	 * @return The {@link NamedValue} containing a value, {@code null} if not set.
 	 *         Never {@code null} if {@link #isSet(String)} with the same key is {@code true}
 	 *
 	 * @see #isSet(String)
 	 */
 	@Nullable
 	@CheckReturnValue
-	NamedValue get(final @Nonnull String key);
+	NamedValue get(@Nonnull String key);
 
 	@CheckReturnValue
-	boolean isSet(final @Nonnull String key);
-
+	boolean isSet(@Nonnull String key);
 
 	@Nullable
 	@CheckReturnValue
-	String getString(final @Nonnull String key);
+	String getString(@Nonnull String key);
 
 	@CheckReturnValue
-	long getLong(final @Nonnull String key);
+	long getLong(@Nonnull String key);
 
 	@CheckReturnValue
-	int getInt(final @Nonnull String key);
+	int getInt(@Nonnull String key);
 
 	@CheckReturnValue
-	short getShort(final @Nonnull String key);
+	short getShort(@Nonnull String key);
 
 	@CheckReturnValue
-	byte getByte(final @Nonnull String key);
+	byte getByte(@Nonnull String key);
 
 	@CheckReturnValue
-	double getDouble(final @Nonnull String key);
+	double getDouble(@Nonnull String key);
 
 	@CheckReturnValue
-	float getFloat(final @Nonnull String key);
+	float getFloat(@Nonnull String key);
 
 	@CheckReturnValue
-	boolean getBoolean(final @Nonnull String key);
+	boolean getBoolean(@Nonnull String key);
 
 	@Nonnull
 	@CheckReturnValue
 	Collection<NamedValue> entries();
+
+	void clear();
 
 }

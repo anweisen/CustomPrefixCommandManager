@@ -16,7 +16,7 @@ import java.util.Properties;
  */
 public abstract class NamedValueConfig implements Config {
 
-	protected final ArrayList<NamedValue> values = new ArrayList<>();
+	protected final List<NamedValue> values = new ArrayList<>();
 
 	/**
 	 * @return returns {@code null} when no value was found by the name
@@ -24,7 +24,7 @@ public abstract class NamedValueConfig implements Config {
 	@Nullable
 	@Override
 	@CheckReturnValue
-	public NamedValue get(final @Nonnull String key) {
+	public NamedValue get(@Nonnull String key) {
 		for (NamedValue value : values) {
 			if (value.getKey().equals(key)) {
 				return value;
@@ -39,7 +39,7 @@ public abstract class NamedValueConfig implements Config {
 	 * If it was {@code null}, well create a new {@link NamedValue} and add it to the value list and return it.
 	 */
 	@Nonnull
-	protected NamedValue create(@Nonnull String key, Object value) {
+	protected NamedValue create(@Nonnull String key, @Nullable Object value) {
 		NamedValue entry = get(key);
 		if (entry != null) {
 			entry.setValue(value);
@@ -125,6 +125,11 @@ public abstract class NamedValueConfig implements Config {
 	@CheckReturnValue
 	public boolean isSet(@Nonnull String key) {
 		return get(key) != null;
+	}
+
+	@Override
+	public void clear() {
+		values.clear();
 	}
 
 	@Nonnull

@@ -14,13 +14,16 @@ import java.util.Properties;
 /**
  * This class allows you to easily load data from a file by keys using {@link Properties}
  *
- * @see Properties
  * @author anweisen | https://github.com/anweisen
  * @since 1.2.2
+ *
+ * @see Properties
+ * @see NamedValueConfig
+ * @see Config
  */
 public class ConfigLoader extends NamedValueConfig implements Bindable {
 
-	public static ConfigLoader withoutException(String path, NamedValue... values) {
+	public static ConfigLoader withoutException(@Nonnull String path, @Nonnull NamedValue... values) {
 		try {
 			return new ConfigLoader(path, values);
 		} catch (IOException ex) {
@@ -29,7 +32,7 @@ public class ConfigLoader extends NamedValueConfig implements Bindable {
 		}
 	}
 
-	public static ConfigLoader withoutException(String path, String... values) {
+	public static ConfigLoader withoutException(@Nonnull String path, @Nonnull String... values) {
 		try {
 			return new ConfigLoader(path, values);
 		} catch (IOException ex) {

@@ -1,6 +1,6 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.discord.commandmanager.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.ICommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -133,33 +133,31 @@ public final class Embeds {
 			}
 
 			@Nonnull
-			public EmbedField add(final @Nonnull String command, final @Nullable String description) {
+			public EmbedField add(@Nonnull String command, @Nullable String description) {
 				return add("» " + command + (description != null ? " • " + description : ""));
 			}
 
 			@Nonnull
-			public EmbedField add(final @Nonnull String command, final @Nonnull String description,
-			                      final @Nonnull CommandEvent event, final @Nonnull Permission... permission) {
-				return event.senderHasPermission(permission) ? add(command, description) : this;
+			public EmbedField add(@Nonnull String command, @Nonnull String description,
+			                      @Nonnull CommandEvent event, @Nonnull Permission... permission) {
+				return event.memberHasPermission(permission) ? add(command, description) : this;
 			}
 
 			@Nonnull
-			public EmbedField add(final @Nonnull CommandEvent event, final @Nonnull Class<? extends ICommand> commandClass) {
-				ICommand command = event.getHandler().getCommand(commandClass);
-				if (command == null)
-					throw new IllegalStateException("No command of the class " + commandClass + " is registered");
+			public EmbedField add(@Nonnull CommandEvent event, @Nonnull Class<? extends ICommand> commandClass) {
+				ICommand command = event.getHandler().findCommand(commandClass).get();
 				return add(event, command);
 			}
 
 			@Nonnull
-			public EmbedField add(final @Nonnull CommandEvent event, final @Nonnull ICommand command) {
+			public EmbedField add(@Nonnull CommandEvent event, @Nonnull ICommand command) {
 				return event.getHandler().hasAccess(event.getMember(), command) ?
 						add(CommandEvent.syntax(event, command.getName(), false), command.getDescription()) : this;
 			}
 
 			@Nonnull
 			@SafeVarargs
-			public final EmbedField add(final @Nonnull CommandEvent event, final @Nonnull Class<? extends ICommand>... commandClasses) {
+			public final EmbedField add(@Nonnull CommandEvent event, @Nonnull Class<? extends ICommand>... commandClasses) {
 				for (Class<? extends ICommand> commandClass : commandClasses) {
 					add(event, commandClass);
 				}
@@ -186,64 +184,64 @@ public final class Embeds {
 		private Color color;
 		private CharSequence description;
 
-		public HelpMessageBuilder(final @Nonnull CommandEvent event) {
+		public HelpMessageBuilder(@Nonnull CommandEvent event) {
 			this(event.getJDA());
 			this.color = event.getSelfColorNotNull();
 		}
 
-		public HelpMessageBuilder(final @Nonnull CommandEvent event, final @Nonnull Permission... permissions) {
+		public HelpMessageBuilder(@Nonnull CommandEvent event, final @Nonnull Permission... permissions) {
 			this(event);
 			setAuthorURL(event.getJDA(), permissions);
 		}
 
-		public HelpMessageBuilder(final @Nonnull JDA jda) {
+		public HelpMessageBuilder(@Nonnull JDA jda) {
 			avatar = jda.getSelfUser().getEffectiveAvatarUrl();
 			botName = jda.getSelfUser().getName();
 		}
 
-		public HelpMessageBuilder(final @Nonnull Member selfMember, final @Nonnull Permission... permissions) {
+		public HelpMessageBuilder(@Nonnull Member selfMember, @Nonnull Permission... permissions) {
 			this(selfMember.getJDA());
 			setAuthorURL(selfMember.getJDA(), permissions);
 		}
 
 		@Nonnull
-		public HelpMessageBuilder setColor(final @Nullable Color color) {
+		public HelpMessageBuilder setColor(@Nullable Color color) {
 			this.color = color;
 			return this;
 		}
 
 		@Nonnull
-		public HelpMessageBuilder setColor(final @Nullable String hex) {
+		public HelpMessageBuilder setColor(@Nullable String hex) {
 			this.color = hex == null ? null : Color.decode(hex.startsWith("#") ? hex : "#" + hex);
 			return this;
 		}
 
 		@Nonnull
-		HelpMessageBuilder setAuthorURL(final @Nullable String url) {
+		HelpMessageBuilder setAuthorURL(@Nullable String url) {
 			this.authorURL = url;
 			return this;
 		}
 
 		@Nonnull
-		HelpMessageBuilder setAuthorURL(final @Nonnull JDA jda, final @Nonnull Permission... permissions) {
+		HelpMessageBuilder setAuthorURL(@Nonnull JDA jda, final @Nonnull Permission... permissions) {
 			this.authorURL = jda.getInviteUrl(permissions);
 			return this;
 		}
 
 		@Nonnull
-		public HelpMessageBuilder setDescription(final @Nonnull CharSequence description) {
+		public HelpMessageBuilder setDescription(@Nonnull CharSequence description) {
 			this.description = description;
 			return this;
 		}
 
 		@Nonnull
-		public HelpMessageBuilder addField(final @Nonnull EmbedField field) {
+		public HelpMessageBuilder addField(@Nonnull EmbedField field) {
 			fields.add(field);
 			return this;
 		}
 
 		@Nonnull
-		public HelpMessageBuilder addField(final @Nonnull EmbedField field, boolean add) {
+		public HelpMessageBuilder addField(@Nonnull EmbedField field, boolean add) {
 			if (add) fields.add(field);
 			return this;
 		}

@@ -4,7 +4,7 @@ package net.codingarea.engine.exceptions;
  * @author anweisen | https://github.com/anweisen
  * @since 2.1
  */
-public class CommandExecutionException extends ExecutionException {
+public class CommandExecutionException extends UnexpectedExecutionException {
 
 	public CommandExecutionException() {
 		super();

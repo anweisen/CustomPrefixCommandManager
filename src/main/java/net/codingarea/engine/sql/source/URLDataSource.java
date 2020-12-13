@@ -17,7 +17,7 @@ import java.util.List;
 public final class URLDataSource implements DataSource {
 
 	@Nonnull
-	public static URLDataSource ofConfig(final @Nonnull Config config) {
+	public static URLDataSource ofConfig(@Nonnull Config config) {
 		int port = config.getInt("port");
 		String host = config.getString("host");
 		String user = config.getString("user");
@@ -34,7 +34,7 @@ public final class URLDataSource implements DataSource {
 	private final String host, database, user, password;
 	private final Integer port;
 
-	public URLDataSource(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) {
+	public URLDataSource(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
 		this.host = host;
 		this.database = database;
 		this.user = user;
@@ -42,7 +42,7 @@ public final class URLDataSource implements DataSource {
 		this.port = null;
 	}
 
-	public URLDataSource(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password, final int port) {
+	public URLDataSource(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password, int port) {
 		this.host = host;
 		this.database = database;
 		this.user = user;

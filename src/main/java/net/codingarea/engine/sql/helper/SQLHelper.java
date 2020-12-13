@@ -20,8 +20,8 @@ import java.util.function.Consumer;
  */
 public abstract class SQLHelper {
 
-	public static void update(final @Nonnull SQL sql, final @Nonnull String table, final @Nonnull String column, final @Nullable Object value,
-	                          final @Nonnull String key, final @Nonnull Object keyValue) throws SQLException {
+	public static void update(@Nonnull SQL sql, @Nonnull String table, @Nonnull String column, @Nullable Object value,
+	                          @Nonnull String key, @Nonnull Object keyValue) throws SQLException {
 
 		if (sql.isSet("SELECT " + column + " FROM " + table + " WHERE " + key + " = " + keyValue)) {
 			if (value == null) {
@@ -35,22 +35,104 @@ public abstract class SQLHelper {
 
 	}
 
+	@CheckReturnValue
+	public static int sqlIndex(int index) {
+		return index <= 0 ? 1 : index;
+	}
+
 	@Nonnull
 	@CheckReturnValue
-	public static CachedRowSet select(final @Nonnull SQL sql, final @Nonnull String table, final @Nonnull String selection) throws SQLException {
+	public static CachedRowSet select(@Nonnull SQL sql, @Nonnull String table, @Nonnull String selection) throws SQLException {
 		return sql.query().table(table).select(selection).execute();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static CachedRowSet select(final @Nonnull SQL sql, final @Nonnull String table, final @Nonnull String selection,
-	                                  final @Nonnull String key, final @Nonnull Object keyValue) throws SQLException {
+	public static CachedRowSet select(@Nonnull SQL sql, @Nonnull String table, @Nonnull String selection,
+	                                  @Nonnull String key, @Nonnull Object keyValue) throws SQLException {
 		return sql.query().table(table).select(selection).where(key, keyValue).execute();
 	}
 
+
+	@CheckReturnValue
+	public static int getIntAndClose(@Nonnull ResultSet result, @Nonnull String column) throws SQLException {
+		if (result.isBeforeFirst() || result.isAfterLast()) {
+			if (!result.next()) {
+				result.close();
+				return 0;
+			}
+		}
+		int value = result.getInt(column);
+		result.close();
+		return value;
+	}
+	@CheckReturnValue
+	public static int getIntAndClose(@Nonnull ResultSet result, int column) throws SQLException {
+		if (result.isBeforeFirst() || result.isAfterLast()) {
+			if (!result.next()) {
+				result.close();
+				return 0;
+			}
+		}
+		int value = result.getInt(sqlIndex(column));
+		result.close();
+		return value;
+	}
+
+	@CheckReturnValue
+	public static long getLongAndClose(@Nonnull ResultSet result, @Nonnull String column) throws SQLException {
+		if (result.isBeforeFirst() || result.isAfterLast()) {
+			if (!result.next()) {
+				result.close();
+				return 0;
+			}
+		}
+		long value = result.getLong(column);
+		result.close();
+		return value;
+	}
+	@CheckReturnValue
+	public static long getLongAndClose(@Nonnull ResultSet result, int column) throws SQLException {
+		if (result.isBeforeFirst() || result.isAfterLast()) {
+			if (!result.next()) {
+				result.close();
+				return 0;
+			}
+		}
+		long value = result.getLong(sqlIndex(column));
+		result.close();
+		return value;
+	}
+
+	@CheckReturnValue
+	public static String getStringAndClose(@Nonnull ResultSet result, int column) throws SQLException {
+		if (result.isBeforeFirst() || result.isAfterLast()) {
+			if (!result.next()) {
+				result.close();
+				return null;
+			}
+		}
+		String value = result.getString(sqlIndex(column));
+		result.close();
+		return value;
+	}
+	@CheckReturnValue
+	public static String getStringAndClose(@Nonnull ResultSet result, @Nonnull String column) throws SQLException {
+		if (result.isBeforeFirst() || result.isAfterLast()) {
+			if (!result.next()) {
+				result.close();
+				return null;
+			}
+		}
+		String value = result.getString(column);
+		result.close();
+		return value;
+	}
+
+
 	@Nonnull
 	@CheckReturnValue
-	public static <T> T getPrimitive(final @Nonnull ResultSet result, final @Nonnull String column, final @Nonnull Class<T> type) throws SQLException {
+	public static <T> T getPrimitive(@Nonnull ResultSet result, @Nonnull String column, @Nonnull Class<T> type) throws SQLException {
 		if (type == long.class || type == Long.class) {
 			return (T) Long.valueOf(result.getLong(column));
 		} else if (type == int.class || type == Integer.class) {
@@ -59,6 +141,10 @@ public abstract class SQLHelper {
 			return (T) Short.valueOf(result.getShort(column));
 		} else if (type == byte.class || type == Byte.class) {
 			return (T) Byte.valueOf(result.getByte(column));
+		} else if (type == float.class || type == Float.class) {
+			return (T) Float.valueOf(result.getFloat(column));
+		} else if (type == double.class || type == Double.class || type == Number.class) {
+			return (T) Double.valueOf(result.getDouble(column));
 		} else if (type == char.class || type == Character.class) {
 			String string = result.getString(column);
 			char c = string.length() > 0 ? string.charAt(0) : ' ';
@@ -72,7 +158,7 @@ public abstract class SQLHelper {
 
 	@Nullable
 	@CheckReturnValue
-	public static <T> T get(final @Nonnull ResultSet result, final @Nonnull String column, final @Nonnull Class<T> type) throws SQLException {
+	public static <T> T get(@Nonnull ResultSet result, @Nonnull String column, @Nonnull Class<T> type) throws SQLException {
 		try {
 			if (type.isPrimitive()) {
 				return getPrimitive(result, column, type);
@@ -87,16 +173,18 @@ public abstract class SQLHelper {
 			} else {
 				throw new IllegalArgumentException(type.getName() + " is not a supported type");
 			}
+		} catch (SQLException ex) {
+			throw ex;
 		} catch (Exception ignored) {
 			return null;
 		}
 	}
 
-	public static void logResult(final @Nonnull ResultSet result) throws SQLException {
+	public static void logResult(@Nonnull ResultSet result) throws SQLException {
 		logResult(result, r -> LogHelper.log(LogLevel.DEBUG, SQLHelper.class, r));
 	}
 
-	public static void logResult(final @Nonnull ResultSet result, final @Nonnull Consumer<? super String> action) throws SQLException {
+	public static void logResult(@Nonnull ResultSet result, @Nonnull Consumer<? super String> action) throws SQLException {
 		if (result.isLast()) {
 			action.accept("<Empty ResultSet>");
 		} else {
@@ -107,7 +195,9 @@ public abstract class SQLHelper {
 		}
 	}
 
-	public static String currentRowToString(final @Nonnull ResultSet result, final @Nonnull ResultSetMetaData data) throws SQLException {
+	@Nonnull
+	@CheckReturnValue
+	public static String currentRowToString(@Nonnull ResultSet result, @Nonnull ResultSetMetaData data) throws SQLException {
 		StringBuilder builder = new StringBuilder();
 		builder.append(result.getRow() + " | ");
 		for (int i = 1; i <= data.getColumnCount(); i++) {
@@ -115,6 +205,12 @@ public abstract class SQLHelper {
 			builder.append(data.getColumnName(i) + "='" + object + "' ");
 		}
 		return builder.toString();
+	}
+
+	public static void handleSQLException(@Nonnull SQLException ex) {
+		LogHelper.error("A SQLException occurred: \"" + ex.getMessage() + "\"" +
+						"\tCurrent state: \"" + ex.getSQLState() + "\"" +
+						"\tError code: \"" + ex.getErrorCode() + "\"");
 	}
 
 }

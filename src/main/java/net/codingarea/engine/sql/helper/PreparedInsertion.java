@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
+ * Util class for VERY VERY VERY simple sql access.
+ * If you are advanced you should NOT use this class!
+ *
  * @author anweisen | https://github.com/anweisen
  * @since 2.8
  */
@@ -48,6 +51,31 @@ public final class PreparedInsertion extends AbstractPreparedAccess {
 	}
 
 	/**
+	 * @param columnsAndValues The column as {@link String} and the the column as {@link Object} alternating
+	 *        eg: {@link String} (column), {@link Object} (value), {@link String} (column), {@link Object} (value)
+	 * @return {@code this} for chaining
+	 */
+	@Nonnull
+	public PreparedInsertion insert(final @Nonnull Object... columnsAndValues) {
+		if (columnsAndValues.length % 2 != 0)
+			throw new IllegalArgumentException("The length of columnsAndValues must be a multiple of 2");
+
+		String column = null;
+		for (int i = 0; i < columnsAndValues.length; i++) {
+			Object current = columnsAndValues[i];
+			if (i % 2 == 0) {
+				if (!(current instanceof String))
+					throw new IllegalArgumentException("Entry at index " + i + " (multiple of 2) is not a String");
+				column = (String) current;
+			} else {
+				insert(column, current);
+			}
+		}
+
+		return this;
+	}
+
+	/**
 	 * @param table The table in which the data should be inserted
 	 * @return {@code this} for chaining
 	 *
@@ -70,6 +98,13 @@ public final class PreparedInsertion extends AbstractPreparedAccess {
 	@Override
 	@Deprecated
 	public AbstractPreparedAccess where(final @Nonnull Collection<? extends Where> where) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Nonnull
+	@Override
+	@Deprecated
+	public AbstractPreparedAccess removeWhere() {
 		throw new UnsupportedOperationException();
 	}
 

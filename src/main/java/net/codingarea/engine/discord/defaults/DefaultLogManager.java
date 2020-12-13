@@ -53,11 +53,9 @@ public class DefaultLogManager extends SQLValueCache {
 		set(guild.getId(), channel != null ? channel.getId() : null);
 	}
 
-	/*
-	 * ==========================================
-	 * Begin of methods to log messages, optional
-	 * ==========================================
-	 */
+	//
+	// Methods to log messages
+	//
 
 	public void log(@Nonnull Guild guild, @Nonnull EmbedBuilder embed, @Nonnull Consumer<? super Message> sent) {
 		TextChannel log = getLogChannel(guild);

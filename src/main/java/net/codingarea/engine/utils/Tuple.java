@@ -1,5 +1,6 @@
 package net.codingarea.engine.utils;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
@@ -25,11 +26,13 @@ public class Tuple<A, B> {
 	}
 
 	@Nullable
+	@CheckReturnValue
 	public A a() {
 		return a;
 	}
 
 	@Nullable
+	@CheckReturnValue
 	public B b() {
 		return b;
 	}

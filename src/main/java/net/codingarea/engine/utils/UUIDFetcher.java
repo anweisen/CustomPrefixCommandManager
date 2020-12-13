@@ -1,6 +1,6 @@
 package net.codingarea.engine.utils;
 
-import net.codingarea.engine.exceptions.ExecutionException;
+import net.codingarea.engine.exceptions.UnexpectedExecutionException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -51,7 +51,7 @@ public final class UUIDFetcher {
 	 * @param playerName The player's name whose uuid we are searching for
 	 * @return {@code null} if no player was found according to this name
 	 *
-	 * @throws ExecutionException
+	 * @throws UnexpectedExecutionException
 	 *         If something goes wrong
 	 */
 	public static String fetchUUID(@Nonnull String playerName) {
@@ -64,7 +64,7 @@ public final class UUIDFetcher {
 		} catch (ParseException | NullPointerException ex) {
 			return null;
 		} catch (Exception ex) {
-			throw new ExecutionException(ex);
+			throw new UnexpectedExecutionException(ex);
 		}
 	}
 
@@ -74,7 +74,7 @@ public final class UUIDFetcher {
 	 * @param uuid The player's uuid whose name history we are searching for
 	 * @return {@code null} if no player was found according to this uuid
 	 *
-	 * @throws ExecutionException
+	 * @throws UnexpectedExecutionException
 	 *         If something goes wrong
 	 */
 	public static JSONArray fetchNameHistory(@Nonnull String uuid) {
@@ -86,7 +86,7 @@ public final class UUIDFetcher {
 		} catch (ParseException | NullPointerException ex) {
 			return null;
 		} catch (Exception ex) {
-			throw new ExecutionException(ex);
+			throw new UnexpectedExecutionException(ex);
 		}
 	}
 
@@ -109,7 +109,7 @@ public final class UUIDFetcher {
 	 * @param uuid The player's uuid whose name we are searching for
 	 * @return {@code null} if no user was found by that uuid
 	 *
-	 * @throws ExecutionException
+	 * @throws UnexpectedExecutionException
 	 *         If something goes wrong
 	 *
 	 * @see #fetchName(String)

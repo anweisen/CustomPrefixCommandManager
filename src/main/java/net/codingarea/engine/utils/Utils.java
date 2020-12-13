@@ -1,6 +1,7 @@
 package net.codingarea.engine.utils;
 
 import net.codingarea.engine.exceptions.IllegalTypeException;
+import net.codingarea.engine.exceptions.UnexpectedExecutionException;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -9,14 +10,18 @@ import sun.reflect.CallerSensitive;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -168,7 +173,7 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static List<Method> getMethodsAnnotatedWith(@Nonnull Class<?> clazz, Class<? extends Annotation> annotation) {
+	public static List<Method> getMethodsAnnotatedWith(final @Nonnull Class<?> clazz, final @Nonnull Class<? extends Annotation> annotation) {
 		List<Method> methods = new ArrayList<>();
 		for (Method method : clazz.getMethods()) {
 			if (method.isAnnotationPresent(annotation)) {
@@ -201,13 +206,19 @@ public final class Utils {
 	}
 
 	@CheckReturnValue
-	public static <T extends Enum<?>> T findEnum(@Nonnull T[] enums, @Nonnull String search) {
+	public static <T extends Enum<?>> T findEnum(final @Nonnull T[] enums, final @Nonnull String search) {
 
 		for (T current : enums) {
 			if (current.name().equalsIgnoreCase(search))
 				return current;
 			if (current instanceof INamed && ((INamed)current).getName().equalsIgnoreCase(search))
 				return current;
+			if (current instanceof IAlias) {
+				for (String alias : ((IAlias)current).getAlias()) {
+					if (alias.equalsIgnoreCase(search))
+						return current;
+				}
+			}
 		}
 
 		int ordinal = NumberConversions.toInt(search);
@@ -339,6 +350,40 @@ public final class Utils {
 				return true;
 		}
 		return false;
+	}
+
+	public static <T extends Enum<?>> T nextEnum(final @Nonnull T[] enumValues, final @Nonnull T current) {
+
+		if (enumValues.length == 0)
+			return null;
+
+		int i = current.ordinal();
+		if (++i >= enumValues.length)
+			i = 0;
+
+		return enumValues[i];
+
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static <T, R> Function<T, R> supplierToFunction(final @Nonnull Supplier<? extends R> supplier) {
+		return t -> supplier.get();
+	}
+
+	public static void handleException(@Nonnull Throwable ex) {
+		Thread thread = Thread.currentThread();
+		thread.getUncaughtExceptionHandler().uncaughtException(thread, ex);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String encodeURL(@Nonnull String arg) {
+		try {
+			return URLEncoder.encode(arg, "UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			throw new UnexpectedExecutionException(ex);
+		}
 	}
 
 }

@@ -7,7 +7,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Used to create database connections ({@link #createConnection()})
+ * Used to create sql database connections using {@link #createConnection()}
+ *
  * @author anweisen | https://github.com/anweisen
  * @since 2.0
  */
@@ -17,7 +18,8 @@ public interface DataSource {
 		   LITESQL_URL = "jdbc:sqlite:%file";
 
 	/**
-	 * @return Creates a connection to the SQL server using the url ({@link #getURL()}) (Default: using {@link DriverManager#getConnection(String)})
+	 * @return Creates a connection to the SQL server using the given {@link #getURL() URL}.
+	 * Default: using {@link DriverManager#getConnection(String)}
 	 *
 	 * @throws SQLException
 	 *         If a {@link SQLException} happens while creating the connection
