@@ -1,6 +1,8 @@
 package net.codingarea.engine.discord.commandmanager.event;
 
 import net.codingarea.engine.exceptions.MessageException;
+import net.codingarea.engine.lang.LanguageManager;
+import net.codingarea.engine.utils.Replacement;
 import net.codingarea.engine.utils.function.ThrowingConsumer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -56,12 +58,36 @@ public interface MessagePipeline {
 	@CheckReturnValue
 	User getUser();
 
+	@Nonnull
+	@CheckReturnValue
+	default String getMessage(@Nonnull String key, @Nonnull Replacement... replacements) {
+		return LanguageManager.getInstance().translate(this, key, replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String getMessage(@Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
+		return LanguageManager.getInstance().translate(this, key, fallback, replacements);
+	}
+
 	default void sendTyping() {
 		getChannel().sendTyping().queue();
 	}
 
 	default void sendTyping(long timeout, @Nonnull TimeUnit unit) {
 		getChannel().sendTyping().timeout(timeout, unit).queue();
+	}
+
+	default void deleteMessage(@Nullable Consumer<? super Void> success, @Nullable Consumer<? super Throwable> fail) {
+		getMessage().delete().queue(success, fail);
+	}
+
+	default void deleteMessage(@Nullable Consumer<? super Void> success) {
+		deleteMessage(success, MessageException::create);
+	}
+
+	default void deleteMessage() {
+		deleteMessage(null);
 	}
 
 	default void openPrivateChannel(@Nullable Consumer<? super PrivateChannel> success, @Nullable Consumer<? super Throwable> fail) {
@@ -71,6 +97,7 @@ public interface MessagePipeline {
 	static <T> void queue(@Nonnull RestAction<T> action, @Nullable Consumer<? super T> success, @Nullable Consumer<? super Throwable> fail) {
 		action.queue(success, fail != null ? fail : MessageException::create);
 	}
+
 
 	default void reply(@Nonnull CharSequence message, @Nullable ThrowingConsumer<? super Message> success,
 	                   @Nullable ThrowingConsumer<? super Throwable> fail) {
@@ -167,6 +194,14 @@ public interface MessagePipeline {
 		reply(file, fileName, embed.build(), null, null, options);
 	}
 
+	default void replyMessage(@Nonnull String key, @Nonnull Replacement... replacements) {
+		reply(getMessage(key, replacements));
+	}
+
+	default void replyMessage(@Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
+		reply(getMessage(key, fallback, replacements));
+	}
+
 	default void send(@Nonnull CharSequence message, @Nullable ThrowingConsumer<? super Message> success,
 	                  @Nullable ThrowingConsumer<? super Throwable> fail) {
 		queue(getChannel().sendMessage(message), success, fail);
@@ -260,6 +295,10 @@ public interface MessagePipeline {
 
 	default void send(@Nonnull File file, @Nonnull String fileName, @Nonnull EmbedBuilder embed, @Nonnull AttachmentOption... options) {
 		send(file, fileName, embed.build(), null, null, options);
+	}
+
+	default void sendMessage(@Nonnull String key, @Nonnull Replacement... replacements) {
+		send(getMessage(key, replacements));
 	}
 
 
@@ -378,6 +417,10 @@ public interface MessagePipeline {
 
 	default void sendPrivate(@Nonnull File file, @Nonnull String fileName, @Nonnull EmbedBuilder embed, @Nonnull AttachmentOption... options) {
 		sendPrivate(file, fileName, embed.build(), null, null, options);
+	}
+
+	default void sendMessagePrivate(@Nonnull String key, @Nonnull Replacement... replacements) {
+		sendPrivate(getMessage(key, replacements));
 	}
 
 }
