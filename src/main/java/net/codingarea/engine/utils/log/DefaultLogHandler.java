@@ -1,4 +1,4 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.log;
 
 import net.codingarea.engine.utils.Utils;
 import org.jetbrains.annotations.Contract;

@@ -1,12 +1,14 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.log;
 
+import net.codingarea.engine.utils.Bindable;
+import net.codingarea.engine.utils.StringBuilderPrintWriter;
+import net.codingarea.engine.utils.Utils;
 import sun.reflect.Reflection;
 
 import javax.annotation.Nonnull;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.function.Supplier;
-import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;

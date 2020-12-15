@@ -1,5 +1,6 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.log;
 
+import net.codingarea.engine.utils.Utils;
 import sun.reflect.CallerSensitive;
 
 import javax.annotation.Nonnull;
