@@ -1,145 +1,127 @@
 package net.codingarea.engine.lang;
 
-import net.codingarea.engine.exceptions.LanguageNotFoundException;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
+import net.codingarea.engine.discord.commandmanager.event.MessagePipeline;
+import net.codingarea.engine.exceptions.UnexpectedExecutionException;
+import net.codingarea.engine.lang.support.ConstantLanguageManagerSupport;
+import net.codingarea.engine.lang.support.LanguageManagerSupport;
+import net.codingarea.engine.lang.support.StaticLanguageManagerHolder;
 import net.codingarea.engine.sql.SQL;
-import net.codingarea.engine.sql.cache.SQLValueCache;
+import net.codingarea.engine.utils.Replacement;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildChannel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @author anweisen | https://github.com/anweisen
- * @since 2.2
+ * @since 2.9
  */
-public class LanguageManager extends SQLValueCache {
+public interface LanguageManager {
 
 	@Nonnull
 	@CheckReturnValue
-	public static LanguageManager createDefault(SQL data, String defaultLanguageName, String table, String guildColumn, String languageColumn) {
-		return new LanguageManager(true, defaultLanguageName, data, table, guildColumn, languageColumn, SQLValueCache.DEFAULT_CLEAR_RATE);
-	}
-
-	protected final ArrayList<Language> languages = new ArrayList<>();
-
-	protected LanguageManager() {
-		super();
-		setup();
-	}
-
-	public LanguageManager(boolean cacheValues, @Nonnull String defaultValue, @Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, int clearRate) {
-		super(cacheValues, defaultValue, data, table, keyColumn, valueColumn, clearRate);
-		setup();
-	}
-
-	public LanguageManager(@Nonnull SQL data, @Nonnull String table, @Nonnull String keyColumn, @Nonnull String valueColumn, @Nonnull String defaultValue) {
-		super(data, table, keyColumn, valueColumn, defaultValue);
-		setup();
-	}
-
-	protected void setup() {
-		bind(LanguageManager.class);
-	}
-
-	/**
-	 * @return <code>this</code> for chaining
-	 */
-	@Nonnull
-	public LanguageManager loadLanguagesFromFolder(@Nonnull File folder) {
-		if (!folder.exists()) throw new IllegalArgumentException("File does not exists");
-		if (!folder.isDirectory()) throw new IllegalArgumentException("File is not a directory");
-		for (File file : folder.listFiles()) {
-			try {
-				Language language = new Language(file);
-				registerLanguage(language);
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-		return this;
-	}
-
-	/**
-	 * @return <code>this</code> for chaining
-	 */
-	@Nonnull
-	public LanguageManager loadLanguageFromResource(@Nonnull String path) throws IOException {
-		Language language = Language.loadResource(path);
-		registerLanguage(language);
-		return this;
-	}
-
-	/**
-	 * @return {@code this} for chaining
-	 */
-	@Nonnull
-	public LanguageManager loadLanguageFromFile(@Nonnull String path) throws IOException {
-		Language language = Language.loadFile(path);
-		registerLanguage(language);
-		return this;
-	}
-
-	public void registerLanguage(Language language) {
-		languages.add(language);
-	}
-
-	public void setLanguage(Guild guild, String language) throws SQLException, LanguageNotFoundException {
-		Language lang = getLanguageByName(language);
-		setLanguage(guild, lang);
-	}
-
-	public void setLanguage(Guild guild, Language language) throws SQLException {
-		set(guild.getId(), language.getName());
-	}
-
-	@Nonnull
-	public Language getLanguageByName(String name) {
-		if (name == null || name.isEmpty()) return getDefaultLanguage();
-		for (Language language : languages) {
-			if (language.getName().equalsIgnoreCase(name)) return language;
-			for (String alias : language.getAlias()) {
-				if (alias != null && alias.equalsIgnoreCase(name)) {
-					return language;
-				}
-			}
-		}
-		throw new LanguageNotFoundException("No language found for name " + name);
-	}
-
-	public Language getDefaultLanguage() {
-		return getLanguageByName(defaultValue);
+	static LanguageManager getInstance() {
+		return StaticLanguageManagerHolder.getInstance();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public Language getLanguageForGuild(Guild guild) {
-		if (guild == null) return getDefaultLanguage();
-		String name = getValue(guild.getId());
+	Optional<Language> findLanguage(@Nonnull String name);
+
+	@Nonnull
+	@CheckReturnValue
+	Collection<Language> getLanguages();
+
+	@Nonnull
+	LanguageManager registerLanguage(@Nonnull Language language);
+
+	@Nonnull
+	@CheckReturnValue
+	Language getDefaultLanguage();
+
+	@Nonnull
+	@CheckReturnValue
+	LanguageManager setDefaultLanguage(@Nonnull Language language);
+
+	@Nonnull
+	@CheckReturnValue
+	Language getLanguage(@Nonnull Guild guild);
+
+	@Nonnull
+	@CheckReturnValue
+	default Language getLanguage(@Nonnull CommandEvent event) {
+		return event.isGuild() ? getLanguage(event.getGuild()) : getDefaultLanguage();
+	}
+
+	@Nonnull
+	default LanguageManager setAsCurrent() {
+		return StaticLanguageManagerHolder.setInstance(this);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String translate(@Nonnull CommandEvent event, @Nonnull String key, @Nonnull Replacement... replacements) {
+		return getLanguage(event).translate(key, replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String translate(@Nonnull CommandEvent event, @Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
+		return getLanguage(event).translate(key, fallback, replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String translate(@Nonnull MessagePipeline pipeline, @Nonnull String key, @Nonnull Replacement... replacements) {
+		return (pipeline.getChannel() instanceof GuildChannel ? getLanguage(((GuildChannel)pipeline.getChannel()).getGuild()) : getDefaultLanguage())
+				.translate(key, replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String translate(@Nonnull MessagePipeline pipeline, @Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
+		return (pipeline.getChannel() instanceof GuildChannel ? getLanguage(((GuildChannel)pipeline.getChannel()).getGuild()) : getDefaultLanguage())
+				.translate(key, fallback, replacements);
+	}
+
+	default void setLanguage(@Nonnull Guild guild, @Nonnull Language language) {
 		try {
-			return getLanguageByName(name);
-		} catch (Exception ignored) {
-			return getDefaultLanguage();
+			setLanguageExceptionally(guild, language);
+		} catch (Exception ex) {
+			throw new UnexpectedExecutionException(ex);
 		}
+	}
+
+	void setLanguageExceptionally(@Nonnull Guild guild, @Nonnull Language language) throws Exception;
+
+
+
+	@Nonnull
+	@CheckReturnValue
+	static LanguageManager constant(@Nonnull Language language) {
+		return ConstantLanguageManagerSupport.create(language).setAsCurrent();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public String getMessage(Guild guild, String key) {
-		return get(guild, key);
+	static LanguageManager constant() {
+		return ConstantLanguageManagerSupport.create().setAsCurrent();
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public String get(Guild guild, String key) {
-		try {
-			return getLanguageForGuild(guild).get(key);
-		} catch (Exception ignored) {
-			return getDefaultLanguage().get(key);
-		}
+	static LanguageManager create(@Nonnull SQL sql, @Nonnull String table, @Nonnull String idColumn, @Nonnull String languageColumn) {
+		return LanguageManagerSupport.create(sql, table, idColumn, languageColumn).setAsCurrent();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	static LanguageManager create(@Nonnull SQL sql) {
+		return LanguageManagerSupport.create(sql, "guilds", "guildID", "language").setAsCurrent();
 	}
 
 }
