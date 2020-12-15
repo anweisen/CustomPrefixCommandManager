@@ -4,6 +4,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -53,6 +54,8 @@ public interface Config extends Iterable<NamedValue> {
 	@Nonnull
 	@CheckReturnValue
 	Collection<NamedValue> entries();
+
+	void store(@Nonnull Map<Object, Object> map);
 
 	void clear();
 
