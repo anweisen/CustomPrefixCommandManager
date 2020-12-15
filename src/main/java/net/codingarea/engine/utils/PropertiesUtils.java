@@ -16,14 +16,18 @@ public final class PropertiesUtils {
 	private PropertiesUtils() { }
 
 	@Nonnull
-	public static Properties readProperties(File file) throws IOException {
+	public static Properties readProperties(@Nonnull File file) throws IOException {
 		return readProperties(file.toURI().toURL());
 	}
 
 	@Nonnull
-	public static Properties readProperties(URL url) throws IOException {
+	public static Properties readProperties(@Nonnull URL url) throws IOException {
+		return readProperties(url.openStream());
+	}
+
+	@Nonnull
+	public static Properties readProperties(@Nonnull InputStream input) throws IOException {
 		Properties properties = new Properties();
-		InputStream input = url.openConnection().getInputStream();
 		properties.load(new InputStreamReader(input, StandardCharsets.UTF_8));
 		return properties;
 	}
