@@ -5,10 +5,7 @@ import net.codingarea.engine.utils.NumberConversions;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -57,9 +54,9 @@ public abstract class NamedValueConfig implements Config {
 		}
 	}
 
-	protected void store(@Nonnull Properties properties) {
+	public void store(@Nonnull Map<Object, Object> properties) {
 		for (NamedValue value : values) {
-			properties.setProperty(value.getKey(), value.getValue());
+			properties.put(value.getKey(), value.getValue());
 		}
 	}
 
