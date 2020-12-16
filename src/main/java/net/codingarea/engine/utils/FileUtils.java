@@ -73,4 +73,17 @@ public final class FileUtils {
 		send(channel, embed, fileName, format, file, delete, m -> {});
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	public static String getName(@Nonnull File file) {
+		return getName(file.getName());
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public static String getName(@Nonnull String path) {
+		int dot = path.indexOf(".");
+		return (dot > 0) ? path.substring(0, dot) : path;
+	}
+
 }
