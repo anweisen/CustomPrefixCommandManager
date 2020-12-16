@@ -1,5 +1,7 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.factory;
 
+import net.codingarea.engine.utils.INamed;
+import net.codingarea.engine.utils.NumberConversions;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.sharding.ShardManager;

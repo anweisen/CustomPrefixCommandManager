@@ -1,4 +1,7 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.factory;
+
+import net.codingarea.engine.utils.log.LogHelper;
+import net.codingarea.engine.utils.log.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

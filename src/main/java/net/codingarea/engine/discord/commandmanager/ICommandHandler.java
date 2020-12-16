@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +24,10 @@ public interface ICommandHandler {
 	ICommandHandler registerCommand(@Nonnull ICommand command);
 
 	@Nonnull
-	ICommandHandler registerCommands(@Nonnull ICommand... command);
+	default ICommandHandler registerCommands(@Nonnull ICommand... commands) {
+		Arrays.stream(commands).forEach(this::registerCommand);
+		return this;
+	}
 
 	/**
 	 * @return A copy of the {@link Collection} with all current registered commands
@@ -36,7 +40,6 @@ public interface ICommandHandler {
 	@Nonnull
 	@CheckReturnValue
 	Optional<ICommand> findCommand(@Nonnull String message);
-
 
 	@Nonnull
 	@CheckReturnValue

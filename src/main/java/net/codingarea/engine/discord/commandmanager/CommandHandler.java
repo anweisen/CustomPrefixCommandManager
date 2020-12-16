@@ -128,7 +128,6 @@ public class CommandHandler implements ICommandHandler {
 	}
 
 	protected void process(@Nonnull ICommand command, @Nonnull CommandEvent event, @Nonnull CompletableFuture<CommandResult> callback) {
-		executedCommands.incrementAndGet();
 		if (command.isAsync()) {
 			executorService.execute(() -> execute(command, event, callback));
 		} else {
@@ -144,6 +143,8 @@ public class CommandHandler implements ICommandHandler {
 			callback.completeExceptionally(ex);
 			Utils.handleException(ex);
 			return;
+		} finally {
+			executedCommands.incrementAndGet();
 		}
 		callback.complete(CommandResult.SUCCESS);
 	}
@@ -152,13 +153,6 @@ public class CommandHandler implements ICommandHandler {
 	@Override
 	public CommandHandler registerCommand(@Nonnull ICommand command) {
 		this.registry.add(command);
-		return this;
-	}
-
-	@Nonnull
-	@Override
-	public CommandHandler registerCommands(@Nonnull ICommand... command) {
-		Arrays.stream(command).forEach(this::registerCommand);
 		return this;
 	}
 

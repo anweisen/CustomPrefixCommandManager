@@ -1,4 +1,7 @@
-package net.codingarea.engine.utils;
+package net.codingarea.engine.utils.factory;
+
+import net.codingarea.engine.utils.log.LogHelper;
+import net.codingarea.engine.utils.log.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -22,7 +25,7 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K, V> String mapToString(final @Nonnull Map<K, V> map, final @Nonnull Function<K, String> key, final @Nonnull Function<V, String> value) {
+	public static <K, V> String mapToString(@Nonnull Map<K, V> map, @Nonnull Function<K, String> key, @Nonnull Function<V, String> value) {
 		StringBuilder builder = new StringBuilder();
 		for (Entry<K, V> entry : map.entrySet()) {
 			if (builder.length() != 0) builder.append(REGEX_1);
@@ -35,7 +38,7 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K, V> Map<K, V> stringToMap(final @Nonnull String string, final @Nonnull Function<String, K> key, final @Nonnull Function<String, V> value) {
+	public static <K, V> Map<K, V> stringToMap(@Nonnull String string, @Nonnull Function<String, K> key, final @Nonnull Function<String, V> value) {
 
 		Map<K, V> map = new HashMap<>();
 
@@ -63,7 +66,7 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K extends Comparable<K>, V> TreeMap<K, V> sort(final @Nonnull Map<K, V> map) {
+	public static <K extends Comparable<K>, V> TreeMap<K, V> sort(@Nonnull Map<K, V> map) {
 		TreeMap<K, V> sorted = new TreeMap<>(Collections.reverseOrder());
 		for (Entry<K, V> entry : map.entrySet()) {
 			sorted.put(entry.getKey(), entry.getValue());
@@ -73,7 +76,7 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K, V> Map<K, V> create(final @Nonnull K[] keys, final @Nonnull V[] values) {
+	public static <K, V> Map<K, V> create(@Nonnull K[] keys, @Nonnull V[] values) {
 		if (keys.length != values.length)
 			throw new IllegalArgumentException();
 		Map<K, V> map = new HashMap<>();
@@ -83,9 +86,10 @@ public final class MapFactory {
 		return map;
 	}
 
-	public static <K, V, OldK, OldV> Map<K, V> map(final @Nonnull Map<K, V> map, final @Nonnull Map<OldK, OldV> input,
-	                                               final @Nonnull Function<? super OldK, ? extends K> keyMapper,
-	                                               final @Nonnull Function<? super OldV, ? extends V> valueMapper) {
+	@Nonnull
+	public static <K, V, OldK, OldV> Map<K, V> map(@Nonnull Map<K, V> map, @Nonnull Map<OldK, OldV> input,
+	                                               @Nonnull Function<? super OldK, ? extends K> keyMapper,
+	                                               @Nonnull Function<? super OldV, ? extends V> valueMapper) {
 
 		for (Entry<OldK, OldV> entry : input.entrySet()) {
 
