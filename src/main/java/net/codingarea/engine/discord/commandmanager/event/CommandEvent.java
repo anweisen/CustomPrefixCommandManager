@@ -160,7 +160,7 @@ public interface CommandEvent extends MessagePipeline {
 
 	/**
 	 * @throws IllegalStateException
-	 *         If the command was not triggered by a member / not in a guild
+	 *         If the command was not triggered by a {@link Member} / not in a {@link Guild}
 	 */
 	@Nonnull
 	@CheckReturnValue
