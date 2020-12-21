@@ -26,7 +26,6 @@ public class CommandEventImpl implements CommandEvent {
 	protected final JDA jda;
 	protected final User user;
 	protected final Member member;
-	protected final Guild guild;
 	protected final MessageChannel channel;
 	protected final Message message;
 	protected final String[] args;
@@ -45,7 +44,6 @@ public class CommandEventImpl implements CommandEvent {
 		this.fromGuild = event.isFromGuild();
 		this.event = event;
 		this.jda = event.getJDA();
-		this.guild = event.getGuild();
 		this.channel = event.getChannel();
 		this.message = CommandHelper.getMessage(event);
 		this.member = CommandHelper.getMember(event);
@@ -138,7 +136,7 @@ public class CommandEventImpl implements CommandEvent {
 	@Nonnull
 	@Override
 	public Guild getGuild() {
-		return guild;
+		return event.getGuild();
 	}
 
 	@Nonnull

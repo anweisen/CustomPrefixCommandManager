@@ -133,17 +133,18 @@ public abstract class CommandHelper extends SearchHelper {
 
 	@CheckReturnValue
 	public static Member getMember(@Nonnull GenericMessageEvent event) {
-		if (event instanceof MessageUpdateEvent) {
-			return ((MessageUpdateEvent) event).getMember();
-		} else if (event instanceof MessageReceivedEvent) {
-			return ((MessageReceivedEvent) event).getMember();
-		} else if (event instanceof MessageReactionAddEvent) {
-			return ((MessageReactionAddEvent) event).getMember();
-		} else if (event instanceof MessageReactionRemoveEvent) {
-			return ((MessageReactionRemoveEvent) event).getMember();
-		} else {
-			return null;
-		}
+		try {
+			if (event instanceof MessageUpdateEvent) {
+				return ((MessageUpdateEvent) event).getMember();
+			} else if (event instanceof MessageReceivedEvent) {
+				return ((MessageReceivedEvent) event).getMember();
+			} else if (event instanceof MessageReactionAddEvent) {
+				return ((MessageReactionAddEvent) event).getMember();
+			} else if (event instanceof MessageReactionRemoveEvent) {
+				return ((MessageReactionRemoveEvent) event).getMember();
+			}
+		} catch (IllegalStateException ex) { }
+		return null;
 	}
 
 	@CheckReturnValue
