@@ -1,13 +1,14 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.discord.commandmanager.Command;
-import net.codingarea.engine.exceptions.LanguageNotFoundException;
+import net.codingarea.engine.discord.commandmanager.event.CommandEvent;
 import net.codingarea.engine.lang.Language;
+import net.codingarea.engine.lang.LanguageManager;
 import net.codingarea.engine.utils.Replacement;
 import net.dv8tion.jda.api.Permission;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 /**
  * @author anweisen | https://github.com/anweisen
@@ -30,29 +31,22 @@ public class DefaultLanguageCommand extends Command {
 	@Override
 	public void onCommand(@Nonnull final CommandEvent event) throws Exception {
 
-		if (getLanguageManager() == null) {
-			throw new IllegalStateException("LanguageManager was not set via the StaticBinder#bindToClass!");
-		}
-
 		String givenName = event.getArgsAsString();
 		if (givenName.isEmpty()) {
-			sendSyntax(event, "<language>");
+			event.replySyntax("<language>");
 			return;
 		}
 
-		Language language;
-
-		try {
-			language = getLanguageManager().getLanguageByName(givenName);
-		} catch (LanguageNotFoundException ex) {
+		Optional<Language> language = LanguageManager.getInstance().findLanguage(givenName);
+		if (!language.isPresent()) {
 			event.reply(getMessage(event, "language-not-found", "The language **%language%** was not found",
 						new Replacement("%language%", removeMarkdown(givenName))));
 			return;
 		}
 
-		getLanguageManager().setLanguage(event.getGuild(), language);
+		LanguageManager.getInstance().setLanguage(event.getGuild(), language.get());
 		event.reply(getMessage(event, "language-changed", "The language was changed to **%language%**",
-					new Replacement("%language%", removeMarkdown(language.getName()))));
+					new Replacement("%language%", removeMarkdown(language.get().getName()))));
 
 	}
 
