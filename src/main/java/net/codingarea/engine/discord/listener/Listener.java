@@ -26,7 +26,6 @@ public interface Listener extends EventListener {
 			Class<?> parameter = currentMethod.getParameterTypes()[0];
 			if (parameter == null)
 				continue;
-
 			if (!parameter.isAssignableFrom(event.getClass()))
 				continue;
 
@@ -34,9 +33,7 @@ public interface Listener extends EventListener {
 				currentMethod.setAccessible(true);
 				currentMethod.invoke(this, event);
 			} catch (Throwable ex) {
-				// Handling exception by passing it to the UncaughtExceptionHandler of the current thread
-				Thread thread = Thread.currentThread();
-				thread.getUncaughtExceptionHandler().uncaughtException(thread, ex);
+				Utils.handleException(ex);
 			}
 
 		}
