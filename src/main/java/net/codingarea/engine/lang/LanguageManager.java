@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.GuildChannel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -40,6 +41,12 @@ public interface LanguageManager {
 	LanguageManager registerLanguage(@Nonnull Language language);
 
 	@Nonnull
+	default LanguageManager registerLanguages(@Nonnull Language... languages) {
+		Arrays.stream(languages).forEach(this::registerLanguage);
+		return this;
+	}
+
+	@Nonnull
 	@CheckReturnValue
 	Language getDefaultLanguage();
 
@@ -55,6 +62,12 @@ public interface LanguageManager {
 	@CheckReturnValue
 	default Language getLanguage(@Nonnull CommandEvent event) {
 		return event.isGuild() ? getLanguage(event.getGuild()) : getDefaultLanguage();
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default Language getLanguage(@Nonnull MessagePipeline pipeline) {
+		return pipeline.getChannel() instanceof GuildChannel ? getLanguage(((GuildChannel)pipeline.getChannel()).getGuild()) : getDefaultLanguage();
 	}
 
 	@Nonnull
@@ -77,15 +90,13 @@ public interface LanguageManager {
 	@Nonnull
 	@CheckReturnValue
 	default String translate(@Nonnull MessagePipeline pipeline, @Nonnull String key, @Nonnull Replacement... replacements) {
-		return (pipeline.getChannel() instanceof GuildChannel ? getLanguage(((GuildChannel)pipeline.getChannel()).getGuild()) : getDefaultLanguage())
-				.translate(key, replacements);
+		return getLanguage(pipeline).translate(key, replacements);
 	}
 
 	@Nonnull
 	@CheckReturnValue
 	default String translate(@Nonnull MessagePipeline pipeline, @Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
-		return (pipeline.getChannel() instanceof GuildChannel ? getLanguage(((GuildChannel)pipeline.getChannel()).getGuild()) : getDefaultLanguage())
-				.translate(key, fallback, replacements);
+		return getLanguage(pipeline).translate(key, fallback, replacements);
 	}
 
 	default void setLanguage(@Nonnull Guild guild, @Nonnull Language language) {
@@ -97,7 +108,6 @@ public interface LanguageManager {
 	}
 
 	void setLanguageExceptionally(@Nonnull Guild guild, @Nonnull Language language) throws Exception;
-
 
 
 	@Nonnull
