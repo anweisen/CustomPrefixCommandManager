@@ -4,7 +4,7 @@ package net.codingarea.engine.exceptions;
  * @author anweisen | https://github.com/anweisen
  * @since 2.7
  */
-public class IllegalTypeException extends RuntimeException {
+public class IllegalTypeException extends IllegalArgumentException {
 
 	public IllegalTypeException() {
 		super();
@@ -20,10 +20,6 @@ public class IllegalTypeException extends RuntimeException {
 
 	public IllegalTypeException(Throwable cause) {
 		super(cause);
-	}
-
-	public IllegalTypeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
 }
