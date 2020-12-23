@@ -34,7 +34,7 @@ public class DefaultSetLogCommand extends Command {
 	public void onCommand(@Nonnull final CommandEvent event) throws Exception {
 
 		if (event.getMentionedChannels().size() != 1) {
-			sendSyntax(event, "<#channel>");
+			event.replySyntax("<#channel>");
 			return;
 		}
 
@@ -45,7 +45,7 @@ public class DefaultSetLogCommand extends Command {
 		}
 
 		logManager.setLogChannel(channel);
-		event.reply(getMessage(event, "log-set", "The log channel was set to %channel%", new Replacement("%channel%", channel.getAsMention())));
+		event.replyMessage("log-set", "The log channel was set to %channel%", new Replacement("%channel%", channel.getAsMention()));
 
 	}
 

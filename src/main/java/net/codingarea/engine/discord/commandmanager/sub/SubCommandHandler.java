@@ -196,12 +196,12 @@ public abstract class SubCommandHandler extends Command {
 	}
 
 	protected void onNoCommandGiven(@Nonnull CommandEvent event) throws Exception {
-		sendSyntax(event, "<subcommand>");
+		event.replySyntax("<subcommand>");
 	}
 
 	protected void onSubCommandNotFound(@Nonnull CommandEvent event, @Nonnull String subCommand) throws Exception {
-		event.reply(getMessage(event, "sub-command-not-found", "The SubCommand `%subcommand%` is invalid.",
-						 new Replacement("%subcommand%", subCommand)));
+		event.replyMessage("sub-command-not-found", "The SubCommand `%subcommand%` is invalid.",
+						   new Replacement("%subcommand%", removeMarkdown(subCommand, true)));
 	}
 
 	protected void onInvalidSubCommandArguments(@Nonnull CommandEvent event, @Nonnull SubCommandImpl command) throws Exception {
@@ -210,11 +210,10 @@ public abstract class SubCommandHandler extends Command {
 
 	protected void onInvalidSubCommandArgument(@Nonnull CommandEvent event, @Nonnull SubCommandImpl command,
 	                                           @Nonnull Class<?> expected, @Nonnull String given, int argumentIndex) throws Exception {
-		event.reply(getMessage(event, "invalid-sub-command-argument",
-					"Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
-								new Replacement("%index%", argumentIndex),
-								new Replacement("%given%", given),
-								new Replacement("%expected%", expected.getSimpleName())));
+		event.replyMessage("invalid-sub-command-argument", "Invalid argument at **%index%**: Expected `%expected%`, got `%given%`",
+						   new Replacement("%index%", argumentIndex),
+						   new Replacement("%given%", removeMarkdown(given, true)),
+						   new Replacement("%expected%", expected.getSimpleName()));
 	}
 
 	@CheckReturnValue
