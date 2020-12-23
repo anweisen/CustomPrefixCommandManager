@@ -38,12 +38,6 @@ public class LanguageSupport implements Language {
 	}
 
 	@Nonnull
-	public synchronized LanguageSupport setMessages(@Nonnull Map<? extends String, ? extends String> valueMap) {
-		messages.putAll(valueMap);
-		return this;
-	}
-
-	@Nonnull
 	@Override
 	@CheckReturnValue
 	public String getName() {
