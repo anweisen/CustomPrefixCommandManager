@@ -1,8 +1,8 @@
 package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
-import net.codingarea.engine.utils.ListFactory;
-import net.codingarea.engine.utils.MapFactory;
+import net.codingarea.engine.utils.factory.ListFactory;
+import net.codingarea.engine.utils.factory.MapFactory;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

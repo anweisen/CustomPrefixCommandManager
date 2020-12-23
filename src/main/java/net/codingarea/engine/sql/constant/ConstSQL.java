@@ -10,6 +10,8 @@ import net.codingarea.engine.sql.helper.PreparedUpdate;
 import net.codingarea.engine.sql.source.DataSource;
 import net.codingarea.engine.utils.*;
 import net.codingarea.engine.utils.config.Config;
+import net.codingarea.engine.utils.log.LogHelper;
+import net.codingarea.engine.utils.log.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -34,12 +36,12 @@ public final class ConstSQL {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void connect(final @Nonnull DataSource dataSource) throws SQLException {
+	public static void connect(@Nonnull DataSource dataSource) throws SQLException {
 		closeCurrent();
 		instance = SQL.anonymous(dataSource);
 	}
 
-	public static void connectWithoutException(final @Nonnull DataSource dataSource) {
+	public static void connectWithoutException(@Nonnull DataSource dataSource) {
 		try {
 			connect(dataSource);
 		} catch (SQLException ex) {
@@ -47,12 +49,12 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(final @Nonnull File file) throws IOException, SQLException {
+	public static void connect(@Nonnull File file) throws IOException, SQLException {
 		closeCurrent();
 		instance = new LiteSQL(file);
 	}
 
-	public static void connectWithoutException(final @Nonnull File file) {
+	public static void connectWithoutException(@Nonnull File file) {
 		try {
 			connect(file);
 		} catch (SQLException | IOException ex) {
@@ -60,12 +62,12 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(final @Nonnull Config config) throws SQLException {
+	public static void connect(@Nonnull Config config) throws SQLException {
 		closeCurrent();
 		instance = MySQL.defaultOfConfig(config);
 	}
 
-	public static void connectWithoutException(final @Nonnull Config config) {
+	public static void connectWithoutException(@Nonnull Config config) {
 		try {
 			connect(config);
 		} catch (SQLException ex) {
@@ -73,12 +75,12 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) throws SQLException {
+	public static void connect(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
 		closeCurrent();
 		instance = MySQL.createDefault(host, database, user, password);
 	}
 
-	public static void connectWithoutException(final @Nonnull String host, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) {
+	public static void connectWithoutException(@Nonnull String host, @Nonnull String database, @Nonnull String user, @Nonnull String password) {
 		try {
 			connect(host, database, user, password);
 		} catch (SQLException ex) {
@@ -86,13 +88,13 @@ public final class ConstSQL {
 		}
 	}
 
-	public static void connect(final @Nonnull String host, final int port, final @Nonnull String database, final @Nonnull String user, final @Nonnull String password) throws SQLException {
+	public static void connect(@Nonnull String host, int port, @Nonnull String database, @Nonnull String user, @Nonnull String password) throws SQLException {
 		closeCurrent();
 		instance = MySQL.createDefault(host, port, database, user, password);
 	}
 
-	public static void connectWithoutException(final @Nonnull String host, final int port, final @Nonnull String database,
-	                                           final @Nonnull String user, final @Nonnull String password) {
+	public static void connectWithoutException(@Nonnull String host, int port, @Nonnull String database,
+	                                           @Nonnull String user, @Nonnull String password) {
 		try {
 			connect(host, port, database, user, password);
 		} catch (SQLException ex) {
@@ -111,7 +113,7 @@ public final class ConstSQL {
 		return instance;
 	}
 
-	public static void setInstance(final @Nullable SQL sql) {
+	public static void setInstance(@Nullable SQL sql) {
 		closeCurrent();
 		instance = sql;
 	}
@@ -122,7 +124,7 @@ public final class ConstSQL {
 	 * ===============================
 	 */
 
-	public static void switchDatabase(final @Nonnull String database) throws SQLException {
+	public static void switchDatabase(@Nonnull String database) throws SQLException {
 		instance.switchDatabase(database);
 	}
 
@@ -183,20 +185,20 @@ public final class ConstSQL {
 	}
 
 	@Nonnull
-	public static CachedRowSet executeQuery(final @Nonnull String sql) throws SQLException {
+	public static CachedRowSet executeQuery(@Nonnull String sql) throws SQLException {
 		return instance.executeQuery(sql);
 	}
 
 	@Nonnull
-	public CachedRowSet executeQuery(final @Nonnull PreparedStatement statement) throws SQLException {
+	public CachedRowSet executeQuery(@Nonnull PreparedStatement statement) throws SQLException {
 		return instance.executeQuery(statement);
 	}
 
-	public static int executeUpdate(final @Nonnull String sql) throws SQLException {
+	public static int executeUpdate(@Nonnull String sql) throws SQLException {
 		return instance.executeUpdate(sql);
 	}
 
-	public static int executeUpdate(final @Nonnull PreparedStatement statement) throws SQLException {
+	public static int executeUpdate(@Nonnull PreparedStatement statement) throws SQLException {
 		return instance.executeUpdate(statement);
 	}
 
@@ -216,17 +218,17 @@ public final class ConstSQL {
 		return instance.query(sql, params);
 	}
 
-	public static int update(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
+	public static int update(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		return instance.update(sql, params);
 	}
 
 	@CheckReturnValue
-	public static boolean isSet(final @Nonnull String sql, final @Nonnull Object... params) throws SQLException {
+	public static boolean isSet(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
 		return instance.isSet(sql, params);
 	}
 
 	@CheckReturnValue
-	public static boolean isSet(final @Nonnull ResultSet result) throws SQLException {
+	public static boolean isSet(@Nonnull ResultSet result) throws SQLException {
 		return instance.isSet(result);
 	}
 

@@ -1,7 +1,7 @@
 package net.codingarea.engine.discord.defaults;
 
 import net.codingarea.engine.discord.listener.Listener;
-import net.codingarea.engine.utils.LogHelper;
+import net.codingarea.engine.utils.log.LogHelper;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
@@ -42,7 +42,9 @@ public class DefaultServerCountDisplay implements Listener {
 			public void run() {
 				try {
 					GuildChannel channel = shardManager.getVoiceChannelById(channelID);
-					channel.getManager().setName(name.replace("%server%", String.valueOf(shardManager.getGuilds().size()))).queue();
+					String name = DefaultServerCountDisplay.this.name.replace("%server%", String.valueOf(shardManager.getGuilds().size()));
+					if (!channel.getName().equals(name))
+						channel.getManager().setName(name).queue();
 				} catch (Exception ex) {
 					LogHelper.warning("Could not update server count due to an exception: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 				}

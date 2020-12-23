@@ -54,7 +54,7 @@ public abstract class NamedValueConfig implements Config {
 		}
 	}
 
-	public void store(@Nonnull Map<Object, Object> properties) {
+	public void store(@Nonnull Map<? super String, ? super String> properties) {
 		for (NamedValue value : values) {
 			properties.put(value.getKey(), value.getValue());
 		}

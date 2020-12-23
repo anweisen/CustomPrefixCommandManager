@@ -55,7 +55,7 @@ public interface Config extends Iterable<NamedValue> {
 	@CheckReturnValue
 	Collection<NamedValue> entries();
 
-	void store(@Nonnull Map<Object, Object> map);
+	void store(@Nonnull Map<? super String, ? super String> map);
 
 	void clear();
 

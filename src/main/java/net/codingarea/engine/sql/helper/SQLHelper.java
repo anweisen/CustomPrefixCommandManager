@@ -1,8 +1,8 @@
 package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
-import net.codingarea.engine.utils.LogHelper;
-import net.codingarea.engine.utils.LogLevel;
+import net.codingarea.engine.utils.log.LogHelper;
+import net.codingarea.engine.utils.log.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

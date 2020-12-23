@@ -8,8 +8,8 @@ import net.codingarea.engine.sql.helper.PreparedUpdate;
 import net.codingarea.engine.sql.source.DataSource;
 import net.codingarea.engine.utils.Action;
 import net.codingarea.engine.utils.Bindable;
-import net.codingarea.engine.utils.DefaultLogger;
-import net.codingarea.engine.utils.LogLevel;
+import net.codingarea.engine.utils.log.DefaultLogger;
+import net.codingarea.engine.utils.log.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

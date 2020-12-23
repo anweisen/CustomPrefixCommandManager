@@ -1,9 +1,9 @@
 package net.codingarea.engine.discord.defaults;
 
-import net.codingarea.engine.utils.LogHelper;
+import net.codingarea.engine.utils.log.LogHelper;
 import net.codingarea.engine.discord.listener.DiscordEvent;
 import net.codingarea.engine.discord.listener.Listener;
-import net.codingarea.engine.utils.LogLevel;
+import net.codingarea.engine.utils.log.LogLevel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.sharding.ShardManager;
 

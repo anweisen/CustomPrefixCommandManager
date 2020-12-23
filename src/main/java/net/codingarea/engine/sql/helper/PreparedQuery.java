@@ -1,7 +1,7 @@
 package net.codingarea.engine.sql.helper;
 
 import net.codingarea.engine.sql.SQL;
-import net.codingarea.engine.utils.ListFactory;
+import net.codingarea.engine.utils.factory.ListFactory;
 import net.codingarea.engine.utils.function.ThrowingFunction;
 import net.codingarea.engine.utils.function.ThrowingPredicate;
 
