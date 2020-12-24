@@ -29,14 +29,14 @@ public abstract class CommandHelper extends SearchHelper {
 
 	@Nonnull
 	@CheckReturnValue
-	public static String fancyEnumName(@Nonnull Enum<?> enun) {
-		return Utils.getEnumName(enun);
+	public static String fancyEnumName(@Nonnull Enum<?> targetEnum) {
+		return Utils.getEnumName(targetEnum);
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static String fancyEnumName(@Nonnull String enun) {
-		return Utils.getEnumName(enun);
+	public static String fancyEnumName(@Nonnull String enumName) {
+		return Utils.getEnumName(enumName);
 	}
 
 	@CheckReturnValue
@@ -46,7 +46,7 @@ public abstract class CommandHelper extends SearchHelper {
 		try {
 			Long.parseLong(id);
 			return true;
-		} catch (Exception ignored) {
+		} catch (Exception ex) {
 			return false;
 		}
 	}
