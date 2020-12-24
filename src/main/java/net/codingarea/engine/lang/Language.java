@@ -35,18 +35,18 @@ public interface Language extends INamed, IAlias {
 
 	@Nonnull
 	@CheckReturnValue
+	default String translate(@Nonnull String key, @Nonnull Replacement... replacements) throws NoSuchTranslationException {
+		return Replacement.replaceAll(translate(key), replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
 	default String translate(@Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
 		try {
 			return translate(key, replacements);
 		} catch (Exception ex) {
 			return Replacement.replaceAll(fallback, replacements);
 		}
-	}
-
-	@Nonnull
-	@CheckReturnValue
-	default String translate(@Nonnull String key, @Nonnull Replacement... replacements) throws NoSuchTranslationException {
-		return Replacement.replaceAll(translate(key), replacements);
 	}
 
 	@Nonnull
