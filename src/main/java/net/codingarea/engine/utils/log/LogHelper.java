@@ -15,7 +15,7 @@ public abstract class LogHelper {
 
 	@CallerSensitive
 	public static void log(@Nonnull Level level, String message) {
-		LogHelper.log(level, Utils.caller(5), message);
+		LogHelper.log(level, Utils.getCaller(5), message);
 	}
 
 	public static void log(@Nonnull Level level, Class<?> caller, String message) {
@@ -23,7 +23,7 @@ public abstract class LogHelper {
 	}
 
 	public static void log(@Nonnull Level level, Class<?> caller, Throwable ex) {
-		DefaultLogger.DEFAULT.log(level, caller, ex != null ? Utils.exceptionToString(ex) : null);
+		DefaultLogger.DEFAULT.log(level, caller, ex != null ? Utils.getStackTrace(ex) : null);
 	}
 
 
@@ -60,7 +60,7 @@ public abstract class LogHelper {
 	}
 
 	public static void error(Throwable ex) {
-		LogHelper.log(LogLevel.ERROR, ex != null ? Utils.exceptionToString(ex) : null);
+		LogHelper.log(LogLevel.ERROR, ex != null ? Utils.getStackTrace(ex) : null);
 	}
 
 	public static void error(Object message) {

@@ -45,7 +45,7 @@ public final class ConstSQL {
 		try {
 			connect(dataSource);
 		} catch (SQLException ex) {
-			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.getStackTrace(ex));
 		}
 	}
 
@@ -58,7 +58,7 @@ public final class ConstSQL {
 		try {
 			connect(file);
 		} catch (SQLException | IOException ex) {
-			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.getStackTrace(ex));
 		}
 	}
 
@@ -71,7 +71,7 @@ public final class ConstSQL {
 		try {
 			connect(config);
 		} catch (SQLException ex) {
-			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.getStackTrace(ex));
 		}
 	}
 
@@ -84,7 +84,7 @@ public final class ConstSQL {
 		try {
 			connect(host, database, user, password);
 		} catch (SQLException ex) {
-			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.getStackTrace(ex));
 		}
 	}
 
@@ -98,7 +98,7 @@ public final class ConstSQL {
 		try {
 			connect(host, port, database, user, password);
 		} catch (SQLException ex) {
-			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.exceptionToString(ex));
+			LogHelper.log(LogLevel.ERROR, "Could not open database connection due to an exception: " + Utils.getStackTrace(ex));
 		}
 	}
 

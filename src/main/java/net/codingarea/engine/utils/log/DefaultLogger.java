@@ -74,7 +74,7 @@ public class DefaultLogger extends Logger implements Bindable {
 
 	public void error(@Nonnull Throwable ex, Class<?> caller) {
 		if (caller == null) caller = Reflection.getCallerClass();
-		LogRecord record = new LogRecord(LogLevel.ERROR, Utils.exceptionToString(ex));
+		LogRecord record = new LogRecord(LogLevel.ERROR, Utils.getStackTrace(ex));
 		record.setSourceClassName(caller.getSimpleName());
 		log(record);
 	}

@@ -135,15 +135,15 @@ public final class Utils {
 	@Nonnull
 	@CallerSensitive
 	@CheckReturnValue
-	public static Class<?>[] callerContext() {
-		return new SecManager().callerContext();
+	public static Class<?>[] getCallerContext() {
+		return new PublicSecurityManager().getPublicClassContext();
 	}
 
 	@CallerSensitive
 	@CheckReturnValue
-	public static Class<?> caller(int index) {
+	public static Class<?> getCaller(int index) {
 		try {
-			return callerContext()[index];
+			return getCallerContext()[index];
 		} catch (Exception ignored) {
 			return null;
 		}
@@ -151,21 +151,21 @@ public final class Utils {
 
 	@CallerSensitive
 	@CheckReturnValue
-	public static Class<?> caller() {
+	public static Class<?> getCaller() {
 		try {
-			return caller(2);
+			return getCaller(2);
 		} catch (Exception ignored) {
 			return null;
 		}
 	}
 
-	private static class SecManager extends SecurityManager {
-		public Class<?>[] callerContext() {
+	public static class PublicSecurityManager extends SecurityManager {
+		public Class<?>[] getPublicClassContext() {
 			return getClassContext();
 		}
 	}
 
-	public static String exceptionToString(@Nonnull Throwable ex) {
+	public static String getStackTrace(@Nonnull Throwable ex) {
 		StringBuilderPrintWriter writer = new StringBuilderPrintWriter();
 		ex.printStackTrace(writer);
 		return writer.toString();
@@ -173,7 +173,7 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static List<Method> getMethodsAnnotatedWith(final @Nonnull Class<?> clazz, final @Nonnull Class<? extends Annotation> annotation) {
+	public static List<Method> getMethodsAnnotatedWith(@Nonnull Class<?> clazz, @Nonnull Class<? extends Annotation> annotation) {
 		List<Method> methods = new ArrayList<>();
 		for (Method method : clazz.getMethods()) {
 			if (method.isAnnotationPresent(annotation)) {
@@ -279,7 +279,7 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> T nullPrimitive(final @Nonnull Class<T> clazz) {
+	public static <T> T nullPrimitive(@Nonnull Class<T> clazz) {
 		if (clazz == boolean.class || clazz == Boolean.class) {
 			return (T) Boolean.valueOf(false);
 		} else if (clazz == byte.class || clazz == Byte.class) {
@@ -303,13 +303,13 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T> T notNull(final @Nullable T given, final @Nonnull T defauld) {
-		return given != null ? given : defauld;
+	public static <T> T notNull(@Nullable T given, @Nonnull T fallback) {
+		return given != null ? given : fallback;
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static String trimString(final @Nonnull String string, final int size) {
+	public static String trimString(@Nonnull String string, int size) {
 		if (size < 0)
 			throw new IllegalArgumentException("Size cannot be less than zero");
 		if (string.length() == size) {
@@ -325,7 +325,7 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static String trimSmaller(final @Nonnull String string, final int size, final @Nullable String ending) {
+	public static String trimSmaller(@Nonnull String string, int size, final @Nullable String ending) {
 		if (size < 0) {
 			throw new IllegalArgumentException("Size cannot be less than zero");
 		} else if (string.length() <= size) {
@@ -335,7 +335,7 @@ public final class Utils {
 		}
 	}
 
-	public static <T> boolean arrayContains(final @Nonnull T[] array, final @Nullable T search) {
+	public static <T> boolean arrayContains(@Nonnull T[] array, @Nullable T search) {
 		for (T t : array) {
 			if (Objects.equals(search, t))
 				return true;
@@ -343,7 +343,7 @@ public final class Utils {
 		return false;
 	}
 
-	public static boolean arrayContainsIgnoreCase(final @Nonnull String[] array, final @Nullable String search) {
+	public static boolean arrayContainsIgnoreCase(@Nonnull String[] array, @Nullable String search) {
 		if (search == null) return false;
 		for (String string : array) {
 			if (search.equalsIgnoreCase(string))
@@ -352,7 +352,7 @@ public final class Utils {
 		return false;
 	}
 
-	public static <T extends Enum<?>> T nextEnum(final @Nonnull T[] enumValues, final @Nonnull T current) {
+	public static <T extends Enum<?>> T nextEnum(@Nonnull T[] enumValues, @Nonnull T current) {
 
 		if (enumValues.length == 0)
 			return null;
@@ -367,11 +367,12 @@ public final class Utils {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <T, R> Function<T, R> supplierToFunction(final @Nonnull Supplier<? extends R> supplier) {
+	public static <T, R> Function<T, R> supplierToFunction(@Nonnull Supplier<? extends R> supplier) {
 		return t -> supplier.get();
 	}
 
 	public static void handleException(@Nonnull Throwable ex) {
+		// Handling exception by passing it to the UncaughtExceptionHandler of the current thread
 		Thread thread = Thread.currentThread();
 		thread.getUncaughtExceptionHandler().uncaughtException(thread, ex);
 	}
