@@ -11,6 +11,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.time.OffsetDateTime;
 import java.util.function.Consumer;
 
@@ -211,6 +212,19 @@ public abstract class SQLHelper {
 		LogHelper.error("A SQLException occurred: \"" + ex.getMessage() + "\"" +
 						"\tCurrent state: \"" + ex.getSQLState() + "\"" +
 						"\tError code: \"" + ex.getErrorCode() + "\"");
+	}
+
+	public static boolean isClosed(@Nonnull ResultSet result) throws SQLException {
+		try {
+			return result.isClosed();
+		} catch (SQLFeatureNotSupportedException ex) {
+			if (result instanceof CachedRowSet) {
+				try {
+					return isClosed(((CachedRowSet) result).getOriginalRow());
+				} catch (Exception ex2) { }
+			}
+			return false;
+		}
 	}
 
 }
