@@ -70,7 +70,7 @@ public interface Bindable {
 
 	@Nonnull
 	@CheckReturnValue
-	default Collection<String> keys() {
+	default Collection<String> boundKeys() {
 		return StaticBinder.keys(this);
 	}
 
@@ -80,7 +80,7 @@ public interface Bindable {
 	 */
 	default int unbind() {
 		int binds = 0;
-		for (String currentKey : keys()) {
+		for (String currentKey : boundKeys()) {
 			StaticBinder.remove(currentKey);
 			binds++;
 		}
@@ -92,12 +92,12 @@ public interface Bindable {
 	 */
 	@CheckReturnValue
 	default int bindings() {
-		return keys().size();
+		return boundKeys().size();
 	}
 
 	@CheckReturnValue
 	default boolean isBound() {
-		return !keys().isEmpty();
+		return !boundKeys().isEmpty();
 	}
 
 }
