@@ -95,11 +95,11 @@ public interface ICommandHandler {
 
 	@Nullable
 	@CheckReturnValue
-	TeamRankChecker getAccessChecker();
+	TeamRankChecker getTeamRankChecker();
 
 	default boolean hasAccess(@Nonnull Member member, @Nonnull ICommand command) {
 		return command.getPermissionNeeded() != null && member.hasPermission(command.getPermissionNeeded())
-		 	|| command.isTeamCommand() && getAccessChecker() != null && getAccessChecker().hasTeamRank(member);
+		 	|| command.isTeamCommand() && getTeamRankChecker() != null && getTeamRankChecker().hasTeamRank(member);
 	}
 
 	@Nonnull

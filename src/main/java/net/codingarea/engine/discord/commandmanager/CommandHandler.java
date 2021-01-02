@@ -277,7 +277,7 @@ public class CommandHandler implements ICommandHandler {
 	@Nullable
 	@Override
 	@CheckReturnValue
-	public TeamRankChecker getAccessChecker() {
+	public TeamRankChecker getTeamRankChecker() {
 		return teamRankChecker;
 	}
 
