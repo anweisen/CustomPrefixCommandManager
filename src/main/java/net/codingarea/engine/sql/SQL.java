@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
+import java.io.Serializable;
 import java.sql.*;
 import java.util.logging.Logger;
 
@@ -33,19 +34,22 @@ public abstract class SQL implements Bindable {
 	@Nonnull
 	@Deprecated
 	@CheckReturnValue
-	public static String removeInjectionPossibility(final @Nonnull String string) {
+	public static String removeInjectionPossibility(@Nonnull String string) {
 		return string.replaceAll("[']", "\\\\'").replaceAll("[`]", "\\\\`");
 	}
 
 	/**
 	 * @param result The {@link ResultSet} which should be stored into the {@link CachedRowSet}
 	 * @return A new {@link CachedRowSet} using {@link RowSetProvider#newFactory()} as factory
-	 * @throws SQLException If a {@link SQLException} is thrown while creating the {@link CachedRowSet}
+	 *
+	 * @throws SQLException
+	 *         If a {@link SQLException} is thrown while creating the {@link CachedRowSet}
+	 *
 	 * @see CachedRowSet#populate(ResultSet)
 	 */
 	@Nonnull
 	@CheckReturnValue
-	public static CachedRowSet cache(final @Nonnull ResultSet result) throws SQLException {
+	public static CachedRowSet cache(@Nonnull ResultSet result) throws SQLException {
 		CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
 		cachedRowSet.populate(result);
 		return cachedRowSet;
@@ -55,21 +59,26 @@ public abstract class SQL implements Bindable {
 	/**
 	 * @see PreparedStatement#setObject(int, Object)
 	 */
-	public static void fillParams(final @Nonnull PreparedStatement statement, final @Nonnull Object... params) throws SQLException {
+	public static void fillParams(@Nonnull PreparedStatement statement, @Nonnull Object... params) throws SQLException {
 		for (int i = 0; i < params.length; i++) {
-			statement.setObject(i+1, params[i]);
+
+			Object param = params[i];
+			if (!(param instanceof Serializable) && param != null)
+				param = param.toString();
+
+			statement.setObject(i+1, param);
 		}
 	}
 
 	@Nonnull
 	@CheckReturnValue
-	public static SQL anonymous(final @Nonnull DataSource dataSource) throws SQLException {
+	public static SQL anonymous(@Nonnull DataSource dataSource) throws SQLException {
 		SQL instance = new SQL(dataSource) { };
 		instance.connect();
 		return instance;
 	}
 
-	public static void disconnect(final @Nullable SQL sql) {
+	public static void disconnect(@Nullable SQL sql) {
 		if (sql != null) {
 			try {
 				sql.disconnect();
@@ -81,11 +90,11 @@ public abstract class SQL implements Bindable {
 	protected volatile Connection connection;
 	protected volatile Logger logger = new DefaultLogger(this);
 
-	public SQL(final @Nonnull DataSource dataSource) {
+	public SQL(@Nonnull DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	public SQL(final @Nonnull DataSource dataSource, final @Nonnull Logger logger) {
+	public SQL(@Nonnull DataSource dataSource, @Nonnull Logger logger) {
 		this.dataSource = dataSource;
 		this.logger = logger;
 	}
@@ -184,6 +193,7 @@ public abstract class SQL implements Bindable {
 	 * @param sql The SQLCommand
 	 * @param params The params which replace the ?s in the command.
 	 * @return The {@link PreparedStatement} just created
+	 *
 	 * @throws SQLException
 	 *         If a {@link SQLException} is thrown while preparing the {@link PreparedStatement} ({@link #prepare(String)})
 	 *         or while filling the params ({@link #fillParams(PreparedStatement, Object...)})
