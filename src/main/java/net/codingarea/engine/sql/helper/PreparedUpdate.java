@@ -125,6 +125,11 @@ public final class PreparedUpdate extends AbstractPreparedAccess {
 		return new PreparedInsertion(sql).table(table).insert(MapFactory.map(new HashMap<>(), where, key -> key, Where::getValue)).insert(set);
 	}
 
+	public boolean entryExists() throws SQLException {
+		PreparedQuery query = sql.query().table(table).where(where.values());
+		return query.isSet();
+	}
+
 	@Nonnull
 	@Override
 	public PreparedStatement prepare() throws SQLException {
@@ -168,6 +173,10 @@ public final class PreparedUpdate extends AbstractPreparedAccess {
 	@Override
 	public void execute0() throws SQLException {
 		execute();
+	}
+
+	public int updateOrInsert() throws SQLException {
+		return entryExists() ? this.execute() : toInsertion().execute();
 	}
 
 }
