@@ -1,0 +1,44 @@
+package net.codingarea.engine.utils.document.gson;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+/**
+ * @author Tareko | https://github.com/CloudNetService/CloudNet-v3/blob/master/cloudnet-common/src/main/java/de/dytanic/cloudnet/common/document/gson/JsonDocProperty.java
+ * @since 0.0.1
+ */
+public class JsonDocProperty<E> {
+
+	protected final BiConsumer<E, JsonDocument> appender;
+
+	protected final Function<JsonDocument, E> resolver;
+
+	protected final Consumer<JsonDocument> remover;
+
+	protected final Predicate<JsonDocument> tester;
+
+	public JsonDocProperty(BiConsumer<E, JsonDocument> appender, Function<JsonDocument, E> resolver, Consumer<JsonDocument> remover, Predicate<JsonDocument> tester) {
+		this.appender = appender;
+		this.resolver = resolver;
+		this.remover = remover;
+		this.tester = tester;
+	}
+
+	public BiConsumer<E, JsonDocument> getAppender() {
+		return this.appender;
+	}
+
+	public Function<JsonDocument, E> getResolver() {
+		return this.resolver;
+	}
+
+	public Consumer<JsonDocument> getRemover() {
+		return this.remover;
+	}
+
+	public Predicate<JsonDocument> getTester() {
+		return this.tester;
+	}
+}
