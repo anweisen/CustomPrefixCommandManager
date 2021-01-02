@@ -6,28 +6,25 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.3
  */
-public abstract class NamedValueConfig implements Config {
+public abstract class NamedValueConfig<Conf extends NamedValueConfig<?>> implements Config {
 
 	protected final List<NamedValue> values = new ArrayList<>();
 
-	/**
-	 * @return returns {@code null} when no value was found by the name
-	 */
-	@Nullable
-	@Override
+	@Nonnull
 	@CheckReturnValue
-	public NamedValue get(@Nonnull String key) {
+	public Optional<NamedValue> get(@Nonnull String key) {
 		for (NamedValue value : values) {
 			if (value.getKey().equals(key)) {
-				return value;
+				return Optional.of(value);
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	/**
@@ -37,7 +34,7 @@ public abstract class NamedValueConfig implements Config {
 	 */
 	@Nonnull
 	protected NamedValue create(@Nonnull String key, @Nullable Object value) {
-		NamedValue entry = get(key);
+		NamedValue entry = get(key).orElse(null);
 		if (entry != null) {
 			entry.setValue(value);
 			return entry;
@@ -72,7 +69,7 @@ public abstract class NamedValueConfig implements Config {
 	@Override
 	@CheckReturnValue
 	public String getString(@Nonnull String key) {
-		NamedValue value = get(key);
+		NamedValue value = get(key).orElse(null);
 		return value != null ? value.getValue() : null;
 	}
 
@@ -120,24 +117,50 @@ public abstract class NamedValueConfig implements Config {
 
 	@Override
 	@CheckReturnValue
-	public boolean isSet(@Nonnull String key) {
-		return get(key) != null;
+	public char getChar(@Nonnull String key) {
+		String string = getString(key);
+		if (string != null && string.length() == 1)
+			return string.toCharArray()[0];
+		return 0;
 	}
 
 	@Override
-	public void clear() {
-		values.clear();
+	@CheckReturnValue
+	public boolean isSet(@Nonnull String key) {
+		return get(key).isPresent();
 	}
 
 	@Nonnull
 	@Override
+	public Conf clear() {
+		values.clear();
+		return (Conf) this;
+	}
+
+	@Nonnull
+	@Override
+	public Conf remove(@Nullable String key) {
+		values.removeIf(value -> value.getKey().equals(key));
+		return (Conf) this;
+	}
+
+	@Override
+	public int size() {
+		return values.size();
+	}
+
+	@Nonnull
 	@CheckReturnValue
 	public List<NamedValue> entries() {
 		return values;
 	}
 
 	@Nonnull
-	@Override
+	public Collection<String> keys() {
+		return values.stream().map(NamedValue::getKey).collect(Collectors.toList());
+	}
+
+	@Nonnull
 	public Iterator<NamedValue> iterator() {
 		return values.parallelStream().iterator();
 	}

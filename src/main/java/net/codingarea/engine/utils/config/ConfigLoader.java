@@ -21,7 +21,7 @@ import java.util.Properties;
  * @see NamedValueConfig
  * @see Config
  */
-public class ConfigLoader extends NamedValueConfig implements Bindable {
+public class ConfigLoader extends NamedValueConfig<ConfigLoader> implements Bindable {
 
 	public static ConfigLoader withoutException(@Nonnull String path, @Nonnull NamedValue... values) {
 		try {

@@ -68,6 +68,12 @@ public class NamedValue implements INamed {
 		return value;
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	public String getValueNonnull() {
+		return String.valueOf(getValue());
+	}
+
 	@Override
 	public String toString() {
 		return "NamedValue{" +
