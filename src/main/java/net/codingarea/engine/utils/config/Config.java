@@ -4,24 +4,12 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * @author anweisen | https://github.com/anweisen
  * @since 2.7
  */
-public interface Config extends Iterable<NamedValue> {
-
-	/**
-	 * @param key The of the value
-	 * @return The {@link NamedValue} containing a value, {@code null} if not set.
-	 *         Never {@code null} if {@link #isSet(String)} with the same key is {@code true}
-	 *
-	 * @see #isSet(String)
-	 */
-	@Nullable
-	@CheckReturnValue
-	NamedValue get(@Nonnull String key);
+public interface Config {
 
 	@CheckReturnValue
 	boolean isSet(@Nonnull String key);
@@ -29,6 +17,12 @@ public interface Config extends Iterable<NamedValue> {
 	@Nullable
 	@CheckReturnValue
 	String getString(@Nonnull String key);
+
+	@Nonnull
+	@CheckReturnValue
+	default String getStringNonnull(@Nonnull String key) {
+		return String.valueOf(getString(key));
+	}
 
 	@CheckReturnValue
 	long getLong(@Nonnull String key);
@@ -51,12 +45,25 @@ public interface Config extends Iterable<NamedValue> {
 	@CheckReturnValue
 	boolean getBoolean(@Nonnull String key);
 
+	@CheckReturnValue
+	char getChar(@Nonnull String key);
+
 	@Nonnull
 	@CheckReturnValue
-	Collection<NamedValue> entries();
+	Collection<String> keys();
 
-	void store(@Nonnull Map<? super String, ? super String> map);
+	@Nonnull
+	Config clear();
 
-	void clear();
+	@Nonnull
+	Config remove(@Nullable String key);
+
+	@CheckReturnValue
+	int size();
+
+	@CheckReturnValue
+	default boolean isEmpty() {
+		return size() == 0;
+	}
 
 }
