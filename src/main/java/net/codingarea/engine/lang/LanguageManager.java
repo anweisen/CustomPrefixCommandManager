@@ -29,6 +29,11 @@ public interface LanguageManager {
 		return StaticLanguageManagerHolder.getInstance();
 	}
 
+	@CheckReturnValue
+	static boolean hasInstance() {
+		return StaticLanguageManagerHolder.hasInstance();
+	}
+
 	@Nonnull
 	@CheckReturnValue
 	Optional<Language> findLanguage(@Nonnull String name);

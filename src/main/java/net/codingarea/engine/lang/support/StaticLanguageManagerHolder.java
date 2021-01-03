@@ -26,4 +26,9 @@ public final class StaticLanguageManagerHolder {
 		return instance;
 	}
 
+	@CheckReturnValue
+	public static boolean hasInstance() {
+		return instance != null;
+	}
+
 }
