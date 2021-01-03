@@ -67,6 +67,7 @@ public interface MessagePipeline {
 	@Nonnull
 	@CheckReturnValue
 	default String getMessage(@Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
+		if (!LanguageManager.hasInstance()) return Replacement.replaceAll(fallback, replacements);
 		return LanguageManager.getInstance().translate(this, key, fallback, replacements);
 	}
 
