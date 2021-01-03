@@ -387,4 +387,10 @@ public final class Utils {
 		}
 	}
 
+	@CheckReturnValue
+	public static long getAge(@Nonnull OffsetDateTime time) {
+		OffsetDateTime now = OffsetDateTime.now(time.getOffset());
+		return now.toEpochSecond() - time.toEpochSecond();
+	}
+
 }
