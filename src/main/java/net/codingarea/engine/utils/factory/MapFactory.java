@@ -5,6 +5,7 @@ import net.codingarea.engine.utils.log.LogLevel;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +39,10 @@ public final class MapFactory {
 
 	@Nonnull
 	@CheckReturnValue
-	public static <K, V> Map<K, V> stringToMap(@Nonnull String string, @Nonnull Function<String, K> key, final @Nonnull Function<String, V> value) {
+	public static <K, V> Map<K, V> stringToMap(@Nullable String string, @Nonnull Function<String, K> key, final @Nonnull Function<String, V> value) {
 
 		Map<K, V> map = new HashMap<>();
+		if (string == null) return map;
 
 		String[] args = string.split(REGEX_1);
 		for (String arg : args) {
