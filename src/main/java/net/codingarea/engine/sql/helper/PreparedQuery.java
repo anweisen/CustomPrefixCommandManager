@@ -28,6 +28,7 @@ import java.util.stream.Stream;
  */
 public final class PreparedQuery extends AbstractPreparedAccess {
 
+	private String[] with = null;
 	private String[] select = {"*"};
 	private String[] as = null;
 	private Order order;
@@ -37,7 +38,7 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	private boolean distinct = false;
 
 	@CheckReturnValue
-	public PreparedQuery(final @Nonnull SQL sql) {
+	public PreparedQuery(@Nonnull SQL sql) {
 		super(sql);
 	}
 
@@ -46,7 +47,8 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @return {@code this} for chaining
 	 */
 	@Nonnull
-	public PreparedQuery select(final @Nonnull String... select) {
+	@CheckReturnValue
+	public PreparedQuery select(@Nonnull String... select) {
 		this.select = select;
 		return this;
 	}
@@ -59,10 +61,11 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @throws SQLException
 	 *         If a database error occurs
 	 */
-	public int count(final @Nonnull String column, final boolean distinct) throws SQLException {
+	@CheckReturnValue
+	public int count(@Nonnull String column, boolean distinct) throws SQLException {
 		PreparedQuery query = this.clone()
 				.select("count(" + (distinct ? "DISTINCT " : "") + column + ") count")
-				.removeAs().removeGrouping().removeLimit().distinct(false);
+				.resetAs().resetGrouping().resetLimit().distinct(false);
 		CachedRowSet result = query.execute();
 		int count = result.getInt("count");
 		result.close();
@@ -77,7 +80,8 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @throws SQLException
 	 *         If a database error occurs
 	 */
-	public int count(final @Nonnull String column) throws SQLException {
+	@CheckReturnValue
+	public int count(@Nonnull String column) throws SQLException {
 		return count(column, false);
 	}
 
@@ -89,6 +93,7 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @see AbstractPreparedAccess#where(String, Object, String)
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery where(final @Nonnull String key, final @Nonnull Object value, final @Nonnull String operator) {
 		return (PreparedQuery) super.where(key, value, operator);
 	}
@@ -101,29 +106,28 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @see AbstractPreparedAccess#where(String, Object)
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery where(final @Nonnull String key, final @Nonnull Object value) {
 		return (PreparedQuery) super.where(key, value);
 	}
 
 	/**
-	 * @return {@code this} for chaining
-	 *
 	 * @see AbstractPreparedAccess#where(Collection)
 	 * @see AbstractPreparedAccess#where(String, Object, String)
 	 */
 	@Nonnull
 	@Override
+	@CheckReturnValue
 	public PreparedQuery where(final @Nonnull Collection<? extends Where> where) {
 		return (PreparedQuery) super.where(where);
 	}
 
 	/**
-	 * @return {@code this} for chaining
-	 *
 	 * @see AbstractPreparedAccess#removeWhere()
 	 */
 	@Nonnull
 	@Override
+	@CheckReturnValue
 	public PreparedQuery removeWhere() {
 		return (PreparedQuery) super.removeWhere();
 	}
@@ -132,19 +136,17 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @apiNote key word {@code ORDER BY %column% %order%}
 	 * @param column The column the result should be ordered by
 	 * @param order The order the result should have
-	 * @return {@code this} for chaining
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery order(final @Nonnull String column, final @Nullable Order order) {
 		this.orderBy = column;
 		this.order = order;
 		return this;
 	}
 
-	/**
-	 * @return {@code this} for chaining
-	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery removeOrder() {
 		this.orderBy = null;
 		this.order = null;
@@ -154,9 +156,9 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	/**
 	 * @apiNote key word {@code ORDER BY %column%}
 	 * @param column The column the result should be ordered by
-	 * @return {@code this} for chaining
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery order(final @Nonnull String column) {
 		this.orderBy = column;
 		return this;
@@ -164,22 +166,22 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 
 	/**
 	 * @param table The table from where the data should be accessed
-	 * @return {@code this} for chaining
 	 *
 	 * @see AbstractPreparedAccess#table(String)
 	 */
 	@Nonnull
-	public PreparedQuery table(final @Nonnull String table) {
+	@CheckReturnValue
+	public PreparedQuery table(@Nonnull String table) {
 		return (PreparedQuery) super.table(table);
 	}
 
 	/**
 	 * @apiNote key word {@code LIMIT %limit%}
 	 * @param limit Sets the limit of rows to be selected
-	 * @return {@code this} for chaining
 	 */
 	@Nonnull
-	public PreparedQuery limit(final int limit) {
+	@CheckReturnValue
+	public PreparedQuery limit(int limit) {
 		this.limit = limit;
 		return this;
 	}
@@ -188,17 +190,32 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	 * @return {@code this}
 	 */
 	@Nonnull
-	public PreparedQuery removeLimit() {
+	@CheckReturnValue
+	public PreparedQuery resetLimit() {
 		this.limit = null;
+		return this;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public PreparedQuery with(@Nonnull String... with) {
+		this.with = with;
+		return this;
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	public PreparedQuery resetWith() {
+		this.with = null;
 		return this;
 	}
 
 	/**
 	 * @apiNote key word {@code DISTINCT}
 	 * @param distinct {@code true} if the result should return different values
-	 * @return {@code this} for chaining
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery distinct(final boolean distinct) {
 		this.distinct = distinct;
 		return this;
@@ -207,19 +224,17 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	/**
 	 * @apiNote key word {@code GROUP BY %column%}
 	 * @param group The column the result should be grouped by
-	 * @return {@code this} for chaining
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery group(final @Nonnull String group) {
 		this.group = group;
 		return this;
 	}
 
-	/**
-	 * @return {@code this} for chaining
-	 */
 	@Nonnull
-	public PreparedQuery removeGrouping() {
+	@CheckReturnValue
+	public PreparedQuery resetGrouping() {
 		this.group = null;
 		return this;
 	}
@@ -227,19 +242,17 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	/**
 	 * @apiNote key word {@code AS}
 	 * @param as The column names the result columns should have
-	 * @return {@code this} for chaining
 	 */
 	@Nonnull
+	@CheckReturnValue
 	public PreparedQuery as(final @Nonnull String... as) {
 		this.as = as;
 		return this;
 	}
 
-	/**
-	 * @return {@code this} for chaining
-	 */
 	@Nonnull
-	public PreparedQuery removeAs() {
+	@CheckReturnValue
+	public PreparedQuery resetAs() {
 		this.as = null;
 		return this;
 	}
@@ -257,6 +270,19 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 			throw new IllegalArgumentException("Length of 'as' cannot be different as length of 'select'");
 
 		StringBuilder query = new StringBuilder();
+		
+		if (with != null && with.length > 0) {
+			query.append("WITH ");
+
+			for (int i = 0; i < with.length; i++) {
+				String current = with[i];
+				if (i != 0)
+					query.append(",");
+				query.append(current + " ");
+			}
+
+		}
+
 		query.append("SELECT ");
 		if (distinct)
 			query.append(" DISTINCT ");
@@ -334,14 +360,14 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 
 	@Nonnull
 	@CheckReturnValue
-	public <T> Optional<T> first(final @Nonnull Function<? super CachedRowSet, T> mapper) throws SQLException {
+	public <T> Optional<T> first(@Nonnull Function<? super CachedRowSet, T> mapper) throws SQLException {
 		CachedRowSet result = this.clone().limit(1).execute();
 		if (result.next()) {
 			T value = mapper.apply(result);
-			result.close();
+			if (SQLHelper.isClosed(result)) result.close();
 			return Optional.ofNullable(value);
 		} else {
-			result.close();
+			if (SQLHelper.isClosed(result)) result.close();
 			return Optional.empty();
 		}
 	}
@@ -375,7 +401,7 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 				/* Ignoring any exceptions while mapping */
 			}
 		}
-		result.close();
+		if (SQLHelper.isClosed(result)) result.close();
 		return list;
 	}
 
@@ -406,7 +432,7 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 	}
 
 	@CheckReturnValue
-	public int count(final @Nonnull ToIntFunction<? super CachedRowSet> counter) throws SQLException {
+	public int count(@Nonnull ToIntFunction<? super CachedRowSet> counter) throws SQLException {
 
 		CachedRowSet result = execute();
 		int value = 0;
@@ -480,6 +506,10 @@ public final class PreparedQuery extends AbstractPreparedAccess {
 		if (action != null)
 			action.accept(this);
 		return this;
+	}
+
+	public void print() throws SQLException {
+		SQLHelper.logResult(execute());
 	}
 
 	@Nullable
