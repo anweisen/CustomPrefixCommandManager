@@ -79,12 +79,16 @@ public interface ICommandHandler {
 
 	@Nonnull
 	default ICommandHandler setCoolDown(float seconds) {
-		return setCoolDownManager(new CoolDownManager(seconds));
+		if (getCoolDownManager() == null) return setCoolDownManager(new CoolDownManager(seconds));
+		getCoolDownManager().setSeconds(seconds);
+		return this;
 	}
 
 	@Nonnull
 	default ICommandHandler setCoolDown(long millis) {
-		return setCoolDownManager(new CoolDownManager(millis));
+		if (getCoolDownManager() == null) return setCoolDownManager(new CoolDownManager(millis));
+		getCoolDownManager().setMillis(millis);
+		return this;
 	}
 
 	@CheckReturnValue
