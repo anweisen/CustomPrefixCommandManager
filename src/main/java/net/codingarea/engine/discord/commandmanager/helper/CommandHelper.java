@@ -66,7 +66,7 @@ public abstract class CommandHelper extends SearchHelper {
 	@Nonnull
 	@CheckReturnValue
 	public static String syntax(@Nonnull CommandEvent event, @Nonnull CharSequence syntax) {
-		return event.getMessage("syntax", "Please use `%syntax%`",
+		return event.getMessage("syntax", "Please use %syntax%",
 						        new Replacement("%syntax%", event.syntax(syntax)));
 	}
 

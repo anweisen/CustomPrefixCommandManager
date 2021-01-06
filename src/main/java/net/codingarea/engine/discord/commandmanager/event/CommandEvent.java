@@ -618,7 +618,7 @@ public interface CommandEvent extends MessagePipeline {
 		String prefix = event.getHandler().getPrefixProvider().getPrefix(event);
 		String message = prefix + (command ? event.getCommandName() + " " : "") + syntax;
 		boolean mark = !CommandHelper.containsMention(message);
-		return (mark ? "`" : "*") + message + (mark ? "`" : "*");
+		return (mark ? "`" : "*") + CommandHelper.removeMarkdown(message, mark) + (mark ? "`" : "*");
 	}
 
 }
