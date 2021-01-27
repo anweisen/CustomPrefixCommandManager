@@ -104,6 +104,18 @@ public interface LanguageManager {
 		return getLanguage(pipeline).translate(key, fallback, replacements);
 	}
 
+	@Nonnull
+	@CheckReturnValue
+	default String translate(@Nonnull Guild guild, @Nonnull String key, @Nonnull Replacement... replacements) {
+		return getLanguage(guild).translate(key, replacements);
+	}
+
+	@Nonnull
+	@CheckReturnValue
+	default String translate(@Nonnull Guild guild, @Nonnull String key, @Nonnull String fallback, @Nonnull Replacement... replacements) {
+		return getLanguage(guild).translate(key, fallback, replacements);
+	}
+
 	default void setLanguage(@Nonnull Guild guild, @Nonnull Language language) {
 		try {
 			setLanguageExceptionally(guild, language);
