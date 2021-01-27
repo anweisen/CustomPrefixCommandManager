@@ -38,6 +38,7 @@ public class LanguageManagerSupport extends SQLValueCache implements LanguageMan
 	@Override
 	public LanguageManagerSupport registerLanguage(@Nonnull Language language) {
 		languages.add(language);
+		if (defaultLanguage == null) defaultLanguage = language;
 		return this;
 	}
 
